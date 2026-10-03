@@ -4,28 +4,33 @@
 area net
 area 0g
   source = -flics\net\0g.flc           ;gora do drzwi od zlodzieja
+  lores  = net\sprites\0g.spl
   hires  = net\sprites\0g.sph
 endarea
 
 area 0d
   source = -flics\net\0d.flc           ;dol do drzwi od zlodzieja
+  lores  = net\sprites\0d.spl
   hires  = net\sprites\0d.sph
 endarea
 
 area 0gd
   source = -flics\net\0gd.flc           ;gora do drzwi od zlodzieja dest
+  lores  = net\sprites\0gd.spl
   hires  = net\sprites\0gd.sph
   collis = net\sprites\0gd.spc
 endarea
 
 area 0dd
   source = -flics\net\0dd.flc           ;dol do drzwi od zlodzieja dest
+  lores  = net\sprites\0dd.spl
   hires  = net\sprites\0dd.sph
   collis = net\sprites\0dd.spc
 endarea
 
 area 0gdx
   source = -flics\net\0gdx.flc           ;gora do drzwi od zlodzieja good
+  lores  = net\sprites\0gdx.spl
   hires  = net\sprites\0gdx.sph
   csource = -flics\net\0gdxc.flc
   collis = net\sprites\0gdx.spc
@@ -33,6 +38,7 @@ endarea
 
 area 0ddx
   source = -flics\net\0ddx.flc           ;dol do drzwi od zlodzieja good
+  lores  = net\sprites\0ddx.spl
   hires  = net\sprites\0ddx.sph
   csource = -flics\net\0ddxc.flc
   collis = net\sprites\0ddx.spc

@@ -7,7 +7,7 @@ See docs/original-archive.md for what the archive holds and what these checks fo
   ffarchive.py unpack VOL [OUTDIR]      list a .vol volume, or extract it into OUTDIR
   ffarchive.py cache FILE...            header and phases of built sprite caches (.sph/.spl/.spc)
   ffarchive.py compare-cd CDDIR         every file in CDDIR/*.vol against data/ or FF/WORK.RTL
-  ffarchive.py lores                    phase bounds the port computes vs. the shipped caches
+  ffarchive.py bounds DUMP              a sprite_bounds.txt dump of the port vs. the shipped caches
 
 The archive root is --archive, else $FF_ARCHIVE, else this repository's parent directory if it
 holds FF/WORK.RTL, else ../FireFight next to the repository. Its file names are mixed-case 8.3
@@ -208,32 +208,46 @@ def cmd_compare_cd(a):
     return 1 if bad else 0
 
 
-def cmd_lores(a):
+def parse_bounds_line(line):
+    """'<target> <phases> l,r,u,d[*n] ...' (sprite_bounds.txt) -> (target, [(l, r, u, d)])."""
+    target, phases, *runs = line.split()
+    out = []
+    for run in runs:
+        b, _, n = run.partition('*')
+        out += [tuple(int(v) for v in b.split(','))] * int(n or 1)
+    if len(out) != int(phases):
+        raise ValueError(f'bad line: {line}')
+    return target, out
+
+
+def cmd_bounds(a):
     rtl = archive_root(a.archive) / 'FF' / 'WORK.RTL'
     cache = lambda v: read_cache(find_ci(rtl, v.split()[0]))['phases'] if v else []
-    same = 0
-    print('Sprites whose phase bounds differ between the shipped caches and the port\n')
+    expected = {}                                    # first target -> shipped bounds, per area
     for man in sorted(rtl.glob('*.DIR')):
         for area, d in parse_manifest(man):
-            if 'lores' not in d:
-                continue
-            h, l, c = cache(d.get('hires')), cache(d['lores']), cache(d.get('collis'))
-            # The port has no lores lines: Lsprite::measure takes the `source` FLC at the default
-            # lores scale 2x1. For a frame that is hires//2 of the same FLC at 1x1.
-            port_l = [(ox // 2, oy // 2, sx // 2, sy // 2) for ox, oy, sx, sy in h] \
-                if 'source' in d and 'hsource' not in d else []
-            if port_l == l:
-                same += 1
-                continue
-            orig, port = union_bounds(h, l, c), union_bounds(h, port_l, c)
-            diff = [i for i, (o, p) in enumerate(zip(orig, port)) if o != p]
-            if diff or len(orig) != len(port):
-                i = diff[0] if diff else 0
-                print(f"{man.name:10s} {area:22s} lores = {d['lores']}"
-                      + (f"  (lsource {d['lsource'].split()[0]})" if 'lsource' in d else ''))
-                print(f'{"":33s} {len(diff)}/{len(orig)} phases differ, '
-                      f'phase {i}: shipped (l,r,u,d) {orig[i]}, port {port[i] if i < len(port) else None}')
-    print(f'\n{same} sprites: the port\'s lores phases equal the shipped .spl exactly')
+            key = next((d[k] for k in ('hires', 'collis', 'lores') if k in d), None)
+            if key:
+                key = key.split()[0].replace('\\', '/').lower()
+                bounds = union_bounds(cache(d.get('hires')), cache(d.get('lores')), cache(d.get('collis')))
+                expected.setdefault(key, []).append(bounds)
+    seen, bad = set(), 0
+    for line in pathlib.Path(a.dump).read_text().splitlines():
+        if not line.strip() or line in seen:
+            continue
+        seen.add(line)
+        target, bounds = parse_bounds_line(line)
+        if target not in expected:
+            print(f'{target}: not in the original manifests')
+            bad += 1
+        elif bounds not in expected[target]:
+            exp = expected[target][0]
+            i = next((i for i, (x, y) in enumerate(zip(bounds, exp)) if x != y), min(len(bounds), len(exp)))
+            print(f'{target}: phase {i} is {bounds[i] if i < len(bounds) else None}, '
+                  f'shipped {exp[i] if i < len(exp) else None} ({len(bounds)} vs {len(exp)} phases)')
+            bad += 1
+    print(f'{len(seen)} sprites checked, {bad} differ from the shipped caches')
+    return 1 if bad else 0
 
 
 def main():
@@ -244,7 +258,7 @@ def main():
     p = sub.add_parser('unpack'); p.add_argument('vol'); p.add_argument('outdir', nargs='?'); p.set_defaults(f=cmd_unpack)
     p = sub.add_parser('cache'); p.add_argument('files', nargs='+'); p.set_defaults(f=cmd_cache)
     p = sub.add_parser('compare-cd'); p.add_argument('cddir'); p.set_defaults(f=cmd_compare_cd)
-    p = sub.add_parser('lores'); p.set_defaults(f=cmd_lores)
+    p = sub.add_parser('bounds'); p.add_argument('dump'); p.set_defaults(f=cmd_bounds)
     a = ap.parse_args()
     sys.exit(a.f(a) or 0)
 

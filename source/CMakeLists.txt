@@ -126,3 +126,14 @@ add_test(NAME golden_title
           "-DARGS=--shot-every 20 --quit-frames 200"
           -P ${CMAKE_SOURCE_DIR}/tests/check_frames.cmake)
 set_tests_properties(golden_title PROPERTIES TIMEOUT 300)
+
+# Sprite bounds check: check mode loads the level of every mission, and the phase bounds of every
+# sprite loaded must match the golden file, which matches the original's prebuilt caches. The
+# bounds decide which level objects look_at sees and builds, so they are simulation state.
+add_test(NAME sprite_bounds
+  COMMAND ${CMAKE_COMMAND}
+          -DFIREFIGHT=$<TARGET_FILE:firefight> -DDATA=${FF_DATA_DIR}
+          -DPREF=${CMAKE_CURRENT_BINARY_DIR}/sprite_bounds
+          -DEXPECTED=${CMAKE_SOURCE_DIR}/tests/golden/sprite_bounds.txt
+          -P ${CMAKE_SOURCE_DIR}/tests/check_sprite_bounds.cmake)
+set_tests_properties(sprite_bounds PROPERTIES TIMEOUT 300)

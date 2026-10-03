@@ -18,6 +18,7 @@ area white
     source = -flics\white\sciany1.flc
     csource = -flics\white\sciany2k.flc
     hires  =  white\sprites\sciany1.sph
+    lores  =  white\sprites\sciany1.spl
     collis  =  white\sprites\sciany1.spc
   endarea
 
@@ -25,18 +26,21 @@ area white
     source = -flics\white\kolumna.flc
     csource= -flics\white\kolumn_k.flc
     hires  =  white\sprites\kolumna.sph
+    lores  =  white\sprites\kolumna.spl
     collis =  white\sprites\kolumna.spc
   endarea
 
   area cpx421
     source = -flics\white\cpx421.flc
     hires  =  white\sprites\cpx421.sph
+    lores  =  white\sprites\cpx421.spl
  endarea
 
   area cpx421a
     source = -flics\white\cpx421a.flc
     csource= -flics\white\cpx421b.flc
     hires  =  white\sprites\cpx421a.sph
+    lores  =  white\sprites\cpx421a.spl
     collis =  white\sprites\cpx421a.spc
  endarea
 
@@ -44,106 +48,125 @@ area white
     source = -flics\white\cpx421c.flc
     csource= -flics\white\cpx421b.flc
     hires  =  white\sprites\cpx421c.sph
+    lores  =  white\sprites\cpx421c.spl
     collis =  white\sprites\cpx421c.spc
  endarea
 
   area polka1
     source = -flics\white\polka1.flc
     hires  =  white\sprites\polka1.sph
+    lores  =  white\sprites\polka1.spl
   endarea
 
   area polka3
     source = -flics\white\polka3.flc
     hires  =  white\sprites\polka3.sph
+    lores  =  white\sprites\polka3.spl
   endarea
 
   area sciany2
     source = -flics\white\sciany2.flc
     hires  =  white\sprites\sciany2.sph
+    lores  =  white\sprites\sciany2.spl
   endarea
 
   area skaly
     source = -flics\white\skaly.flc
     hires  =  white\sprites\skaly.sph
+    lores  =  white\sprites\skaly.spl
   ; collis =  white\sprites\skaly.spc
   endarea
 
   area skaly_sn
     source = -flics\white\skaly_sn.flc
     hires  =  white\sprites\skaly_sn.sph
+    lores  =  white\sprites\skaly_sn.spl
     ;collis =  white\sprites\skaly_sn.spc
   endarea
 
   area sople_d
     source = -flics\white\sople_.flc
     hires  =  white\sprites\sople_.sph
+    lores  =  white\sprites\sople_.spl
   endarea
 
   area sople
     source = -flics\white\sople.flc
     csource= -flics\white\sople_k.flc
     hires  =  white\sprites\sople.sph
+    lores  =  white\sprites\sople.spl
     collis =  white\sprites\sople.spc
   endarea
 
   area sople_d1
     source = -flics\white\sople1_.flc
     hires  =  white\sprites\sople1_.sph
+    lores  =  white\sprites\sople1_.spl
   endarea
 
   area kwiatek
     source = -flics\white\kwiatek.flc
     hires  =  white\sprites\kwiatek.sph
+    lores  =  white\sprites\kwiatek.spl
     collis =  white\sprites\kwiatek.spc
   endarea
 
   area kwiatek1
     source = -flics\white\kwiatek1.flc
     hires  =  white\sprites\kwiatek1.sph
+    lores  =  white\sprites\kwiatek1.spl
     collis =  white\sprites\kwiatek1.spc
   endarea
 
   area kwiatek2
     source = -flics\white\kwiatek2.flc
     hires  =  white\sprites\kwiatek2.sph
+    lores  =  white\sprites\kwiatek2.spl
     collis =  white\sprites\kwiatek2.spc
   endarea
 
   area waza1
     source = -flics\white\waza1.flc
     hires  =  white\sprites\waza1.sph
+    lores  =  white\sprites\waza1.spl
   endarea
 
   area cien
     source = -flics\white\cien.flc
     hires  =  white\sprites\cien.sph
+    lores  =  white\sprites\cien.spl
   endarea
 
   area klada
     source = -flics\white\klada.flc
     hires  =  white\sprites\klada.sph
+    lores  =  white\sprites\klada.spl
   endarea
 
   area back
     source = -flics\white\backg.flc
     hires  =  white\sprites\backg.sph
+    lores  =  white\sprites\backg.spl
   endarea
 
   area dzialo_u
     source = -flics\white\dzialo_u.flc
     hires  =  white\sprites\dzialo_u.sph
+    lores  =  white\sprites\dzialo_u.spl
     collis =  white\sprites\dzialo_u.spc
   endarea
 
   area rocker
     source = -flics\white\rocker.flc
     hires  =  white\sprites\rocker.sph
+    lores  =  white\sprites\rocker.spl
     collis =  white\sprites\rocker.spc
   endarea
 
   area flamer
     source = -flics\white\flamer.flc
     hires  =  white\sprites\flamer.sph
+    lores  =  white\sprites\flamer.spl
     collis =  white\sprites\flamer.spc
   endarea
 
@@ -156,12 +179,14 @@ area white
   area dzialo2_
     source = -flics\white\dzialo2_.flc
     hires  =  white\sprites\dzialo2_.sph
+    lores  =  white\sprites\dzialo2_.spl
   endarea
 
   area belkot
     source = -flics\white\belkot.flc
     csource= -flics\white\belkotk.flc
     hires  =  white\sprites\belkot.sph
+    lores  =  white\sprites\belkot.spl
     collis =  white\sprites\belkot.spc
   endarea
 
@@ -169,12 +194,14 @@ area white
     source = -flics\white\belkot2.flc
     csource= -flics\white\belkot2k.flc
     hires  =  white\sprites\belkot2.sph
+    lores  =  white\sprites\belkot2.spl
     collis =  white\sprites\belkot2.spc
   endarea
 
   area belk_z
     source = -flics\white\bel_z.flc
     hires  =  white\sprites\bel_z.sph
+    lores  =  white\sprites\bel_z.spl
     collis =  white\sprites\bel_z.spc
   endarea
 
@@ -209,12 +236,14 @@ area white
   area kwiat_z
     source = -flics\white\kwiat_z.flc
     hires  =  white\sprites\kwiat_z.sph
+    lores  =  white\sprites\kwiat_z.spl
     collis =  white\sprites\kwiat_z.spc
   endarea
 
   area macki
     source = -flics\white\macki.flc
     hires  =  white\sprites\macki.sph
+    lores  =  white\sprites\macki.spl
     csource= -flics\white\macki_k.flc
     collis =  white\sprites\macki.spc
   endarea
@@ -222,6 +251,7 @@ area white
   area macki_z
     source = -flics\white\macki_z.flc
     hires  =  white\sprites\macki_z.sph
+    lores  =  white\sprites\macki_z.spl
     csource= -flics\white\macki_zk.flc
     collis =  white\sprites\macki_z.spc
   endarea
@@ -229,28 +259,33 @@ area white
   area macki_z1
     source = -flics\white\macki_z1.flc
     hires  =  white\sprites\macki_z1.sph
+    lores  =  white\sprites\macki_z1.spl
   endarea
 
   area 3rdplane
     source = -flics\white\3rdplane.flc
     hires  =  white\sprites\3rdplane.sph
+    lores  =  white\sprites\3rdplane.spl
   endarea
 
   area fl_b
     source = -flics\net\fl_b.flc
     hires  =  net\sprites\fl_b.sph
+    lores  =  net\sprites\fl_b.spl
     collis =  net\sprites\fl_b.spc
   endarea
 
   area fl_s
     source = -flics\net\fl_s.flc
     hires  =  net\sprites\fl_s.sph
+    lores  =  net\sprites\fl_s.spl
     collis =  net\sprites\fl_s.spc
   endarea
 
   area fl_m
     source = -flics\net\fl_m.flc
     hires  =  net\sprites\fl_m.sph
+    lores  =  net\sprites\fl_m.spl
     collis =  net\sprites\fl_m.spc
   endarea
 
@@ -258,6 +293,7 @@ area white
   area b_flame
     source = -flics\net\b_flame.flc
     hires  =  net\sprites\b_flame.sph
+    lores  =  net\sprites\b_flame.spl
     collis =  net\sprites\b_flame.spc
   endarea
 
@@ -265,6 +301,7 @@ area white
   area s_flame
     source = -flics\net\s_flame.flc
     hires  =  net\sprites\s_flame.sph
+    lores  =  net\sprites\s_flame.spl
     collis =  net\sprites\s_flame.spc
   endarea
 
@@ -272,30 +309,35 @@ area white
   area m_flame
     source = -flics\net\m_flame.flc
     hires  =  net\sprites\m_flame.sph
+    lores  =  net\sprites\m_flame.spl
     collis =  net\sprites\m_flame.spc
   endarea
 
   area ludek
     source = -flics\white\ludek.flc
     hires  =  white\sprites\ludek.sph
+    lores  =  white\sprites\ludek.spl
     collis =  white\sprites\ludek.spc
   endarea
 
    area unlock
     source = -flics\white\unlock.flc
     hires  =  white\sprites\unlock.sph
+    lores  =  white\sprites\unlock.spl
     collis =  white\sprites\unlock.spc
   endarea
 
    area telep
     source = -flics\white\telep.flc
     hires  =  white\sprites\telep.sph
+    lores  =  white\sprites\telep.spl
     collis =  white\sprites\telep.spc
   endarea
 
    area bunk1
     source = -flics\white\bunk1.flc
     hires  =  white\sprites\bunk1.sph
+    lores  =  white\sprites\bunk1.spl
     csource= -flics\white\bunk1k.flc
     collis =  white\sprites\bunk1.spc
   endarea
@@ -303,12 +345,14 @@ area white
    area bunk1z
     source = -flics\white\bunk1z.flc
     hires  =  white\sprites\bunk1z.sph
+    lores  =  white\sprites\bunk1z.spl
 ;    collis =  white\sprites\bunk1z.spc
   endarea
 
    area bunk2
     source = -flics\white\bunk2.flc
     hires  =  white\sprites\bunk2.sph
+    lores  =  white\sprites\bunk2.spl
     csource= -flics\white\bunk2k.flc
     collis =  white\sprites\bunk2.spc
   endarea
@@ -316,12 +360,14 @@ area white
    area bunk2z
     source = -flics\white\bunk2z.flc
     hires  =  white\sprites\bunk2z.sph
+    lores  =  white\sprites\bunk2z.spl
  ;   collis =  white\sprites\bunk2z.spc
   endarea
 
   area wieza1u
     source = -flics\white\wiez1_u1.flc
     hires  =  white\sprites\wiez1_u1.sph
+    lores  =  white\sprites\wiez1_u1.spl
     csource= -flics\white\wiez1c.flc
     collis =  white\sprites\wiez1_u1.spc
   endarea
@@ -329,6 +375,7 @@ area white
   area wieza1z
     source = -flics\white\wiez1_zu.flc
     hires  =  white\sprites\wiez1_zu.sph
+    lores  =  white\sprites\wiez1_zu.spl
     csource= -flics\white\wiez1_zc.flc
     collis =  white\sprites\wiez1_zu.spc
   endarea
@@ -336,12 +383,14 @@ area white
   area wieza1d
     source = -flics\white\wiez1_u.flc
     hires  =  white\sprites\wiez1_u.sph
+    lores  =  white\sprites\wiez1_u.spl
   endarea
 
 
   area beczka1
     source = -flics\white\beczka.flc
     hires  =  white\sprites\beczka.sph
+    lores  =  white\sprites\beczka.spl
     csource= -flics\white\beczkac.flc
     collis =  white\sprites\beczka.spc
   endarea
@@ -349,16 +398,19 @@ area white
   area beczka1z
     source = -flics\white\beczkaz.flc
     hires  =  white\sprites\beczkaz.sph
+    lores  =  white\sprites\beczkaz.spl
   endarea
 
   area droga
     source = -flics\white\droga.flc
     hires  =  white\sprites\droga.sph
+    lores  =  white\sprites\droga.spl
   endarea
 
   area kopst
     source = -flics\white\kopst.flc
     hires  =  white\sprites\kopst.sph
+    lores  =  white\sprites\kopst.spl
     csource = -flics\white\kopstc.flc
     collis =  white\sprites\kopst.spc
   endarea
@@ -366,6 +418,7 @@ area white
   area kopend
     source = -flics\white\kopend.flc
     hires  =  white\sprites\kopend.sph
+    lores  =  white\sprites\kopend.spl
     csource = -flics\white\kopstc.flc
     collis  =  white\sprites\kopend.spc
   endarea
@@ -373,6 +426,7 @@ area white
   area kopani
     source = -flics\white\kopani.flc
     hires  =  white\sprites\kopani.sph
+    lores  =  white\sprites\kopani.spl
     csource = -flics\white\kopanic.flc
     collis  =  white\sprites\kopani.spc
   endarea
@@ -381,23 +435,27 @@ area white
   area landplac
     source = -flics\white\landpl.flc
     hires  =  white\sprites\landpl.sph
+    lores  =  white\sprites\landpl.spl
   endarea
 
   area load1
     source = -flics\white\load1.flc
     hires  =  white\sprites\load1.sph
+    lores  =  white\sprites\load1.spl
     collis =  white\sprites\load1.spc
   endarea
 
   area load2
     source = -flics\white\load2.flc
     hires  =  white\sprites\load2.sph
+    lores  =  white\sprites\load2.spl
     collis =  white\sprites\load2.spc
   endarea
 
   area obca_mina
    source = -flics\!global\defmine.flc
    hires  =  !global\sprites\defmine.sph
+   lores  =  !global\sprites\defmine.spl
    ;csource = -flics\!global\defmine_k.flc
    collis =  !global\sprites\defminek.spc
   endarea
@@ -405,12 +463,14 @@ area white
   area marker
     source = -flics\white\marker.flc
     hires  =  white\sprites\marker.sph
+    lores  =  white\sprites\marker.spl
     collis =  white\sprites\marker.spc
   endarea
 
   area sekret
     source = -flics\gray\sekret.flc
     hires  =  gray\sprites\sekret.sph
+    lores  =  gray\sprites\sekret.spl
     collis =  gray\sprites\sekret.spc
   endarea
 
@@ -421,18 +481,21 @@ area white
   area bronie
     source = -flics\!global\bronie.flc
     hires  =  !global\sprites\bronie.sph
+    lores  =  !global\sprites\bronie.spl 1x1
     collis =  !global\sprites\bronie.spc
   endarea
 
   area _wrog
     source = -flics\!global\_wrog.flc
     hires  =  !global\sprites\_wrog.sph
+    lores  =  !global\sprites\_wrog.spl
     collis =  !global\sprites\_wrog.spc
   endarea
 
   area light
     source = -flics\!global\light.flc
     hires  =  !global\sprites\light.sph
+    lores  =  !global\sprites\light.spl
   endarea
 
 endarea

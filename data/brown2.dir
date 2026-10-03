@@ -4,6 +4,7 @@
 area brown
         area 2elektrownia                     ; podpora do drutow
           source = -flics\brown\elektr.flc
+          lores = brown\sprites\elektr.spl
           hires = brown\sprites\elektr.sph
          csource = -flics\brown\elektrk.flc
           collis = brown\sprites\elektr.spc
@@ -11,37 +12,44 @@ area brown
 
         area 2elektrowniad                    ; podpora do drutow zniszczona
           source = -flics\brown\elektrd.flc
+          lores = brown\sprites\elektrd.spl
           hires = brown\sprites\elektrd.sph
         endarea
 
         area 2pipes                           ; rury
           source = -flics\brown\pipes.flc
+          lores = brown\sprites\pipes.spl
           hires = brown\sprites\pipes.sph
         endarea
 
         area 2collis                          ; kolizje do rur
           source = -flics\brown\pipesk.flc
+          lores = brown\sprites\pipesk.spl
           hires = brown\sprites\pipesk.sph
           collis = brown\sprites\pipesk.spc
         endarea
 
         area 2roads                           ; druty i drogi
           source = -flics\brown\roads.flc
+          lores = brown\sprites\roads.spl
           hires = brown\sprites\roads.sph
         endarea
 
         area 2servo                           ; servo i boisko
           source = -flics\brown\servo.flc
+          lores = brown\sprites\servo.spl
           hires = brown\sprites\servo.sph
         endarea
 
         area 2kopula                          ; kopula dziala otwierajaca sie
           source = -flics\brown\kopula.flc
+          lores = brown\sprites\kopula.spl
           hires = brown\sprites\kopula.sph
         endarea
 
         area 2kopulap                         ; kopula dziala na slupie
           source = -flics\brown\kopulap.flc
+          lores = brown\sprites\kopulap.spl
           hires = brown\sprites\kopulap.sph
           csource = -flics\brown\kopulapk.flc
           collis = brown\sprites\kopulap.spc
@@ -49,16 +57,19 @@ area brown
 
         area 2kopulad                         ; kopula zniszczona
           source = -flics\brown\kopulad.flc
+          lores = brown\sprites\kopulad.spl
           hires = brown\sprites\kopulad.sph
         endarea
 
         area 2cooler                         ; wentylatorek
           source = -flics\brown\cooler.flc
+          lores = brown\sprites\cooler.spl
           hires = brown\sprites\cooler.sph
         endarea
 
         area 2walldoor                        ; sciana drzwi
           source = -flics\brown\walldoor.flc
+          lores = brown\sprites\walldoor.spl
           hires = brown\sprites\walldoor.sph
           csource = -flics\brown\walldook.flc
           collis = brown\sprites\walldoor.spc

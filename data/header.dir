@@ -6,20 +6,28 @@ endarea
 
 area screen1
   source  = -flics\!global\screen1.flc
+  lsource = -flics\!global\screen1l.flc
   hires   =  !global\sprites\screen1.sph
+  lores   =  !global\sprites\screen1.spl 1x1
 endarea
 
 area screen2
   source  = -flics\!global\screen2.flc
+  lsource = -flics\!global\screen2l.flc
   hires   =  !global\sprites\screen2.sph
+  lores   =  !global\sprites\screen2.spl 1x1
 endarea
 
 area press
   source  = -flics\!global\press.flc
+ lsource  = -flics\!global\pressl.flc
   hires   =  !global\sprites\press.sph
+  lores   =  !global\sprites\press.spl 1x1
 endarea
 
 area copy
   source  = -flics\!global\copy.flc
+ lsource  = -flics\!global\copyl.flc
   hires   =  !global\sprites\copy.sph
+  lores   =  !global\sprites\copy.spl 1x1
 endarea

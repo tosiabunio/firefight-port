@@ -108,8 +108,7 @@ void Mysprites::load_splinter(void)
     sprintf(tmp,"odlamek%d",i);
     File::area(tmp);
 
-    // Was "lores": the hires-only port data has no lores lines; every splinter has both.
-    int t=File::specified("hires");
+    int t=File::specified("lores");
     File::endarea();
 
     if (t) splinter[i].load(tmp);

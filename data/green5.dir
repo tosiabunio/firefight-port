@@ -6,12 +6,14 @@ area green
   area brick                                ; paczki do sieci
     source = -flics\green\energy.flc
     hires  =  green\sprites\energy.sph
+    lores  =  green\sprites\energy.spl
     collis =  green\sprites\energy.spc
   endarea
 
   area base                               ; baza do sieci
     source = -flics\green\base.flc
     hires  =  green\sprites\base.sph
+    lores  =  green\sprites\base.spl
    csource = -flics\green\base_k.flc
     collis =  green\sprites\base.spc
   endarea
@@ -19,11 +21,13 @@ area green
   area gunbase                             ; podstawka dziala sieciowego
     source = -flics\green\gunbase.flc
     hires  =  green\sprites\gunbase.sph
+    lores  =  green\sprites\gunbase.spl
   endarea
 
   area dzialo_podstawa
     source = -flics\green\dzialk1p.flc
     hires  =  green\sprites\dzialk1p.sph
+    lores  =  green\sprites\dzialk1p.spl
     ;collis =  green\sprites\dzialk1p.spc
   endarea
 

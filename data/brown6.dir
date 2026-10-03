@@ -4,6 +4,7 @@
 area brown
   area tratwa                           ; skaly do wybuchania dol
     source = -flics\brown\tratwa.flc
+    lores = brown\sprites\tratwa.spl
     hires = brown\sprites\tratwa.sph
     csource = -flics\brown\tratwa.flc
     collis = brown\sprites\tratwa.spc
@@ -11,6 +12,7 @@ area brown
 
   area buoy                             ; skaly do wybuchania dol
     source = -flics\brown\buoy.flc
+    lores = brown\sprites\buoy.spl
     hires = brown\sprites\buoy.sph
     csource = -flics\brown\buoy.flc
     collis = brown\sprites\buoy.spc
@@ -18,16 +20,19 @@ area brown
 
   area border6                            ; skaly otaczajace
     source = -flics\brown\border.flc
+    lores  = brown\sprites\border.spl
     hires  = brown\sprites\border.sph
   endarea
 
  area river6
     source = -flics\brown\river.flc
+    lores  = brown\sprites\river.spl
     hires  = brown\sprites\river.sph
   endarea
 
   area water6                            ; rzeka woda
     source = -flics\brown\waterA.flc
+    lores  = brown\sprites\waterA.spl
     hires  = brown\sprites\waterA.sph
     csource = -flics\brown\watere.flc
     collis = brown\sprites\waterA.spc
@@ -35,6 +40,7 @@ area brown
 
   area water26                            ; rzeka poczatek wody
     source = -flics\brown\water2.flc
+    lores  = brown\sprites\water2.spl
     hires  = brown\sprites\water2.sph
     csource = -flics\brown\water2e.flc
     collis = brown\sprites\water2.spc
@@ -42,21 +48,25 @@ area brown
 
   area 6cooler                         ; wentylatorek
     source = -flics\brown\cooler.flc
+    lores = brown\sprites\cooler.spl
     hires = brown\sprites\cooler.sph
   endarea
 
   area 6pipes                           ; rury
     source = -flics\brown\pipes.flc
+    lores = brown\sprites\pipes.spl
     hires = brown\sprites\pipes.sph
   endarea
 
   area bridge                           ; rury most
     source = -flics\brown\bridge.flc
+    lores = brown\sprites\bridge.spl
     hires = brown\sprites\bridge.sph
   endarea
 
   area destup6                          ; skaly do wybuchania gora
     source = -flics\brown\destup.flc
+    lores = brown\sprites\destup.spl
     hires = brown\sprites\destup.sph
     csource = -flics\brown\destupk.flc
     collis = brown\sprites\destup.spc
@@ -64,6 +74,7 @@ area brown
 
   area destdwn6                         ; skaly do wybuchania dol
     source = -flics\brown\destdwn.flc
+    lores = brown\sprites\destdwn.spl
     hires = brown\sprites\destdwn.sph
     csource = -flics\brown\destdwnk.flc
     collis = brown\sprites\destdwn.spc

@@ -325,8 +325,8 @@ void Lsprite::rebuild(void)
 }
 
 // Port: the lores variant is never drawn (hires only), but its bounds count towards each phase's
-// bounds (Sprite::load). The original built it from the source FLC at Spr::lores_scale; this
-// computes the same sizes and origins as rebuild() without building the pixels.
+// bounds (Sprite::load). This computes the same sizes and origins as rebuild() without building
+// the pixels.
 void Lsprite::measure(void)
 {
   frame.buf=NULL;

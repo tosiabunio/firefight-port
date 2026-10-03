@@ -4,17 +4,20 @@
 area brown
   area 4pipes                           ; grube rury
     source = -flics\brown\pipes.flc
+    lores = brown\sprites\pipes.spl
     hires = brown\sprites\pipes.sph
   endarea
 
   area 4collis                          ; kolizje do grubych rur
     source = -flics\brown\pipesk.flc
+    lores = brown\sprites\pipesk.spl
     hires = brown\sprites\pipesk.sph
     collis = brown\sprites\pipesk.spc
   endarea
 
   area destup                          ; skaly do wybuchania gora
     source = -flics\brown\destup.flc
+    lores = brown\sprites\destup.spl
     hires = brown\sprites\destup.sph
     csource = -flics\brown\destupk.flc
     collis = brown\sprites\destup.spc
@@ -22,6 +25,7 @@ area brown
 
   area destdwn                         ; skaly do wybuchania dol
     source = -flics\brown\destdwn.flc
+    lores = brown\sprites\destdwn.spl
     hires = brown\sprites\destdwn.sph
     csource = -flics\brown\destdwnk.flc
     collis = brown\sprites\destdwn.spc
@@ -29,6 +33,7 @@ area brown
 
   area 4elektrownia                    ; podpora do drutow
     source = -flics\brown\elektr.flc
+    lores = brown\sprites\elektr.spl
     hires = brown\sprites\elektr.sph
     csource = -flics\brown\elektrk.flc
     collis = brown\sprites\elektr.spc
@@ -36,16 +41,19 @@ area brown
 
   area 4elektrowniad                   ; podpora do drutow zniszczona
     source = -flics\brown\elektrd.flc
+    lores = brown\sprites\elektrd.spl
     hires = brown\sprites\elektrd.sph
   endarea
 
   area 4servo                           ; servo i boisko
     source = -flics\brown\servo.flc
+    lores = brown\sprites\servo.spl
     hires = brown\sprites\servo.sph
   endarea
 
   area 4walldoor                        ; sciana drzwi
     source = -flics\brown\walldoor.flc
+    lores = brown\sprites\walldoor.spl
     hires = brown\sprites\walldoor.sph
     csource = -flics\brown\walldook.flc
     collis = brown\sprites\walldoor.spc
@@ -53,6 +61,7 @@ area brown
 
   area destup4                          ; skaly do wybuchania gora
     source = -flics\brown\destup.flc
+    lores = brown\sprites\destup.spl
     hires = brown\sprites\destup.sph
     csource = -flics\brown\destupk.flc
     collis = brown\sprites\destup.spc
@@ -60,6 +69,7 @@ area brown
 
   area destdwn4                         ; skaly do wybuchania dol
     source = -flics\brown\destdwn.flc
+    lores = brown\sprites\destdwn.spl
     hires = brown\sprites\destdwn.sph
     csource = -flics\brown\destdwnk.flc
     collis = brown\sprites\destdwn.spc
@@ -67,6 +77,7 @@ area brown
 
   area 01                               ; cool glass
     source = -flics\brown\01.flc
+    lores = brown\sprites\01.spl
     hires = brown\sprites\01.sph
     csource = -flics\brown\01_k.flc
     collis = brown\sprites\01.spc
@@ -74,11 +85,13 @@ area brown
 
   area 02                               ; cool glass anim
     source = -flics\brown\02.flc
+    lores = brown\sprites\02.spl
     hires = brown\sprites\02.sph
   endarea
 
   area 03                               ; cool glass dest
     source = -flics\brown\03.flc
+    lores = brown\sprites\03.spl
     hires = brown\sprites\03.sph
   endarea
 

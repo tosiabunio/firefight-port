@@ -37,6 +37,7 @@ public:
 
   //----- zmienne
   static int mirror, onecolor, toload, load_enabled, hires_scale, lores_scale, collis_scale;
+  static int dump_bounds;    // port: write every loaded sprite's phase bounds (Sprite::load)
 
   //----- inicjalizacje
   enum work_modes   {work_normal, work_debug, work_safe };

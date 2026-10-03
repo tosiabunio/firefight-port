@@ -105,7 +105,7 @@ build/linux-gcc/tools/smoke/Debug/ff_smoke --music music/track02.flac --wav 'dat
 
 | Left out | Why | Where it is in the original tree |
 |---|---|---|
-| Lores art: `.spl` sprites and `lsource` FLCs | The port is hires-only. 525 `lores =`/`lsource =` lines were removed from the manifests. Their `1x1` overrides and lores masters still shaped 15 sprites' phase bounds (`docs/original-archive.md`) | `FF/WORK.RTL` |
+| Lores sprites (`.spl`) | The port is hires-only and never builds lores pixels. The manifests keep their `lores`/`lsource` lines and `data/` has the 22 `lsource` masters, because lores bounds count towards every sprite's phase bounds (see "Sprites") | `FF/WORK.RTL` |
 | Built sprite caches: `.sph` (hires), `.spc` (collision), `.spp` (palette tables) | Regenerated from the FLC masters (see "Sprites"). They are compiled, engine-specific RLE formats | `FF/WORK.RTL` |
 | Launcher `LOADER.EXE` (MFC options/network wizard), `FFSTART`, `INFO`, the LED level editor | Platform-specific front-ends and tools, not the game. `RegData` (kept) is the settings model the launcher edited | `FF/C/LOADER`, `FF/C/FFSTART`, `FF/C/INFO`, `FF/C/LED` |
 | Makefiles (`.mak`/`.mdp`), engine test harnesses, DirectX SDK headers | MSVC 4 / Win95 only | `FF/C`, `LIB` |
@@ -116,7 +116,7 @@ build/linux-gcc/tools/smoke/Debug/ff_smoke --music music/track02.flac --wav 'dat
 
 - **Names:** all file and directory names are lowercase, and every `#include` in the kept sources already uses lowercase names. Paths inside manifests are mixed-case DOS paths, because the original engine `strupr()`s everything. Resolve them as `path.lower().replace('\\', '/')` relative to `data/`, which works on case-sensitive file systems.
 - **Source encoding:** source files are UTF-8. The only non-ASCII bytes were in comments (Polish, CP852). `resource.rc` was Windows-1252.
-- **Data bytes:** data files are **byte-for-byte originals**. Text data is CP852 with CRLF line endings. The in-game fonts index glyphs by byte value, so don't re-encode them. The only edit to any data file is the removal of the lores lines from the manifests.
+- **Data bytes:** data files are **byte-for-byte originals**. Text data is CP852 with CRLF line endings. The in-game fonts index glyphs by byte value, so don't re-encode them. No data file has been edited.
 
 ## Data layout
 
@@ -140,11 +140,14 @@ The art masters are Autodesk Animator FLIC files (`data/flics/**.flc`): 8-bit, w
 |---|---|---|
 | `hires` → `.sph` | `hsource` if present, else `source` | 1×1, so the FLC frames are the hires art as-is |
 | `collis` → `.spc` | `csource` if present, else `source` | 8×1 (collision masks) |
+| `lores` → `.spl` | `lsource` if present, else `source` | 2×1, or `1x1` on the target line. Only measured, never built: its bounds count towards the phase bounds |
 | `target` → `.spp` | the palette FLC `source` | palette plus derived lookup tables |
 
 Per-entry flags: `o+` = one-colour (the weather overlays: fog, cloud, night), `m+` = generate mirrored copies, `NxM` = scale override.
 
 **Palette index 255 is the transparent key colour** (`key_color` in `1sp_lreb.cpp`). Keep it as alpha when converting frames to a modern format.
+
+A sprite's phase bounds are the union of its hires, lores and collision bounds. They are simulation state: they decide which level objects `look_at` sees and builds, and the on-screen tests of game objects. The `sprite_bounds` test checks every sprite the game loads against the original's prebuilt caches.
 
 The rebuild path that turns FLC frames into engine sprites is the reference for anything else a converter must preserve. It lives in `source/engine/1sp/1sp_lmai.cpp`, `1sp_lreb.cpp`, `1sp_ldsa.cpp` and `1sp_flic.cpp`. With the original engine in loose-file mode, missing targets were simply rebuilt on first load. The port builds every sprite in memory on load and never writes the target files.
 

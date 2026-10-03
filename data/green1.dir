@@ -7,6 +7,7 @@ area green
   area kadlub
     source = -flics\green\kadlub.flc
     hires  =  green\sprites\kadlub.sph
+    lores  =  green\sprites\kadlub.spl
    endarea
 
 endarea

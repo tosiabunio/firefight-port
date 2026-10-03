@@ -8,12 +8,14 @@ area gray
  area brick
     source = -flics\gray\energy.flc
     hires  =  gray\sprites\energy.sph
+    lores  =  gray\sprites\energy.spl
     collis =  gray\sprites\energy.spc
   endarea
 
   area base                             ; baza do sieci
     source = -flics\gray\base.flc
     hires  =  gray\sprites\base.sph
+    lores  =  gray\sprites\base.spl
    csource = -flics\gray\base_k.flc
     collis =  gray\sprites\base.spc
   endarea
@@ -21,11 +23,13 @@ area gray
   area gunbase                             ; podstawka dziala do sieci
     source = -flics\gray\gunbase.flc
     hires  =  gray\sprites\gunbase.sph
+    lores  =  gray\sprites\gunbase.spl
   endarea
 
   area netplace                             ; lotnisko na siec
     source = -flics\gray\lplace.flc
     hires  =  gray\sprites\lplace.sph
+    lores  =  gray\sprites\lplace.spl
     collis =  gray\sprites\lplace.spc
   endarea
 

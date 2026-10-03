@@ -253,6 +253,7 @@ void Cwe::init (Cwe_param *param)
         Spr::toload=htoload|ltoload|ctoload;
       }
       Spr::mirror=text.value(spr_mirror);
+      Spr::dump_bounds=Cmd_line::get_int("sprite_bounds",0);  // port
 
       char *tmp;
       int scale;

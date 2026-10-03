@@ -5,6 +5,7 @@
 area brown
   area 1walldoor                        ; sciana drzwi
     source = -flics\brown\walldoor.flc
+    lores = brown\sprites\walldoor.spl
     hires = brown\sprites\walldoor.sph
     csource = -flics\brown\walldook.flc
     collis = brown\sprites\walldoor.spc
@@ -12,16 +13,19 @@ area brown
 
   area 1servo                           ; servo i boisko
     source = -flics\brown\servo.flc
+    lores = brown\sprites\servo.spl
     hires = brown\sprites\servo.sph
   endarea
 
   area 1roads                           ; druty i drogi
     source = -flics\brown\roads.flc
+    lores = brown\sprites\roads.spl
     hires = brown\sprites\roads.sph
   endarea
 
   area 1elektrownia                     ; podpora do drutow
     source = -flics\brown\elektr.flc
+    lores = brown\sprites\elektr.spl
     hires = brown\sprites\elektr.sph
     csource = -flics\brown\elektrk.flc
     collis = brown\sprites\elektr.spc
@@ -29,27 +33,32 @@ area brown
 
   area 1elektrowniad                    ; podpora do drutow zniszczona
     source = -flics\brown\elektrd.flc
+    lores = brown\sprites\elektrd.spl
     hires = brown\sprites\elektrd.sph
   endarea
 
   area 1pipes                           ; rury
     source = -flics\brown\pipes.flc
+    lores = brown\sprites\pipes.spl
     hires = brown\sprites\pipes.sph
   endarea
 
   area 1collis                          ; kolizje do rur
     source = -flics\brown\pipesk.flc
+    lores = brown\sprites\pipesk.spl
     hires = brown\sprites\pipesk.sph
     collis = brown\sprites\pipesk.spc
   endarea
 
  area river
     source = -flics\brown\river.flc
+    lores  = brown\sprites\river.spl
     hires  = brown\sprites\river.sph
   endarea
 
   area water                            ; rzeka woda
     source = -flics\brown\waterA.flc
+    lores  = brown\sprites\waterA.spl
     hires  = brown\sprites\waterA.sph
     csource = -flics\brown\watere.flc
     collis = brown\sprites\waterA.spc
@@ -57,6 +66,7 @@ area brown
 
   area water2                            ; rzeka poczatek wody
     source = -flics\brown\water2.flc
+    lores  = brown\sprites\water2.spl
     hires  = brown\sprites\water2.sph
     csource = -flics\brown\water2e.flc
     collis = brown\sprites\water2.spc
@@ -64,11 +74,13 @@ area brown
 
   area border                            ; skaly otaczajace
     source = -flics\brown\border.flc
+    lores  = brown\sprites\border.spl
     hires  = brown\sprites\border.sph
   endarea
 
   area pompa                              ; pompa wodna
     source = -flics\brown\pompa.flc
+    lores  = brown\sprites\pompa.spl
     hires  = brown\sprites\pompa.sph
     csource = -flics\brown\pompa.flc
     collis = brown\sprites\pompa.spc
@@ -76,6 +88,7 @@ area brown
 
   area pompad                             ; pompa wodna (destroyed)
     source = -flics\brown\pompad.flc
+    lores  = brown\sprites\pompad.spl
     hires  = brown\sprites\pompad.sph
     csource = -flics\brown\pompad.flc
     collis = brown\sprites\pompad.spc
@@ -83,6 +96,7 @@ area brown
 
   area destup1                          ; skaly do wybuchania gora
     source = -flics\brown\destup.flc
+    lores = brown\sprites\destup.spl
     hires = brown\sprites\destup.sph
     csource = -flics\brown\destupk.flc
     collis = brown\sprites\destup.spc
@@ -90,6 +104,7 @@ area brown
 
   area destdwn1                         ; skaly do wybuchania dol
     source = -flics\brown\destdwn.flc
+    lores = brown\sprites\destdwn.spl
     hires = brown\sprites\destdwn.sph
     csource = -flics\brown\destdwnk.flc
     collis = brown\sprites\destdwn.spc

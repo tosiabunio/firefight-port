@@ -8,24 +8,28 @@ area green
 area 2load1
     source = -flics\green\load1.flc
     hires  =  green\sprites\load1.sph
+    lores  =  green\sprites\load1.spl
     collis =  green\sprites\load1.spc
 endarea
 
 area 2load2
     source = -flics\green\load2.flc
     hires  =  green\sprites\load2.sph
+    lores  =  green\sprites\load2.spl
     collis =  green\sprites\load2.spc
 endarea
 
 area 2load3
     source = -flics\green\load3.flc
     hires  =  green\sprites\load3.sph
+    lores  =  green\sprites\load3.spl
     collis =  green\sprites\load3.spc
 endarea
 
 area 2loadz
     source = -flics\green\loadz.flc
     hires  =  green\sprites\loadz.sph
+    lores  =  green\sprites\loadz.spl
     collis =  green\sprites\loadz.spc
 endarea
 
@@ -33,12 +37,14 @@ endarea
 area 2antena1
     source = -flics\green\ant1.flc
     hires  =  green\sprites\ant1.sph
+    lores  =  green\sprites\ant1.spl
     collis =  green\sprites\ant1.spc
 endarea
 
 area 2antena2
     source = -flics\green\ant2.flc
     hires  =  green\sprites\ant2.sph
+    lores  =  green\sprites\ant2.spl
     collis =  green\sprites\ant2.spc
 endarea
 
@@ -46,6 +52,7 @@ area 2antena_off
     source = -flics\green\ant1s.flc
     csource = -flics\green\ant1sk.flc
     hires  =  green\sprites\ant1s.sph
+    lores  =  green\sprites\ant1s.spl
     collis =  green\sprites\ant1s.spc
 endarea
 
@@ -53,6 +60,7 @@ area 2antena_on
     source = -flics\green\ant1e.flc
     csource = -flics\green\ant1ek.flc
     hires  =  green\sprites\ant1e.sph
+    lores  =  green\sprites\ant1e.spl
     collis =  green\sprites\ant1e.spc
 endarea
 
@@ -61,12 +69,14 @@ endarea
 area 2sw_on
     source = -flics\green\sw_on.flc
     hires  =  green\sprites\sw_on.sph
+    lores  =  green\sprites\sw_on.spl
 ;    collis =  green\sprites\sw_on.spc
 endarea
 
 area 2sw_off
     source = -flics\green\sw_off.flc
     hires  =  green\sprites\sw_off.sph
+    lores  =  green\sprites\sw_off.spl
 ;    collis =  green\sprites\sw_off.spc
 endarea
 
@@ -77,6 +87,7 @@ area 2mur1
     source = -flics\green\mur1.flc
     csource = -flics\green\mur1k.flc
     hires  =  green\sprites\mur1.sph
+    lores  =  green\sprites\mur1.spl
     collis =  green\sprites\mur1.spc
 endarea
 
@@ -84,6 +95,7 @@ area 2mur2
     source = -flics\green\mur2.flc
     csource = -flics\green\mur2k.flc
     hires  =  green\sprites\mur2.sph
+    lores  =  green\sprites\mur2.spl
     collis =  green\sprites\mur2.spc
 endarea
 
@@ -91,6 +103,7 @@ area 2mur3
     source = -flics\green\mur3.flc
     csource = -flics\green\mur3k.flc
     hires  =  green\sprites\mur3.sph
+    lores  =  green\sprites\mur3.spl
     collis =  green\sprites\mur3.spc
 endarea
 
@@ -98,6 +111,7 @@ area 2mur4
     source = -flics\green\mur4.flc
     csource = -flics\green\mur4k.flc
     hires  =  green\sprites\mur4.sph
+    lores  =  green\sprites\mur4.spl
     collis =  green\sprites\mur4.spc
 endarea
 
@@ -105,6 +119,7 @@ area 2mur5
     source = -flics\green\mur5.flc
     csource = -flics\green\mur5k.flc
     hires  =  green\sprites\mur5.sph
+    lores  =  green\sprites\mur5.spl
     collis =  green\sprites\mur5.spc
 endarea
 
@@ -112,6 +127,7 @@ area 2mur6
     source = -flics\green\mur6.flc
     csource = -flics\green\mur6k.flc
     hires  =  green\sprites\mur6.sph
+    lores  =  green\sprites\mur6.spl
     collis =  green\sprites\mur6.spc
 endarea
 
@@ -119,6 +135,7 @@ area ruiny
     source = -flics\green\ruiny.flc
     csource= -flics\green\ruiny_k.flc
     hires  =  green\sprites\ruiny.sph
+    lores  =  green\sprites\ruiny.spl
     collis =  green\sprites\ruiny.spc
   endarea
 

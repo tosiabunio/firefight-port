@@ -173,6 +173,43 @@ void Lsprite::load (void)
   }
 }
 
+// Port: the engine switch sprite_bounds=1 writes the phase bounds of every sprite loaded to
+// sprite_bounds.txt in the preferences directory: one line per load, keyed by the sprite's
+// first target, "<target> <phases> l,r,u,d[*repeat] ...". The bounds of the original's
+// prebuilt caches are in tests/golden/sprite_bounds.txt (tools/archive/ffarchive.py bounds).
+static void dump_bounds (Phase *phase, int phases)
+{
+  static FILE *f=NULL;
+  static int checked=0;
+  if (!checked)
+  {
+    checked=1;
+    if (Spr::dump_bounds)
+    {
+      char path[_MAX_PATH];
+      snprintf(path,sizeof(path),"%ssprite_bounds.txt",Comm::pref_path);
+      f=fopen(path,"w");
+    }
+  }
+  if (!f)
+    return;
+  File::get_flags(File::specified(hires_id) ?hires_id :File::specified(collis_id) ?collis_id :lores_id);
+  fprintf(f,"%s %d",File::info.real_name,phases);
+  for (int i=0; i<phases; )
+  {
+    int n=1;
+    while ((i+n<phases)&&(phase[i+n].l==phase[i].l)&&(phase[i+n].r==phase[i].r)&&
+      (phase[i+n].u==phase[i].u)&&(phase[i+n].d==phase[i].d))
+      n++;
+    fprintf(f," %d,%d,%d,%d",phase[i].l,phase[i].r,phase[i].u,phase[i].d);
+    if (n>1)
+      fprintf(f,"*%d",n);
+    i+=n;
+  }
+  fprintf(f,"\n");
+  fflush(f);
+}
+
 void Sprite::load (char *_filename)
 {
   int umem=(int)Heap::mem_avail();
@@ -209,10 +246,10 @@ void Sprite::load (char *_filename)
     hmemused+=(int)memused-Heap::mem_avail();
 
     memused=(int)Heap::mem_avail();
-    l.load();
-    // Port: the port data has no lores targets, but the lores bounds still count towards the
-    // phase bounds below. The original built lores from the same source FLC, so measure it.
-    if (l.wanted&&!l.specified&&l.source_datetime)
+    // Port: was l.load(). The lores pixels are never drawn (hires only), but the lores bounds
+    // count towards the phase bounds below, so measure the target from its master (lsource or
+    // source) at its scale (a 1x1 flag on the target line overrides Spr::lores_scale).
+    if (l.wanted&&l.specified)
       l.measure();
     lmemused+=(int)memused-Heap::mem_avail();
 
@@ -315,6 +352,7 @@ void Sprite::load (char *_filename)
         if (phase[i].u<maxu) maxu=phase[i].u;
         if (phase[i].d>maxd) maxd=phase[i].d;
       }
+      dump_bounds(phase,phases);
     }
   }
   catch (Failure)

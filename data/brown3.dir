@@ -4,17 +4,20 @@
 area brown
   area 3pipes                           ; grube rury
     source = -flics\brown\pipes.flc
+    lores = brown\sprites\pipes.spl
     hires = brown\sprites\pipes.sph
   endarea
 
   area 3collis                          ; kolizje do grubych rur
     source = -flics\brown\pipesk.flc
+    lores = brown\sprites\pipesk.spl
     hires = brown\sprites\pipesk.sph
     collis = brown\sprites\pipesk.spc
   endarea
 
   area 3elektrownia                    ; podpora do drutow
     source = -flics\brown\elektr.flc
+    lores = brown\sprites\elektr.spl
     hires = brown\sprites\elektr.sph
     csource = -flics\brown\elektrk.flc
     collis = brown\sprites\elektr.spc
@@ -22,11 +25,13 @@ area brown
 
   area 3elektrowniad                   ; podpora do drutow zniszczona
     source = -flics\brown\elektrd.flc
+    lores = brown\sprites\elektrd.spl
     hires = brown\sprites\elektrd.sph
   endarea
 
   area base                            ; baza sieciowa.
     source = -flics\net\base.flc
+    lores = brown\sprites\base.spl
     hires = brown\sprites\base.sph
     csource = -flics\net\base_k.flc
     collis = brown\sprites\base.spc
@@ -34,6 +39,7 @@ area brown
 
   area energy                            ; energia
     source = -flics\net\energy.flc
+    lores = brown\sprites\energy.spl
     hires = brown\sprites\energy.sph
     csource = -flics\net\energy.flc
     collis = brown\sprites\energy.spc
@@ -41,6 +47,7 @@ area brown
 
   area border3                            ; skaly otaczajace
     source = -flics\brown\border.flc
+    lores  = brown\sprites\border.spl
     hires  = brown\sprites\border.sph
   endarea
 endarea

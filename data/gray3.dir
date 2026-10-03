@@ -23,6 +23,7 @@ area gray
   area kop2en
     source = -flics\gray\kop2en.flc
     hires  =  gray\sprites\kop2en.sph
+    lores  =  gray\sprites\kop2en.spl
     ;collis =  gray\sprites\kop2en.spc
   endarea
 

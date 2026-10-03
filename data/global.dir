@@ -6,53 +6,68 @@
 
 area fog
   source = -flics\!global\cloud.flc
+  lsource= -flics\!global\cloud_lo.flc
   hires  =  !global\sprites\cloud.sph o+
+  lores  =  !global\sprites\cloud.spl 1x1 o+
 endarea
 
 area cloud
   source = -flics\!global\cloud.flc
+  lsource= -flics\!global\cloud_lo.flc
   hires  =  !global\sprites\cloud.sph o+
+  lores  =  !global\sprites\cloud.spl 1x1 o+
 endarea
 
 area night
   source  = -flics\!global\noc.flc
+  lsource = -flics\!global\noc_lo.flc
   hires   =  !global\sprites\noc.sph o+
+  lores   =  !global\sprites\noc.spl 1x1 o+
 endarea
 
 ; TITLE
 area title_sprite_in
   source = -flics\!global\menu_in.flc
   hires  =  !global\sprites\menu_in.sph
+  lores  =  !global\sprites\menu_in.spl
 endarea
 
 area title_sprite_out
   source = -flics\!global\menu_out.flc
   hires  =  !global\sprites\menu_out.sph
+  lores  =  !global\sprites\menu_out.spl
 endarea
 
 area missions_pics_nor
   source  = -flics\!global\prgnor.flc
   hires   =  !global\sprites\prgnor.sph
+  lores   =  !global\sprites\prgnor.spl
 endarea
 
 area missions_pics_dark
   source  = -flics\!global\prgdrk.flc
   hires   =  !global\sprites\prgdrk.sph
+  lores   =  !global\sprites\prgdrk.spl
 endarea
 
 area indicatore
   source  = -flics\!global\damagee.flc
+  lsource = -flics\!global\damageee.flc
   hires   =  !global\sprites\damagee.sph
+  lores   =  !global\sprites\damageee.spl 1x1
 endarea
 
 area frame
   source  = -flics\!global\ramka.flc
   hires   =  !global\sprites\ramka.sph
+  lores   =  !global\sprites\ramka.spl
 endarea
 
 area header
   source  = -flics\!global\intro.flc
+ lsource  = -flics\!global\introl.flc
   hires   =  !global\sprites\intro.sph
+  lores   =  !global\sprites\intro.spl 1x1
 endarea
 
 area palette
@@ -63,50 +78,60 @@ endarea
 area level_pictures
   source  = -flics\!global\level.flc
   hires   =  !global\sprites\level.sph
+  lores   =  !global\sprites\level.spl
 endarea
 
 ; PRINT
 area small_letters
   source  = -flics\!global\sletter.flc
   hires   =  !global\sprites\sletter.sph
+  lores   =  !global\sprites\sletter.spl
 endarea
 
 area small_italic_letters
   source  = -flics\!global\siletter.flc
   hires   =  !global\sprites\siletter.sph
+  lores   =  !global\sprites\siletter.spl
 endarea
 
 area big_letters
   source  = -flics\!global\bletter.flc
   hires   =  !global\sprites\bletter.sph
+  lores   =  !global\sprites\bletter.spl
 endarea
 
 area big_italic_letters
   source  = -flics\!global\biletter.flc
   hires   =  !global\sprites\biletter.sph
+  lores   =  !global\sprites\biletter.spl
 endarea
 
 ; GAMEMANAGER
 
 area patern
+  lsource = -flics\!global\title_l2.flc
   hsource = -flics\!global\title_h2.flc
   hires  =  !global\sprites\title_hi.sph
+  lores  =  !global\sprites\title_lo.spl 1x1
 endarea
 
 area pointer
   source  = -flics\!global\pointer.flc
   hires   =  !global\sprites\pointer.sph
+  lores   =  !global\sprites\pointer.spl
 endarea
 
 area active_mission
   source = -flics\!global\active.flc
   hires  =  !global\sprites\active.sph
+  lores  =  !global\sprites\active.spl
 endarea
 
 ; GLOBAL SPRITES
 
 area radar
   source = -flics\!global\raaa1.flc
+ lsource = -flics\!global\raaa1_l.flc
 ;  hires  =  !global\sprites\raaa1.sph
 ;  lores  =  !global\sprites\raaa1.spl 1x1
 endarea
@@ -114,37 +139,49 @@ endarea
 area radar_landing
   source = -flics\!global\lanpoint.flc
   hires  =  !global\sprites\lanpoint.sph
+ lsource = -flics\!global\lanpoinl.flc
+  lores  =  !global\sprites\lanpoint.spl 1x1
 endarea
 
 area indicator
   source = -flics\!global\damage.flc
+ lsource = -flics\!global\damagel.flc
   hires  =  !global\sprites\damage.sph
+  lores  =  !global\sprites\damagel.spl 1x1
 endarea
 
 area radar_point
   source = -flics\!global\raaa2.flc
+ lsource = -flics\!global\raaa2_l.flc
   hires  =  !global\sprites\raaa2.sph
+  lores  =  !global\sprites\raaa2.spl 1x1
 endarea
 
 area radar_target
   source = -flics\!global\direkt.flc
+  lsource = -flics\!global\direkt_l.flc
   hires  =  !global\sprites\direkt.sph
+  lores  =  !global\sprites\direkt.spl 1x1
 endarea
 
 area radar_scope
   source = -flics\!global\radpoint.flc
   hires  =  !global\sprites\radpoint.sph
+ lsource = -flics\!global\radpoinl.flc
+  lores  =  !global\sprites\radpoint.spl 1x1
 endarea
 
 area cinder_cannon
   source  = -flics\!global\dzialo1z.flc
   hires   =  !global\sprites\dzialo1z.sph
+  lores   =  !global\sprites\dzialo1z.spl
   collis  = !global\sprites\dzialo1z.spc
 endarea
 
 area cinder_pulse
   source  = -flics\!global\dzialo2z.flc
   hires   =  !global\sprites\dzialo2z.sph
+  lores   =  !global\sprites\dzialo2z.spl
   collis  = !global\sprites\dzialo2z.spc
 endarea
 
@@ -153,31 +190,37 @@ endarea
 area expl_destroy
   source = -flics\!global\gexplp.flc
   hires  =  !global\sprites\gexplp.sph
+  lores  =  !global\sprites\gexplp.spl
 endarea
 
 area expl_dest_small
   source = -flics\!global\gexpl.flc
   hires  =  !global\sprites\gexpl.sph
+  lores  =  !global\sprites\gexpl.spl
 endarea
 
 area expl_air
   source = -flics\!global\blow3.flc
   hires  =  !global\sprites\blow3.sph
+  lores  =  !global\sprites\blow3.spl
 endarea
 
 area expl_rocket
   source = -flics\!global\homeexpl.flc
   hires  =  !global\sprites\homeexpl.sph
+  lores  =  !global\sprites\homeexpl.spl
 endarea
 
 area expl_laser
   source = -flics\!global\lsrexpl.flc
   hires  =  !global\sprites\lsrexpl.sph
+  lores  =  !global\sprites\lsrexpl.spl
 endarea
 
 area expl_swarm
   source = -flics\!global\swrmexpl.flc
   hires  =  !global\sprites\swrmexpl.sph
+  lores  =  !global\sprites\swrmexpl.spl
 endarea
 
 ;*************************************
@@ -185,60 +228,73 @@ endarea
 area flame
   source = -flics\!global\explode.flc
   hires  =  !global\sprites\explode.sph
+  lores  =  !global\sprites\explode.spl
   collis =  !global\sprites\explode.spc
 endarea
 
 area dymki
   source = -flics\!global\dym2.flc
   hires  =  !global\sprites\dym2.sph
+  lores  =  !global\sprites\dym2.spl
   collis =  !global\sprites\dym2.spc
 endarea
 
 area myswarmersmoke
   source = -flics\!global\swarmsmk.flc ;dym.flc
   hires  =  !global\sprites\swarmsmk.sph ;dym.sph
+  lores  =  !global\sprites\swarmsmk.spl ;dym.spl
 endarea
 
 area myswarmer
   source = -flics\!global\missile2.flc
   hires  =  !global\sprites\missile2.sph
+  lores  =  !global\sprites\missile2.spl
   collis =  !global\sprites\missile2.spc
 endarea
 
 area mybomb
   source = -flics\!global\bolt.flc
   hires  =  !global\sprites\bolt.sph
+  lores  =  !global\sprites\bolt.spl
   collis =  !global\sprites\bolt.spc
 endarea
 
 area snail
   source = -flics\!global\slimak.flc
   hires  =  !global\sprites\slimak.sph
+  lores  =  !global\sprites\slimak.spl
 endarea
 
 area destsmoke
   source = -flics\!global\grzesdym.flc
+  lsource = -flics\!global\grzesdyl.flc
   hires  =  !global\sprites\grzesdym.sph
+  lores  =  !global\sprites\gzresdym.spl 1x1
 endarea
 
 area dym
   source = -flics\!global\dymek.flc
   hires  =  !global\sprites\dymek.sph
+  lores  =  !global\sprites\dymek.spl
 endarea
 
 area boom
   source = -flics\!global\fire.flc
   hires  =  !global\sprites\fire.sph
+  lores  =  !global\sprites\fire.spl
 endarea
 
 area cursor
   hsource = -flics\!global\cel.flc
+  lsource = -flics\!global\cel_l.flc
   hires   =  !global\sprites\cel.sph
+  lores   =  !global\sprites\cel.spl 1x1
 endarea
 
 area arocket
   source = -flics\!global\wkapusta.flc
   hires  =  !global\sprites\wkapusta.sph
+  lores  =  !global\sprites\wkapusta.spl
   collis =  !global\sprites\wkapusta.spc
 endarea
 
@@ -247,59 +303,74 @@ endarea
 area ship
   source = -flics\!global\bohater2.flc
   hires  =  !global\sprites\bohater2.sph
+  lsource = -flics\!global\bohaterl.flc
+  lores  =  !global\sprites\bohater2.spl 1x1
   collis = !global\sprites\bohater2.spc
 endarea
 
 area shiptower
   source = -flics\!global\bohtow2.flc
   hires  =  !global\sprites\bohtow2.sph
+  lores  =  !global\sprites\bohtow2.spl
 endarea
 
 area shiptowerpoint
   source = -flics\!global\bohtowp2.flc
   hires  =  !global\sprites\bohtowp2.sph
+  lores  =  !global\sprites\bohtowp2.spl
 endarea
 
 
 area shipexhaust1
   source = -flics\!global\jet_s.flc
   hires  =  !global\sprites\jet_s.sph
+  lores  =  !global\sprites\jet_s.spl
 endarea
 
 area shipexhaust2
   source = -flics\!global\jet_b.flc
   hires  =  !global\sprites\jet_b.sph
+  lores  =  !global\sprites\jet_b.spl
 endarea
 
 area shipborder
   source = -flics\!global\bohborh.flc
   hires  =  !global\sprites\bohborh.sph
+  lsource  =  -flics\!global\bohborl.flc
+  lores  =  !global\sprites\bohborh.spl 1x1 o+
 endarea
 
 area shipborderstrong
   source = -flics\!global\bosup2b.flc
   hires  =  !global\sprites\bohbosh.sph
+  lsource  =  -flics\!global\bohasplb.flc
+  lores  =  !global\sprites\bohbosh.spl 1x1 o+
 endarea
 
 area shipshield
   source = -flics\!global\bohasup2.flc
+ lsource = -flics\!global\bohasupl.flc 1x1
   hires  =  !global\sprites\bohasup2.sph
+  lores  =  !global\sprites\bohasup2.spl 1x1
 endarea
 
 area shipskin
   source = -flics\!global\skorka.flc
   hires  =  !global\sprites\skorka.sph
+  lores  =  !global\sprites\skorka.spl
   collis =  !global\sprites\skorka.spc
 endarea
 
 area weap1fire
   source = -flics\!global\w1fire.flc
   hires  =  !global\sprites\w1fire.sph
+  lores  =  !global\sprites\w1fire.spl
 endarea
 
 area shotgunfire
   source = -flics\!global\w5shoot.flc
   hires  =  !global\sprites\w5shoot.sph
+  lores  =  !global\sprites\w5shoot.spl
 endarea
 
 ;***************************************
@@ -307,11 +378,13 @@ endarea
 area dispfigsmall
   source  = -flics\!global\num_sml.flc
   hires   =  !global\sprites\num_sml.sph
+  lores   =  !global\sprites\num_sml.spl
 endarea
 
 area dispfigbig
   source  = -flics\!global\num_big.flc
   hires   =  !global\sprites\num_big.sph
+  lores   =  !global\sprites\num_big.spl
 endarea
 
 ;***************************************
@@ -319,28 +392,33 @@ endarea
 area teportu
   source  = -flics\!global\teportu.flc
   hires   =  !global\sprites\teportu.sph
+  lores   =  !global\sprites\teportu.spl
 endarea
 
 area teportd
   source  = -flics\!global\teportd.flc
   hires   =  !global\sprites\teportd.sph
+  lores   =  !global\sprites\teportd.spl
 endarea
 
 area coll_up
   source = -flics\!global\beamupx.flc
   hires  =  !global\sprites\beamupx.sph
+  lores  =  !global\sprites\beamupx.spl
 endarea
 ;*************** HERO FIRE *************
 
 area asplash
   source = -flics\!global\laserbar.flc
   hires  =  !global\sprites\laserbar.sph
+  lores  =  !global\sprites\laserbar.spl
   collis =  !global\sprites\laserbar.spc
 endarea
 
 area CannonSplash
   source = -flics\!global\strzal.flc
   hires  =  !global\sprites\strzal.sph
+  lores  =  !global\sprites\strzal.spl
   csource= -flics\!global\strzal_k.flc
   collis =  !global\sprites\strzal.spc
 endarea
@@ -348,46 +426,54 @@ endarea
 area myrocket
   source = -flics\!global\kapusta3.flc
   hires  =  !global\sprites\kapusta3.sph
+  lores  =  !global\sprites\kapusta3.spl
   collis =  !global\sprites\kapusta3.spc
 endarea
 
 area cannonpoint2
   source = -flics\brown\cannon2p.flc
+  lores  =  brown\sprites\cannon2p.spl
   hires  =  brown\sprites\cannon2p.sph
 endarea
 
 area cannonpoint1
   source = -flics\brown\cannongp.flc
+  lores  =  brown\sprites\cannongp.spl
   hires  =  brown\sprites\cannongp.sph
 endarea
 
 area fireball
   source = -flics\!global\laser2.flc
   hires  =  !global\sprites\laser2.sph
+  lores  =  !global\sprites\laser2.spl
   collis =  !global\sprites\laser2.spc
 endarea
 
 area gunfire
   source = -flics\!global\gunsht.flc
   hires  =  !global\sprites\gunsht.sph
+  lores  =  !global\sprites\gunsht.spl
   collis =  !global\sprites\gunsht.spc
 endarea
 
 area mboss3_fire_left
   source = -flics\!global\mboss3l.flc
   hires  =  !global\sprites\mboss3l.sph
+  lores  =  !global\sprites\mboss3l.spl
   collis =  !global\sprites\mboss3l.spc
 endarea
 
 area mboss3_fire_right
   source = -flics\!global\mboss3r.flc
   hires  =  !global\sprites\mboss3r.sph
+  lores  =  !global\sprites\mboss3r.spl
   collis =  !global\sprites\mboss3r.spc
 endarea
 
 area strzal
   source = -flics\!global\strzal.flc
   hires  =  !global\sprites\strzal.sph
+  lores  =  !global\sprites\strzal.spl
   csource= -flics\!global\strzal_k.flc
   collis =  !global\sprites\strzal.spc
 endarea
@@ -395,51 +481,61 @@ endarea
 area odlamek0
   source = -flics\!global\odd2.flc
   hires  =  !global\sprites\odd2.sph
+  lores  =  !global\sprites\odd2.spl
 endarea
 
 area odlamek1
   source = -flics\!global\odd1.flc
   hires  =  !global\sprites\odd1.sph
+  lores  =  !global\sprites\odd1.spl
 endarea
 
 area odlamek2
   source = -flics\!global\odlamek2.flc
   hires  =  !global\sprites\odlamek2.sph
+  lores  =  !global\sprites\odlamek2.spl
 endarea
 
 area odlamek3
   source = -flics\!global\odlamek3.flc
   hires  =  !global\sprites\odlamek3.sph
+  lores  =  !global\sprites\odlamek3.spl
 endarea
 
 area odlamek4
   source = -flics\!global\odd3.flc
   hires  =  !global\sprites\odd3.sph
+  lores  =  !global\sprites\odd3.spl
 endarea
 
 area odlamek5
   source = -flics\!global\odd4.flc
   hires  =  !global\sprites\odd4.sph
+  lores  =  !global\sprites\odd4.spl
 endarea
 
 area odlamek6
   source = -flics\!global\odd5.flc
   hires  =  !global\sprites\odd5.sph
+  lores  =  !global\sprites\odd5.spl
 endarea
 
 area odlamek7
   source = -flics\!global\odd6.flc
   hires  =  !global\sprites\odd6.sph
+  lores  =  !global\sprites\odd6.spl
 endarea
 
 area odlamek8
   source = -flics\!global\odd7.flc
   hires  =  !global\sprites\odd7.sph
+  lores  =  !global\sprites\odd7.spl
 endarea
 
 area mbosssplinter
   source = -flics\!global\odboss.flc
   hires  =  !global\sprites\odboss.sph
+  lores  =  !global\sprites\odboss.spl
   collis =  !global\sprites\odboss.spc
 endarea
 
@@ -447,42 +543,49 @@ area mine
   source = -flics\!global\sbomb.flc
   csource= -flics\!global\mine_k.flc
   hires  =  !global\sprites\sbomb.sph
+  lores  =  !global\sprites\sbomb.spl
   collis =  !global\sprites\sbomb.spc
 endarea
 
 area defmine
   source = -flics\!global\defmine.flc
   hires  =  !global\sprites\defmine.sph
+  lores  =  !global\sprites\defmine.spl
   collis =  !global\sprites\defmine.spc
 endarea
 
 area staticmine1
   source = -flics\!global\mine.flc
   hires  =  !global\sprites\mine.sph
+  lores  =  !global\sprites\mine.spl
   collis =  !global\sprites\mine.spc
 endarea
 
 area staticmine2
   source = -flics\!global\mine2.flc
   hires  =  !global\sprites\mine2.sph
+  lores  =  !global\sprites\mine2.spl
   collis =  !global\sprites\mine2.spc
 endarea
 
 area staticmine3
   source = -flics\!global\mine3.flc
   hires  =  !global\sprites\mine3.sph
+  lores  =  !global\sprites\mine3.spl
   collis =  !global\sprites\mine3.spc
 endarea
 
 area staticmine4
   source = -flics\!global\mine4.flc
   hires  =  !global\sprites\mine4.sph
+  lores  =  !global\sprites\mine4.spl
   collis =  !global\sprites\mine4.spc
 endarea
 
 area photo_cross
   source = -flics\!global\badpic.flc
   hires  =  !global\sprites\badpic.sph
+  lores  =  !global\sprites\badpic.spl
   collis =  !global\sprites\badpic.spc
 endarea
 
@@ -490,12 +593,14 @@ endarea
 area bomb
   source = -flics\!global\bomb.flc
   hires  =  !global\sprites\bomb.sph
+  lores  =  !global\sprites\bomb.spl
   collis =  !global\sprites\bomb.spc
 endarea
 
 area upgrade
   source = -flics\!global\upgrade.flc
   hires  =  !global\sprites\upgrade.sph
+  lores  =  !global\sprites\upgrade.spl
  csource = -flics\!global\upgradek.flc
   collis =  !global\sprites\upgrade.spc
 endarea
@@ -503,18 +608,22 @@ endarea
 area brick
   source = -flics\net\brick.flc
   hires  =  net\sprites\brick.sph
+  lores  =  net\sprites\brick.spl
  csource = -flics\net\brick_k.flc
   collis =  net\sprites\brick.spc
 endarea
 
 area lightexpl
   hsource = -flics\!global\elipsy.flc
+  lsource = -flics\!global\elips_lo.flc
   hires   =  !global\sprites\elipsy.sph
+  lores   =  !global\sprites\elipsy.spl 1x1
 endarea
 
 area expl_mine
   source  = -flics\!global\mineexp.flc
   hires   =  !global\sprites\mineexp.sph
+  lores   =  !global\sprites\mineexp.spl
 endarea
 
 ;STATKI
@@ -522,59 +631,69 @@ endarea
 area taran
   source = -flics\!global\spider.flc
   hires  =  !global\sprites\spider.sph
+  lores  =  !global\sprites\spider.spl
   collis = !global\sprites\spider.spc
 endarea
 
 area simple1
   source = -flics\!global\mucha.flc
   hires  =  !global\sprites\mucha.sph
+  lores  =  !global\sprites\mucha.spl
   collis = !global\sprites\mucha.spc
 endarea
 
 area simple2
   source = -flics\!global\buc.flc
   hires  =  !global\sprites\buc.sph
+  lores  =  !global\sprites\buc.spl
   collis = !global\sprites\buc.spc
 endarea
 
 area simple3
   source = -flics\!global\bug.flc
   hires  =  !global\sprites\bug.sph
+  lores  =  !global\sprites\bug.spl
   collis = !global\sprites\bug.spc
 endarea
 
 area mboss1
   source = -flics\!global\mboss1.flc
   hires  =  !global\sprites\mboss1.sph
+  lores  =  !global\sprites\mboss1.spl
   collis = !global\sprites\mboss1.spc
 endarea
 
 area mboss2
   source = -flics\!global\mboss2.flc
   hires  =  !global\sprites\mboss2.sph
+  lores  =  !global\sprites\mboss2.spl
   collis = !global\sprites\mboss2.spc
 endarea
 
 area mboss3
   source = -flics\!global\mboss3.flc
   hires  =  !global\sprites\mboss3.sph
+  lores  =  !global\sprites\mboss3.spl
   collis = !global\sprites\mboss3.spc
 endarea
 
 area mboss4
   source = -flics\!global\mboss4.flc
   hires  =  !global\sprites\mboss4.sph
+  lores  =  !global\sprites\mboss4.spl
   collis = !global\sprites\mboss4.spc
 endarea
 
 area persons
   source  = -flics\!global\persons.flc
   hires   =  !global\sprites\persons.sph
+  lores   =  !global\sprites\persons.spl
 endarea
 
 area generat
   source  = -flics\!global\shipgene.flc
   hires   =  !global\sprites\shipgene.sph
+  lores   =  !global\sprites\shipgene.spl
 endarea
 
 

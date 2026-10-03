@@ -101,7 +101,7 @@ Each phase ends with something runnable and an exit check. Phases 5–7 can over
   - **Other fixes:**
     - the static `Listmanager::run` is renamed `run_all`, because C++ forbids it hiding the virtual `Object::run`;
     - `friend class Weapon` needed a forward declaration;
-    - splinter sprites are detected by their `hires` entry, since the port data has no `lores` lines;
+    - splinter sprites are detected by their `hires` entry, since the port data has no `lores` lines (undone on 2026-10-04, when the lines came back);
     - `SysSet::init` writes one past `ranges`/`defaults`, so they have a spare slot. `data` keeps its size because it is saved with the pilot;
     - the Xio hash table holds 64-bit pointers. Xio has to stay: **demo files are Xio-compressed**;
     - `Heap::mcb` is 48 bytes and 16-byte aligned, and blocks are rounded to 16. `Sprite::Data` and `plane_buf` are no longer packed. `Phase` stays packed: its arrays follow a variable-length name in the same buffer;
@@ -190,12 +190,15 @@ Each phase ends with something runnable and an exit check. Phases 5–7 can over
   - **Fonts:** `tools/fonts/convert_fonts.py` runs each compiled glyph routine of `asm/1sp_afhi.asm`/`1sp_aflo.asm` symbolically and writes row bitmasks to `1sp_font.cpp`.
   - **Video:** `VD_sdl` replaces both the DirectDraw and the GDI-bitmap devices; the window is created by `Spr::create_window`. Display options are command-line switches for now (`--fullscreen`, `--stretch`); the phase 8 menus take them over. The game draws on every batch of ticks, presented with vsync.
   - **Sprites:** built in memory on every load in about 1 s (`keep_prepared`). Nothing is written to `data/`, and the "building …" screens the original showed for a missing cache are gone.
-    - Lores bounds come from `Lsprite::measure` (the `source` FLC at the lores scale, no pixels), for every sprite that has a `source` and wants lores.
-    - **Settled against the archive (2026-10-04):** every hires sprite had a lores target. The rule is exact for 481 sprites, but 15 differ: a `1x1` override or a separate lores master (`lsource`) was on the removed lines. One of them is the level sprite `bronie` (ship upgrades), whose bounds decide when its builders fire. Details and fix options in [original-archive.md](original-archive.md#lores-bounds-15-sprites-differ-one-of-them-a-level-sprite); the fix belongs to phase 5.
+    - Lores bounds come from `Lsprite::measure` (the lores master at the lores target's scale, no pixels).
+    - **Fixed against the archive (2026-10-04):** this first took the `source` FLC at 2×1, because the port data had dropped the `lores`/`lsource` lines. That was wrong for 15 sprites, among them the level sprite `bronie` (ship upgrades), whose bounds decide when its builders fire.
+      - The manifests are the original files again, plus the 22 lores masters.
+      - All 382 sprites the game loads now match the shipped caches. The `sprite_bounds` test keeps them so.
+      - Details in [original-archive.md](original-archive.md#lores-bounds-15-sprites-were-wrong-fixed).
   - **Test tools, pulled forward from phase 5:**
     - `--fast` runs without the clock: one simulation step per frame, game time still 1/30 s per tick (`Eem::untimed`).
     - `--demo <name>` plays one recorded demo.
-    - With both, `level1` desyncs at check number 0x109. That is expected until the phase 5 compat clones (MSVC `rand`, `qsort`) and the lores bounds fix are in place.
+    - With both, every demo desynced early. Since the lores bounds fix, 7 of the 8 replay in sync to the end on Windows/MSVC, whose CRT `rand` is the MSVC LCG. `level4c` still desyncs, at check 0x1606. Other platforms need the phase 5 `rand` clone first.
   - **Not ported:** sound stays inactive until phase 6 (the DirectSound stub would fail init). Mouse mapping waits for phase 4.
 
 ### Phase 4: input; single player becomes playable
@@ -215,7 +218,7 @@ Each phase ends with something runnable and an exit check. Phases 5–7 can over
   3. **x87 floats: no switch needed.** The CRT ran x87 at 53-bit precision.
      - `METRONQUALITY` is 1024, so the `(int)(seconds*METRONQUALITY)` tick conversions are exact under x87 and SSE alike. The earlier ×1000 analysis (0.7 s → 699 vs 700) was wrong.
      - What can differ is a float result the original used straight from the register: converted to `int` or fed into the next operation. Evaluate those in `double` (sites in [original-archive.md](original-archive.md#x87-the-tick-conversions-are-exact)).
-  4. **Lores bounds.** 15 sprites' phase bounds depend on the removed lores manifest lines, among them the level sprite `bronie`, whose bounds decide when its builders fire. See phase 3 and [original-archive.md](original-archive.md#lores-bounds-15-sprites-differ-one-of-them-a-level-sprite).
+  4. **Lores bounds: done early** (2026-10-04, see phase 3). This was the main demo desync on Windows; [original-archive.md](original-archive.md#lores-bounds-15-sprites-were-wrong-fixed) has before/after results.
 - **Headless demo runner:**
   - `firefight --headless --play-demo <file> --strict-sync` exits non-zero on `Eem_demo_sync_failure`. The original catches that exception silently and just ends the demo;
   - it also checks that the replay reached the demo's last frame;
@@ -225,7 +228,7 @@ Each phase ends with something runnable and an exit check. Phases 5–7 can over
 - **If an original demo desyncs, suspects in order:**
   1. the compat behaviours above;
   2. collision scan order;
-  3. phase bounds: compare the in-memory sprites with the shipped caches in the archive;
+  3. phase bounds: the `sprite_bounds` test checks them against the shipped caches;
   4. render-path side effects: `World::display` calls `look_at` **with builders** (`world.cpp:74-81`). Until that is proven harmless, keep the original cadence of one render per batch of ticks, and run the same calls in headless mode;
   5. the uninitialised `ACannon::global_time` read (`alien.cpp:1726`, `==` instead of `=`);
   6. finally, a real 1.0 → 1.1 gameplay change. The demos were recorded on 20 May 1996; this source is August 1996. Every gameplay `.tdf` predates the demos, so only code changed; the archive's file dates list the candidate files ([original-archive.md](original-archive.md#the-demos-and-10--11)).

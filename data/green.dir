@@ -16,106 +16,125 @@ endarea
   area plk_5
     source = -flics\green\plk_5.flc
     hires  =  green\sprites\plk_5.sph
+    lores  =  green\sprites\plk_5.spl
   endarea
 
   area plk_51
     source = -flics\green\plk_51.flc
     hires  =  green\sprites\plk_51.sph
+    lores  =  green\sprites\plk_51.spl
   endarea
 
   area liscie
     source = -flics\green\liscie.flc
     hires  =  green\sprites\liscie.sph
+    lores  =  green\sprites\liscie.spl
     collis =  green\sprites\liscie.spc
   endarea
 
   area liscie1
     source = -flics\green\liscie1.flc
     hires  =  green\sprites\liscie1.sph
+    lores  =  green\sprites\liscie1.spl
     collis =  green\sprites\liscie1.spc
   endarea
 
   area liscie2
     source = -flics\green\liscie2.flc
     hires  =  green\sprites\liscie2.sph
+    lores  =  green\sprites\liscie2.spl
   endarea
 
   area liscie3
     source = -flics\green\liscie3.flc
     hires  =  green\sprites\liscie3.sph
+    lores  =  green\sprites\liscie3.spl
   endarea
 
   area liscie4
     source = -flics\green\liscie4.flc
     hires  =  green\sprites\liscie4.sph
+    lores  =  green\sprites\liscie4.spl
   endarea
 
   area liscie4c
     source = -flics\green\liscie4c.flc
     hires  =  green\sprites\liscie4c.sph
+    lores  =  green\sprites\liscie4c.spl
     collis =  green\sprites\liscie4c.spc
   endarea
 
   area palma
     source = -flics\green\palma.flc
     hires  =  green\sprites\palma.sph
+    lores  =  green\sprites\palma.spl
     collis =  green\sprites\palma.spc
   endarea
 
   area palma_z
     source = -flics\green\palma_z.flc
     hires  =  green\sprites\palma_z.sph
+    lores  =  green\sprites\palma_z.spl
     collis =  green\sprites\palma_z.spc
   endarea
 
   area z
     source = -flics\green\z.flc
     hires  =  green\sprites\z.sph
+    lores  =  green\sprites\z.spl
     collis =  green\sprites\z.spc
   endarea
 
   area firez
     source = -flics\green\firez.flc
     hires  =  green\sprites\firez.sph
+    lores  =  green\sprites\firez.spl
     collis =  green\sprites\firez.spc
   endarea
 
   area cqx421
     source = -flics\green\cqx421.flc
     hires  =  green\sprites\cqx421.sph
+    lores  =  green\sprites\cqx421.spl
   endarea
 
   area back
     source = -flics\green\back.flc
     hires  =  green\sprites\back.sph
+    lores  =  green\sprites\back.spl
   endarea
 
   area ruiny1
     source = -flics\green\ruiny1.flc
     hires  =  green\sprites\ruiny1.sph
+    lores  =  green\sprites\ruiny1.spl
   endarea
 
   area ruiny1a
     source = -flics\green\ruiny1a.flc
     hires  =  green\sprites\ruiny1a.sph
+    lores  =  green\sprites\ruiny1a.spl
     collis =  green\sprites\ruiny1a.spc
   endarea
 
   area ruiny1z
     source = -flics\green\ruiny1z.flc
     hires  =  green\sprites\ruiny1z.sph
+    lores  =  green\sprites\ruiny1z.spl
     collis =  green\sprites\ruiny1z.spc
   endarea
 
   area ruiny2d
     source = -flics\green\ruiny2d.flc
     hires  =  green\sprites\ruiny2d.sph
+    lores  =  green\sprites\ruiny2d.spl
   endarea
 
   area ruiny2g
     source = -flics\green\ruiny2g.flc
     csource= -flics\green\ruiny2k1.flc
     hires  =  green\sprites\ruiny2g.sph
+    lores  =  green\sprites\ruiny2g.spl
     collis =  green\sprites\ruiny2g.spc
   endarea
 
@@ -123,6 +142,7 @@ endarea
     source = -flics\green\ruiny2gz.flc
     csource= -flics\green\ruiny2k.flc
     hires  =  green\sprites\ruiny2gz.sph
+    lores  =  green\sprites\ruiny2gz.spl
     collis =  green\sprites\ruiny2gz.spc
   endarea
 
@@ -130,24 +150,28 @@ endarea
     source = -flics\green\beczka.flc
     csource= -flics\green\beczka_k.flc
     hires  =  green\sprites\beczka.sph
+    lores  =  green\sprites\beczka.spl
     collis =  green\sprites\beczka.spc
   endarea
 
   area beczki_z
     source = -flics\green\beczki_z.flc
     hires  =  green\sprites\beczki_z.sph
+    lores  =  green\sprites\beczki_z.spl
     collis =  green\sprites\beczki_z.spc
   endarea
 ;--------------------------------------------------- DZIALA
   area dzialk1p
     source = -flics\net\dzialk1p.flc
     hires  =  net\sprites\dzialk1p.sph
+    lores  =  net\sprites\dzialk1p.spl
     collis =  net\sprites\dzialk1p.spc
   endarea
 
   area dzialko1
     source = -flics\green\dzialko1.flc
     hires  =  green\sprites\dzialko1.sph
+    lores  =  green\sprites\dzialko1.spl
     collis =  green\sprites\dzialko1.spc
   endarea
 
@@ -157,6 +181,7 @@ endarea
   area 3rdplane
     source = -flics\green\3rdplane.flc
     hires  =  green\sprites\3rdplane.sph
+    lores  =  green\sprites\3rdplane.spl
     collis =  green\sprites\3rdplane.spc
   endarea
 
@@ -170,30 +195,35 @@ endarea
   area unlock
     source = -flics\green\unlock.flc
     hires  =  green\sprites\unlock.sph
+    lores  =  green\sprites\unlock.spl
     collis =  green\sprites\unlock.spc
   endarea
 
  area ludek
     source = -flics\gray\ludek.flc
     hires  =  gray\sprites\ludek.sph
+    lores  =  gray\sprites\ludek.spl
     collis =  gray\sprites\ludek.spc
  endarea
 
   area rocker
     source = -flics\green\rocker.flc
     hires  =  green\sprites\rocker.sph
+    lores  =  green\sprites\rocker.spl
     collis =  green\sprites\rocker.spc
   endarea
 
   area telep
     source = -flics\green\telep.flc
     hires  =  green\sprites\telep.sph
+    lores  =  green\sprites\telep.spl
     collis =  green\sprites\telep.spc
   endarea
 
  area obca_mina
    source = -flics\!global\defmine.flc
    hires  =  !global\sprites\defmine.sph
+   lores  =  !global\sprites\defmine.spl
    ;csource = -flics\!global\defmine_k.flc
    collis =  !global\sprites\defminek.spc
  endarea
@@ -202,23 +232,27 @@ endarea
     source = -flics\green\skala.flc
     csource= -flics\green\skala_k.flc
     hires  =  green\sprites\skala.sph
+    lores  =  green\sprites\skala.spl
     collis =  green\sprites\skala.spc
   endarea
 
   area kamien
     source = -flics\green\kamien.flc
     hires  =  green\sprites\kamien.sph
+    lores  =  green\sprites\kamien.spl
   endarea
 
   area landani
     source = -flics\green\landani.flc
     hires  =  green\sprites\landani.sph
+    lores  =  green\sprites\landani.spl
     collis  =  green\sprites\landani.spc
   endarea
 
    area kop1st
     source = -flics\net\kop1st.flc
     hires  =  net\sprites\kop1st.sph
+    lores  =  net\sprites\kop1st.spl
     csource= -flics\net\kop1c.flc
     collis =  net\sprites\kop1st.spc
   endarea
@@ -226,6 +260,7 @@ endarea
   area kop1ani
     source = -flics\net\kop1ani.flc
     hires  =  net\sprites\kop1ani.sph
+    lores  =  net\sprites\kop1ani.spl
     csource= -flics\net\kop1ac.flc
     collis =  net\sprites\kop1ac.spc
   endarea
@@ -233,6 +268,7 @@ endarea
   area kop1en
     source = -flics\net\kop1en.flc
     hires  =  net\sprites\kop1en.sph
+    lores  =  net\sprites\kop1en.spl
     csource= -flics\net\kop1c.flc
     collis =  net\sprites\kop1en.spc
   endarea
@@ -240,24 +276,28 @@ endarea
   area lad
     source = -flics\green\lad.flc
     hires  =  green\sprites\lad.sph
+    lores  =  green\sprites\lad.spl
     collis =  green\sprites\lad.spc
   endarea
 
   area marker
     source = -flics\green\marker.flc
     hires  =  green\sprites\marker.sph
+    lores  =  green\sprites\marker.spl
     collis =  green\sprites\marker.spc
   endarea
 
   area sekret
     source = -flics\green\sekret.flc
     hires  =  green\sprites\sekret.sph
+    lores  =  green\sprites\sekret.spl
     collis =  green\sprites\sekret.spc
   endarea
 
   area smoke
     source = -flics\green\smoke.flc
     hires  =  green\sprites\smoke.sph
+    lores  =  green\sprites\smoke.spl
     collis =  green\sprites\smoke.spc
   endarea
 
@@ -266,18 +306,21 @@ endarea
   area bronie
     source = -flics\!global\bronie.flc
     hires  =  !global\sprites\bronie.sph
+    lores  =  !global\sprites\bronie.spl 1x1
     collis =  !global\sprites\bronie.spc
   endarea
 
   area _wrog
     source = -flics\!global\_wrog.flc
     hires  =  !global\sprites\_wrog.sph
+    lores  =  !global\sprites\_wrog.spl
     collis =  !global\sprites\_wrog.spc
   endarea
 
   area light
     source = -flics\!global\light.flc
     hires  =  !global\sprites\light.sph
+    lores  =  !global\sprites\light.spl
   endarea
 
 endarea
