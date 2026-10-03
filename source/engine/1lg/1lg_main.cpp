@@ -55,8 +55,8 @@ void Log::init (char *_name)
 
   sprintf(name,"%s",_name);  // was upper-cased, which breaks paths on case-sensitive systems
 
-  int fh=_creat(name,_S_IWRITE);
-  if(fh!=-1) _close( fh );
+  FILE *log=fopen(name,"w");  // was _creat
+  if(log) fclose(log);
 
   if ( !GetCurrentDirectory( MAX_PATH, path )) strcpy( path, unknown);
   write_string("Exec info:       working in '");
@@ -156,14 +156,13 @@ char *Log::info (char *_file,int _line)
 
 void Log::write_string (char *c, int flush)
 {
-  int fh=_open(name,_O_APPEND|_O_WRONLY|_O_TEXT);
-  if(fh!=-1)
+  (void)flush;  // the file is closed after every write, so it is always flushed
+  FILE *log=fopen(name,"a");  // was _open in text mode
+  if(log)
   {
     fputs(c,stderr);  // was OutputDebugString
-    _write(fh,c,strlen(c));
-    if ((flush)&&(!Comm::production)) 
-      _commit(fh);
-    _close(fh);
+    fputs(c,log);
+    fclose(log);
   }
 }
 

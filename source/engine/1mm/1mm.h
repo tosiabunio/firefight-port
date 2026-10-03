@@ -57,12 +57,11 @@ public:
   static void     usage  (char const* filter,char const* open_comment=0);
   static unsigned mem_avail(void);
   static unsigned max_avail(void);
+  static unsigned used(void) {return current;}
   static void  walk(void);
   static void  check(char const* where);
-private:
-  static void quit(void);
-  // Block header. Was packed to 32 bytes for 32-bit pointers; on 64-bit it is naturally
-  // aligned and padded so that every payload (header + block) stays 16-byte aligned.
+  // Block header in front of every allocation. Was packed to 32 bytes for 32-bit pointers;
+  // on 64-bit it is naturally aligned and padded so that every payload stays 16-byte aligned.
   enum { mcb_align = 16 };
   struct alignas(16) mcb {
     unsigned       guard_1;     //4      
@@ -76,6 +75,8 @@ private:
     unsigned short alloc_counter; //2
     unsigned       guard_2;     //4=32
   };
+private:
+  static void quit(void);
   static unsigned short alloc_counter;
   static int      active;
   static void*    memory;
@@ -85,8 +86,6 @@ private:
   static unsigned max;
   static unsigned current;
   static unsigned total;
-  static mcb*  find_best(unsigned req_size);
-  static void  compact(mcb* block);
   static void  check_block (mcb* block, int block_number, 
                             char const* who,char const* where=NULL);
 

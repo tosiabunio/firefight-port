@@ -138,19 +138,20 @@ void Cwe::init (Cwe_param *param)
     //----------------------------
     text.mem_alloc=alt_alloc;
     text.mem_free=alt_free;
-    int handle=_open(param->ini_file?param->ini_file:cwe_ini_file,_O_BINARY|_O_RDONLY);
-    if(handle==-1)
+    char *ini_file=param->ini_file?param->ini_file:cwe_ini_file;
+    FILE *ini=fopen(ini_file,"rb");
+    if(ini==NULL)
       FAILURE2(Cwe_error::ini_corrupted, "unable to load ini file");
+    fclose(ini);
     try
     {
-      text.dir_load(handle, param->ini_file?param->ini_file:cwe_ini_file);
+      text.dir_load(ini_file);
     }
     catch (Failure)
     {
       FAILURE2(Cwe_error::ini_corrupted, "ini file corrupted");
     }
     text.find_unused_labels=0;
-    _close(handle);
     //----------------------
     // Window initialization
     //----------------------

@@ -562,15 +562,20 @@ int Text::compile_texts (char *dst, char *src)
   return(len);
 }
 
-void Text::dir_load(int handle,char* name)
+void Text::dir_load(char* name)
 {
-  unsigned len=_filelength(handle);
-  if(len==-1) FAILURE("unable to load: %s",name);
-  char* src=(char*)((*mem_alloc)(len+1,"[txt] tmp src"));
-  if(_read(handle,src,len)==-1) FAILURE("unable to load: %s");
-  _close(handle);
+  FILE* file=fopen(name,"rb");
+  if(file==NULL) FAILURE("unable to load: %s",name);
+  fseek(file,0,SEEK_END);
+  long len=ftell(file);
+  fseek(file,0,SEEK_SET);
+  if(len<0) {fclose(file); FAILURE("unable to load: %s",name);}
+  char* src=(char*)((*mem_alloc)((unsigned)len+1,"[txt] tmp src"));
+  size_t got=fread(src,1,(size_t)len,file);
+  fclose(file);
+  if(got!=(size_t)len) {mem_free(src,FILE_LINE); FAILURE("unable to load: %s",name);}
   src[len]=0;
-  process(src,len,name);
+  process(src,(unsigned)len,name);
   if(src) mem_free(src,FILE_LINE);
 }
 

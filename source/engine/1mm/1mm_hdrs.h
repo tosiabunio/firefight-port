@@ -9,7 +9,6 @@
 
 #include <1lg.h>
 
-// #define MMU_USE_WINDOWS_HEAP
 
 #include "1mm.h"
 

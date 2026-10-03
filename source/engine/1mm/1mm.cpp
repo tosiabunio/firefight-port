@@ -7,7 +7,6 @@ const unsigned mcb_id=make_fcc('h','e','a','p');
 const unsigned guard_value=make_fcc(GUARD,GUARD,GUARD,GUARD);
 
 static char other[] ="other data";
-static char free_owner[] = "heap";
 
 //---------------------------------------------------------------------------
 // Heap static variables 
@@ -37,33 +36,23 @@ Fast_heap Fast_object::my_heap;
 //===========================================================================
 // Heap
 //===========================================================================
+// Port: every block is its own zero-filled malloc allocation behind the original block header
+// (owner name, guards, allocation counter); the headers form a list of live blocks for the
+// walks, checks and usage reports. The original carved blocks out of one VirtualAlloc'ed arena
+// of cwe.ini's memory_required bytes; that size is kept as the budget mem_avail reports against.
+// Zero-filling keeps reads of uninitialised memory the same on every platform; the original
+// arena started zeroed but handed out reused blocks with their old contents.
+static_assert(sizeof(Heap::mcb)%16==0, "block payloads must stay 16-byte aligned");
+
 void Heap::init(unsigned heap_size)
 {
   DBG_CHECK(!active);
-#ifndef MMU_USE_WINDOWS_HEAP
-        size=heap_size;
-        if ((size%65536)!=0) 
-          size = (size/65536+1)*65536;
-        memory = VirtualAlloc (NULL,size,MEM_RESERVE,PAGE_READWRITE);
-        memory = VirtualAlloc (memory,size,MEM_COMMIT,PAGE_READWRITE);
-        if (memory==NULL) 
-          FAILURE2(Mmu_error::not_enough_memory, "unable to alloc memory (error code=%0X) [Heap::init]", 
-                   GetLastError());
-        first=(mcb*)memory;
-        memset(first,GUARD,sizeof(mcb));
-        first->id    = mcb_id;
-        first->free  = 1;
-        first->owner = free_owner;
-        first->size  = size-sizeof(mcb);
-        first->prev  = NULL;
-        first->next  = NULL;
-        last=first;
-        max=0;
-        current=0;
-        total=first->size;
-#else
-  (void)heap_size;
-#endif
+  size=heap_size;
+  memory=NULL;
+  first=last=NULL;
+  max=0;
+  current=0;
+  total=size;
   active=1;
   Comm::quit_me (quit, "mmu", "log");
 }
@@ -71,125 +60,61 @@ void Heap::init(unsigned heap_size)
 void Heap::quit(void)
 {
   DBG_CHECK(active);
-#ifndef MMU_USE_WINDOWS_HEAP
-        if (!critical_error_occurred) 
-        {
-          MESSAGE("/-- final heap walk begin");
-          int left=0;
-          mcb* walker=first;
-          int counter = 0;
-          do 
-          {
-            counter++; 
-            check_block(first, counter, "Heap::quit");
-            if (!walker->free) 
-            {
-              left=1;
-              MESSAGE("| - [%05d] used by %s %dkB", walker->alloc_counter, 
-                      walker->owner, kilo(walker->size));
-            }
-            walker=walker->next;
-          } while(walker!=NULL);
-          if (left) 
-          {
-              MESSAGE("\\-- final heap walk end - allocated blocks left on heap");
-              WARNING("allocated blocks at heap quit");
-          }
-          else 
-            MESSAGE("\\-- final heap walk end - heap ok");
-        }
-        unsigned t=kilo(total);
-        unsigned u=kilo(max);
-        unsigned f=t-u;
-        ENGINFO ("Heap usage - total=%dkB used=%dkB free=%dkB", t,u,f);
-        VirtualFree (memory,0,MEM_RELEASE);
-#endif
+  if (!critical_error_occurred) 
+  {
+    MESSAGE("/-- final heap walk begin");
+    int left=0;
+    int counter = 0;
+    for (mcb* walker=first; walker!=NULL; walker=walker->next)
+    {
+      counter++; 
+      check_block(walker, counter, "Heap::quit");
+      left=1;
+      MESSAGE("| - [%05d] used by %s %dkB", walker->alloc_counter, 
+              walker->owner, kilo(walker->size));
+    }
+    if (left) 
+    {
+        MESSAGE("\\-- final heap walk end - allocated blocks left on heap");
+        WARNING("allocated blocks at heap quit");
+    }
+    else 
+      MESSAGE("\\-- final heap walk end - heap ok");
+  }
+  unsigned t=kilo(total);
+  unsigned u=kilo(max);
+  unsigned f=t-u;
+  ENGINFO ("Heap usage - total=%dkB used=%dkB free=%dkB", t,u,f);
   active=0;
-}
-//---------------------------------------------------------------------------
-Heap::mcb* Heap::find_best(unsigned req_size)
-{
-#ifndef MMU_USE_WINDOWS_HEAP
-        mcb* walker=first;
-        mcb* best=NULL;
-        unsigned best_size=0xFFFFFFFF;
-      #if HI_DEBUG
-        int counter = 0;
-      #endif
-        do 
-        {
-      #if HI_DEBUG
-          counter++;
-          check_block(walker, counter, "Heap::alloc","Heap::find_best");
-      #endif
-          if((walker->free)&&(walker->size>=req_size)) 
-          {
-            if((walker->size-req_size)<best_size) 
-            {
-              best=walker;
-              best_size=walker->size-req_size;
-            }
-          }
-          walker=walker->next;
-        } while(walker!=NULL);
-        if(best==NULL) 
-          return first;
-        else 
-          return best;
-#else
-        (void)req_size;
-        FAILURE("Illegal call in Windows Heap mode [Heap::find_best]");
-        return(NULL);
-#endif
 }
 //---------------------------------------------------------------------------
 void* Heap::alloc(unsigned block_size,char const* owner)
 {
   DBG_CHECK(active);
-#ifndef MMU_USE_WINDOWS_HEAP
-        DBG_ONLY check_block (first, 1, "Heap::alloc");
-        if (owner==NULL) 
-          owner=other;
-        block_size+=((block_size%mcb_align)!=0)?mcb_align-block_size%mcb_align:0;
-        mcb* best_free=find_best(block_size);
-        if ((best_free->size<block_size)||(!best_free->free))    // wywalic do find_best
-          FAILURE("out of memory [Heap::alloc]");
-        if ((best_free->size-block_size)<(sizeof(mcb)+4)) 
-        {
-          best_free->id    = mcb_id;
-          best_free->owner = owner;
-          best_free->free  = 0;
-          best_free->usage_flag=0;
-        } 
-        else 
-        {
-          mcb* free_piece=(mcb*)((char*)best_free+sizeof(mcb)+block_size);
-          *free_piece = *best_free;
-          free_piece->size = best_free->size-block_size-sizeof(mcb);
-  	      free_piece->prev = best_free;
-		      if (best_free->next) 
-		        best_free->next->prev=free_piece;
-		      best_free->next  = free_piece;
-          best_free->id    = mcb_id;
-          best_free->owner = owner;
-          best_free->size  = block_size;
-          best_free->free  = 0;
-          best_free->usage_flag=0;
-          if (best_free==last) 
-            last=free_piece;
-        }
-	      best_free->alloc_counter=alloc_counter;
-	      alloc_counter++;
-        current+=best_free->size;
-        if(current>max) max=current;
-        DBG_ONLY check (FILE_LINE);
-        return (void*)((char*)best_free+sizeof(mcb));
-#else
-        void *temp = VirtualAlloc(NULL, block_size, MEM_COMMIT, PAGE_READWRITE);
-        if (!temp)
-          FAILURE("out of memory for %s [Heap::alloc]", owner?owner:"<unknown object>");
-        return(temp);
-#endif
+  if (owner==NULL) 
+    owner=other;
+  block_size+=((block_size%mcb_align)!=0)?mcb_align-block_size%mcb_align:0;
+  mcb* block=(mcb*)calloc(1,sizeof(mcb)+block_size);
+  if (block==NULL)
+    FAILURE("out of memory for %s [Heap::alloc]", (char*)owner);
+  memset(block,GUARD,sizeof(mcb));
+  block->id    = mcb_id;
+  block->owner = owner;
+  block->size  = block_size;
+  block->free  = 0;
+  block->usage_flag=0;
+  block->alloc_counter=alloc_counter;
+  alloc_counter++;
+  block->prev  = last;
+  block->next  = NULL;
+  if (last)
+    last->next=block;
+  else
+    first=block;
+  last=block;
+  current+=block_size;
+  if(current>max) max=current;
+  return (void*)((char*)block+sizeof(mcb));
 }
 //---------------------------------------------------------------------------
 void Heap::free(void* ptr,char const* where)
@@ -197,249 +122,112 @@ void Heap::free(void* ptr,char const* where)
   if (ptr==NULL) 
     return;
   DBG_CHECK(active);
-#ifndef MMU_USE_WINDOWS_HEAP
-        mcb* block=(mcb*)((char*)ptr-sizeof(mcb));
-      #if HI_DEBUG
-        check_block(block, 0, "Heap::free",where);
-        if (block->free) 
-          FAILURE("attempt to free already free block [Heap::free - %s]",where);
-      #endif
-        block->id=mcb_id;
-        block->owner="heap";
-        block->free=1;
-        current-=block->size;
-        compact (block);
-        DBG_ONLY check(FILE_LINE);
-        (void)where;
-#else
-      (void)where;
-      VirtualFree(ptr, 0, MEM_RELEASE);
+  mcb* block=(mcb*)((char*)ptr-sizeof(mcb));
+#if HI_DEBUG
+  check_block(block, 0, "Heap::free",where);
 #endif
-}
-//---------------------------------------------------------------------------
-void Heap::compact(mcb* block)
-{																									
-#ifndef MMU_USE_WINDOWS_HEAP
-      if ((block==NULL)||(!block->free)) 
-        return;
-      DBG_ONLY check_block (block, 0, "Heap::compact");
-      if (block->next!=NULL) 
-      {
-        if (block->next->free) 
-        {
-          block->size+=block->next->size+sizeof(mcb);
-          if (block->next->next==NULL) 
-          {
-            block->next=NULL;
-            last=block;
-          } 
-          else 
-          {
-            block->next->next->prev=block;
-            block->next=block->next->next;
-          }
-        }
-      }
-      compact(block->prev);
-#else
-      (void)block;
-#endif
+  if (block->prev) block->prev->next=block->next; else first=block->next;
+  if (block->next) block->next->prev=block->prev; else last=block->prev;
+  current-=block->size;
+  block->id=0;  // a second free of the same block fails check_block
+  ::free(block);
+  (void)where;
 }
 //---------------------------------------------------------------------------
 void Heap::walk(void)
 {
-DBG_CHECK(active);
-#ifndef MMU_USE_WINDOWS_HEAP
-      int used_blocks = 0;
-      int free_blocks = 0;
-      mcb* walker     = first;
-      int counter=0;
-      MESSAGE("/-- heap walk begin");
-      do 
-      {
-        counter++;
-        check_block(walker, counter, "Heap::walk");
-        if(walker->free) 
-        {
-          MESSAGE("| + free %dkB", kilo(walker->size));
-          free_blocks++;
-        } 
-        else 
-        {
-          MESSAGE("| - [%05d] used by %s %dkB", (unsigned)walker->alloc_counter,
-                  walker->owner, kilo(walker->size));
-          used_blocks++;
-        }
-        walker=walker->next;
-      } while(walker!=NULL);
-      MESSAGE("\\-- heap walk end");
-      MESSAGE("blocks=%d used=%d free=%d",used_blocks+free_blocks, used_blocks,free_blocks);
-#endif
+  DBG_CHECK(active);
+  int used_blocks = 0;
+  int counter=0;
+  MESSAGE("/-- heap walk begin");
+  for (mcb* walker=first; walker!=NULL; walker=walker->next)
+  {
+    counter++;
+    check_block(walker, counter, "Heap::walk");
+    MESSAGE("| - [%05d] used by %s %dkB", (unsigned)walker->alloc_counter,
+            walker->owner, kilo(walker->size));
+    used_blocks++;
+  }
+  MESSAGE("\\-- heap walk end");
+  MESSAGE("blocks=%d used=%d free=%d",used_blocks, used_blocks,0);
 }
 //---------------------------------------------------------------------------
 void Heap::check(char const* where)
 {
-#ifndef MMU_USE_WINDOWS_HEAP
-      DBG_CHECK(active);
-      try 
-      {
-        mcb* walker=first;
-        int counter = 0;
-        do 
-        {
-          counter++;
-          check_block (walker, counter, "Heap::check", where);
-          walker=walker->next;
-        } while (walker!=NULL);
-        walker=last;
-        counter = 0;
-        do 
-        {
-          counter--; 
-          check_block(walker, counter, "Heap::check", where);
-          walker=walker->prev;
-        } while (walker!=NULL);
-      }
-      catch (Failure) 
-      {
-        FAILURE("heap corrupted [Heap::check - %s]", where);
-      }
-#else
-      (void) where;
-#endif
+  DBG_CHECK(active);
+  try 
+  {
+    int counter = 0;
+    for (mcb* walker=first; walker!=NULL; walker=walker->next)
+      check_block (walker, ++counter, "Heap::check", where);
+    counter = 0;
+    for (mcb* walker=last; walker!=NULL; walker=walker->prev)
+      check_block(walker, --counter, "Heap::check", where);
+  }
+  catch (Failure) 
+  {
+    FAILURE("heap corrupted [Heap::check - %s]", where);
+  }
 }
 //---------------------------------------------------------------------------
 unsigned Heap::mem_avail(void)
 {
-#ifndef MMU_USE_WINDOWS_HEAP
-        unsigned avail=0;
-        mcb* walker=first;
-      #if HI_DEBUG
-        int counter = 0;
-      #endif
-        do 
-        {
-      #if HI_DEBUG
-          counter++;
-          check_block(walker, counter, "Heap::mem_avail");
-      #endif
-          if (walker->free) 
-            avail+=walker->size;
-          walker=walker->next;
-        } while (walker!=NULL);
-        return avail;
-#else
-        return(Diag::swap_usage(Diag::su_Free));
-#endif
+  return (current<size) ? size-current : 0;
 }
 //---------------------------------------------------------------------------
 unsigned Heap::max_avail(void)
 {
-#ifndef MMU_USE_WINDOWS_HEAP
-        unsigned max = 0;                               
-        mcb* walker  = first;
-      #if HI_DEBUG
-        int counter  = 0;
-      #endif
-        do 
-        {
-      #if HI_DEBUG
-          counter++;
-          check_block (walker, counter, "Heap::mem_avail");
-      #endif
-          if ((walker->free)&&(walker->size>max)) 
-            max=walker->size;
-          walker=walker->next;
-        } while( walker!=NULL);
-        return max;
-#else
-        return(Diag::swap_usage(Diag::su_Free));
-#endif
+  return mem_avail();
 }
 //---------------------------------------------------------------------------
 void Heap::check_block(mcb* block, int block_counter, char const* who,char const* where)
 {
-#ifndef MMU_USE_WINDOWS_HEAP
-      if (where==NULL)
-        where=who;
-      if ((uintptr_t)block<(uintptr_t)memory) 
-        TERMINATE("[%s] - attempt to access memory below heap, block %d [%s]", who, block_counter,where);
-      if ((uintptr_t)block>=((uintptr_t)memory+(uintptr_t)size)) 
-        TERMINATE("[%s] - attempt to access memory above heap, block %d [%s]", who, block_counter,where);
-      if (block->id!=mcb_id)
-        TERMINATE("[%s] - attempt to access corrupted block, block %d [%s]", who, block_counter,where);
-      if (block->guard_1!=guard_value)
-        TERMINATE("[%s] - attempt to access block with corrupted guard %d, block %d [%s]", who, 1,block_counter,where);
-      if (block->guard_2!=guard_value)
-        TERMINATE("[%s] - attempt to access block with corrupted guard %d, block %d [%s]", who, 2,block_counter,where);
-      if (block->next==block)
-        TERMINATE("[%s] - block->next points to the same block, block %d [%s]", who, block_counter, where);
-      if (block->prev==block)
-        TERMINATE("[%s] - block->prev points to the same block, block %d [%s]", who, block_counter, where);
-#else
-      (void)block;
-      (void)block_counter;
-      (void)who;
-      (void)where;
-#endif
+  if (where==NULL)
+    where=who;
+  if (block->id!=mcb_id)
+    TERMINATE("[%s] - attempt to access corrupted block, block %d [%s]", who, block_counter,where);
+  if (block->guard_1!=guard_value)
+    TERMINATE("[%s] - attempt to access block with corrupted guard %d, block %d [%s]", who, 1,block_counter,where);
+  if (block->guard_2!=guard_value)
+    TERMINATE("[%s] - attempt to access block with corrupted guard %d, block %d [%s]", who, 2,block_counter,where);
+  if (block->next==block)
+    TERMINATE("[%s] - block->next points to the same block, block %d [%s]", who, block_counter, where);
+  if (block->prev==block)
+    TERMINATE("[%s] - block->prev points to the same block, block %d [%s]", who, block_counter, where);
 }
 //---------------------------------------------------------------------------
 void Heap::usage(char const* filter,char const* open_comment)
 {
-#ifndef MMU_USE_WINDOWS_HEAP
-      if(open_comment==NULL)
-        MESSAGE("memory usage:");
-      else
-        MESSAGE("%s",open_comment);
-      int used_blocks = 0;
-      int free_blocks = 0;
-      int counter     = 0;
-      mcb* walker=first;
-      do 
-      {
-        counter++;
-        check_block(walker, counter, "Heap::usage", "Heap::usage");
-        if(walker->free) 
-          free_blocks++;
-        else 
-          used_blocks++;
-        if((!walker->free)&&(!walker->usage_flag)) 
+  if(open_comment==NULL)
+    MESSAGE("memory usage:");
+  else
+    MESSAGE("%s",open_comment);
+  int used_blocks = 0;
+  int counter     = 0;
+  for (mcb* walker=first; walker!=NULL; walker=walker->next)
+  {
+    counter++;
+    check_block(walker, counter, "Heap::usage", "Heap::usage");
+    used_blocks++;
+    if(!walker->usage_flag) 
+    {
+      unsigned sum=0;
+      unsigned blocks=0;
+      for (mcb* second=walker; second!=NULL; second=second->next)
+        if((strcmpi((char*)walker->owner,(char*)second->owner)==0)&&(!second->usage_flag)) 
         {
-          unsigned sum=0;
-          unsigned blocks=0;
-          mcb* second=walker;
-          do 
-          {
-            if((strcmpi(walker->owner,second->owner)==0)&&(!second->usage_flag)) 
-            {
-              sum+=second->size;
-              blocks++;
-              second->usage_flag=1;
-            }
-            second=second->next;
-          } while(second!=NULL);
-          if(sum>0) 
-          {
-            if (filter==NULL)
-              MESSAGE("[%05d] %5dkB (%d) used by %s",
-                      (unsigned)walker->alloc_counter, kilo(sum),blocks,walker->owner);
-            else if(strstr(walker->owner,filter)!=NULL) 
-              MESSAGE("[%05d] %5dkB (%d) used by %s",
-                      (unsigned)walker->alloc_counter, kilo(sum),blocks,walker->owner);
-          }
+          sum+=second->size;
+          blocks++;
+          second->usage_flag=1;
         }
-        walker->usage_flag=0;
-        walker=walker->next;
-      } while(walker!=NULL);
-      MESSAGE("blocks=%d used=%d free=%d",used_blocks+free_blocks,
-                                                 used_blocks,free_blocks);
-#else
-      (void)filter;
-      (void)open_comment;
-      MESSAGE("windows heap usage - %d (%d %%)", 
-        Diag::swap_usage(Diag::su_Used|Diag::su_KB), 
-        Diag::swap_usage(Diag::su_Used|Diag::su_KB));
-#endif
+      if((sum>0)&&((filter==NULL)||(strstr(walker->owner,filter)!=NULL)))
+        MESSAGE("[%05d] %5dkB (%d) used by %s",
+                (unsigned)walker->alloc_counter, kilo(sum),blocks,walker->owner);
+    }
+  }
+  for (mcb* walker=first; walker!=NULL; walker=walker->next)
+    walker->usage_flag=0;
+  MESSAGE("blocks=%d used=%d free=%d",used_blocks,used_blocks,0);
 }
 //===========================================================================
 // Heap_object
@@ -636,15 +424,13 @@ void Fast_object::operator delete(void *ptr,size_t obj_size)
 }
 //===========================================================================
 
+// Port: reports the engine heap against its budget (was the Windows page file).
 unsigned Diag::swap_usage(int flags)
 {
   unsigned ret = 0;
-  MEMORYSTATUS status;
-  status.dwLength=sizeof(status);
-  GlobalMemoryStatus(&status);
-  unsigned total = status.dwTotalPageFile;
-  unsigned free  = status.dwAvailPageFile;
-  unsigned used  = status.dwTotalPageFile-status.dwAvailPageFile;
+  unsigned total = Heap::mem_avail()+Heap::used();
+  unsigned free  = Heap::mem_avail();
+  unsigned used  = Heap::used();
   if ((flags&su_Total)!=0)
     ret = total;
   if ((flags&su_Used)!=0)
@@ -652,7 +438,7 @@ unsigned Diag::swap_usage(int flags)
   if ((flags&su_Free)!=0)
     ret = free;
   if ((flags&su_Percent)!=0)
-    return ((unsigned)(ret*100)/total);
+    return (total ? (unsigned)(((unsigned long long)ret*100)/total) : 0);
   else if ((flags&su_KB)!=0)
     return (ret/1024);
   else if ((flags&su_MB)!=0)
@@ -660,4 +446,3 @@ unsigned Diag::swap_usage(int flags)
   else
     return(ret);
 }
-

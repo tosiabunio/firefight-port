@@ -169,7 +169,6 @@ void  Demo_recorder::close  (void)
   DBG_CHECK(status.is(rec_Initialized));
   DBG_CHECK(status.is(rec_Opened));
   BOOL  name_found = FALSE;
-  int   fh;
   char  name [_MAX_PATH];
   if (strlen(rec_file_name) != 0)
   {
@@ -178,33 +177,34 @@ void  Demo_recorder::close  (void)
   }
   else
   {
-    char tmppath[_MAX_PATH];
-    if(GetTempPath(sizeof(tmppath),tmppath)==0)
-      sprintf(tmppath,"c:");
+    // Port: recordings go to the preferences directory (was TEMP).
     int i = -1;
-    BOOL error = FALSE;
+    FILE *existing;
     do
     {
       i++;
-      sprintf (name, "%s\\demo_%03d.rec", tmppath, i);
-      fh = _open(name, O_RDONLY);
-      _close (fh);
+      sprintf (name, "%sdemo_%03d.rec", Comm::pref_path, i);
+      existing = fopen(name, "rb");
+      if (existing)
+        fclose(existing);
     }
-    while ((i<1000) && (fh!=-1));
+    while ((i<1000) && (existing!=NULL));
     if (i<1000)
       name_found = TRUE;
   }
   BOOL error = FALSE;
   if (name_found)
   {
-    if ((fh = _open(name, O_WRONLY | O_BINARY | O_CREAT | O_TRUNC, _S_IREAD | _S_IWRITE)) != -1)
+    FILE *out = fopen(name, "wb");
+    if (out != NULL)
     {
       memcpy(main_buffer, &header, sizeof(Demo_header));
       ((unsigned short*)main_buffer)[0] = crc16(&(main_buffer[4]), header.size - 4);
       ((unsigned short*)main_buffer)[1] = sum16(&(main_buffer[4]), header.size - 4);
-      if (_write (fh, main_buffer, header.size)==-1)
+      if (fwrite (main_buffer, 1, header.size, out)!=header.size)
         error = TRUE;
-      _close (fh);
+      if (fclose (out)!=0)
+        error = TRUE;
     }
     else
       error = TRUE;
@@ -249,21 +249,23 @@ void  Demo_player::quit (void)
 //-----------------------------------------------------------------------------
 BOOL Demo_player::read_disk_file (char *file_name)
 {
-  int fh;
-  fh = _open(file_name, O_RDONLY, O_BINARY);
-  if (fh==-1)
+  // Port: binary stdio. The original passed O_BINARY as the permission argument of _open,
+  // so on Windows the demo was opened in text mode.
+  FILE *fh = fopen(file_name, "rb");
+  if (fh==NULL)
   {
     WARNING ("Demo_player::open - cannot open demo file");
     return(FALSE);
   }
-  if (_read (fh, &header, sizeof(Demo_header))==-1)
+  if (fread (&header, sizeof(Demo_header), 1, fh)!=1)
   {
-    _close (fh);
+    fclose (fh);
     WARNING ("Demo_player::open - error reading demo file");
     return(FALSE);
   }
   if (header.data_version != version_of_data)
   {
+    fclose (fh);
     WARNING ("Demo_player::open - incorrect demo version");
     return (FALSE);
   }
@@ -279,13 +281,14 @@ BOOL Demo_player::read_disk_file (char *file_name)
     return (FALSE);
   }
   memcpy(main_buffer, &header, sizeof(Demo_header));
-  if (_read (fh, &(main_buffer[sizeof(Demo_header)]), header.size - sizeof(Demo_header))==-1)
+  if (fread (&(main_buffer[sizeof(Demo_header)]), 1, header.size - sizeof(Demo_header), fh)
+      != header.size - sizeof(Demo_header))
   {
-    _close (fh);
+    fclose (fh);
     WARNING ("Demo_player::open - error reading demo file");
     return(FALSE);
   }
-  _close (fh);
+  fclose (fh);
   unsigned short c16 = crc16(&(main_buffer[4]), header.size - 4);
   unsigned short s16 = sum16(&(main_buffer[4]), header.size - 4);
   if ((((unsigned short*)main_buffer)[0] != c16)||(((unsigned short*)main_buffer)[1] != s16))
