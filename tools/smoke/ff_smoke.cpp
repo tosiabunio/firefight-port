@@ -72,7 +72,8 @@ std::uint8_t pattern(int x, int y, int frame) {
 }
 
 void run_video(const Options& o) {
-  const Uint32 window_flags = SDL_WINDOW_RESIZABLE | (o.headless ? SDL_WINDOW_HIDDEN : 0u);
+  Uint32 window_flags = SDL_WINDOW_RESIZABLE;
+  if (o.headless) window_flags |= SDL_WINDOW_HIDDEN;
   SDL_Window* window = SDL_CreateWindow("Fire Fight - SDL smoke test", SDL_WINDOWPOS_CENTERED,
                                         SDL_WINDOWPOS_CENTERED, kWidth, kHeight, window_flags);
   check(window != nullptr, "create 640x400 window", window ? nullptr : SDL_GetError());
