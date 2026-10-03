@@ -32,7 +32,12 @@ Everything was selected by rule from the original archive. `README.md` documents
   - pull requests: macOS only;
   - `main`, nightly and manual runs: everything.
 
-  Work on branches and merge to `main` through a PR, so `main` has been built on all three OSes.
+  Workflow, so `main` has been built on all three OSes:
+  1. Work on a branch and push it; CI builds Windows and Linux.
+  2. Run `cmake --workflow --preset macos-clang` on the local Mac.
+  3. When both are green, fast-forward `main` to the branch and push (`git merge --ff-only`). That push runs the full matrix again.
+
+  No pull request is needed; open one only when the user asks for a review. Documentation-only changes may go straight to `main`.
 - **Archive-only material:** the launcher, the LED level editor, makefiles, shareware data, lores art and the design docs exist only in the original archive, outside this repo.
 
 ## Layout
