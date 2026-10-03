@@ -1,12 +1,13 @@
 # Fire Fight port plan: SDL2 + CMake, cross-platform
 
-Status: **proposal**. Based on a code survey of this repo (Oct 2026). File references are relative to `source/`.
+Status: **accepted.** Decisions recorded 2026-10-03 (see [Decisions](#decisions)). Based on a code survey of this repo. File references are relative to `source/`.
 
 ## Goals
 
-- **Gameplay:** v1.1 retail gameplay, faithful down to the simulation, on **Windows, Linux and macOS**, 64-bit.
-- **Art and audio:** hires art only (640×400), with the CD soundtrack from `music/`.
-- **Fidelity bar:** the 8 original attract-mode demos (`data/demo/*.rec`) replay to the end **in sync** on every platform. This test only works if the simulation is bit-exact, and bit-exactness is also what makes cross-platform network play possible.
+- **Gameplay:** v1.1 retail gameplay, faithful down to the simulation, on **Windows (x64), Linux (x86-64) and macOS (Apple Silicon)**.
+- **Art and audio:** hires art only (640×400, square pixels by default), with the CD soundtrack from `music/`.
+- **Multiplayer:** up to 4 players over **LAN and the internet**.
+- **Fidelity bar: aim for bit-exact.** The 8 original attract-mode demos (`data/demo/*.rec`) should replay to the end **in sync** on every platform. This test only works if the simulation is bit-exact, and bit-exactness is also what makes cross-platform network play possible. A divergence is acceptable only if it is proven to come from a 1.0 → 1.1 gameplay change in the original code. Any such divergence is documented, and the port-recorded golden demos take over as the gate.
 
 **Non-goals (for now):** new art, widescreen or higher internal resolution, rewriting gameplay, the shareware edition, lores mode, the level editor.
 
@@ -30,15 +31,16 @@ Status: **proposal**. Based on a code survey of this repo (Oct 2026). File refer
 |---|---|
 | Language | C++17 (`std::filesystem`, `static_assert`). Compiled as 64-bit only |
 | Build | CMake ≥ 3.21 with `CMakePresets.json`: `windows-msvc`, `linux-gcc`, `linux-clang`, `macos-clang`, each in debug and release |
-| Dependencies | vcpkg manifest mode (`vcpkg.json`, pinned baseline): `sdl2`, `sdl2-mixer` (with FLAC), `enet`. Plain `find_package` also works for distro packages on Linux |
+| Targets | Windows x64, Linux x86-64, macOS **arm64 only** (`CMAKE_OSX_ARCHITECTURES=arm64`, deployment target macOS 11, the first Apple Silicon release). No universal binary |
+| Dependencies | vcpkg manifest mode (`vcpkg.json`, pinned baseline): `sdl2`, `sdl2-mixer` (with FLAC), `enet`, and optionally `miniupnpc` for automatic port mapping. Plain `find_package` also works for distro packages on Linux |
 | Compilers | MSVC 2022, GCC, Clang/AppleClang |
 | Safety flags | `-fwrapv -fno-strict-aliasing -fsigned-char` on GCC/Clang. The code relies on wrapping arithmetic, type punning and signed `char`, which matters on Linux ARM64. MSVC already behaves this way |
-| CI | GitHub Actions matrix: Windows/MSVC, Ubuntu/GCC+Clang, macOS/AppleClang. macOS and Windows runner minutes count at a multiple of Linux minutes against the private-repo allowance, so run macOS on `main` and nightly only |
+| CI | GitHub Actions matrix: Windows/MSVC, Ubuntu/GCC+Clang, macOS arm64/AppleClang. macOS and Windows runner minutes count at a multiple of Linux minutes against the private-repo allowance. Run macOS on `main` and nightly only; day-to-day macOS testing happens on the local Mac |
 
 **Local environment** (on the current development PC):
 - **Windows:** Visual Studio 2022 Build Tools (MSVC 14.44, with bundled CMake, Ninja and vcpkg) are installed under `C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools`. They aren't on `PATH`, so use a Developer PowerShell or `vcvars64.bat`.
 - **Linux:** `wsl --install Ubuntu` gives local GCC/Clang.
-- **macOS:** CI only, unless a Mac is available.
+- **macOS:** a local Apple Silicon Mac. It needs Xcode Command Line Tools, CMake and vcpkg (or Homebrew `sdl2`, `sdl2_mixer`, `enet`).
 
 SDL2 is the stated target. The platform code will sit only in the engine drivers, so a later move to SDL3 would stay contained.
 
@@ -123,7 +125,10 @@ Each phase ends with something runnable and an exit check. Phases 5–7 can over
   - present each frame by converting palette → ARGB8888 using the original gamma tables. Output is 6-bit×4, so the maximum is 252, not 255;
   - emulate the Windows static palette entries 0–9 and 246–255;
   - draw to a streaming texture with letterboxing.
-- **Display options:** integer scaling, square pixels (the 640×480-with-bars look) or 4:3 CRT stretch, and desktop fullscreen.
+- **Display options:**
+  - **square pixels by default:** 640×400 letterboxed, as the original looked in its 640×480 mode, with integer scaling where the window allows it;
+  - 4:3 CRT stretch as an option;
+  - desktop fullscreen.
 - **Blitter:**
   - replace `_uniput`'s 8 modes with C++: put, one-colour shape, Tool, shadow, copy, two transparency variants and the collision scan;
   - the TASM macros in `asm/common.asi` and `asm/bsp.asi` give the exact semantics;
@@ -190,14 +195,40 @@ Each phase ends with something runnable and an exit check. Phases 5–7 can over
 - **To check:** `Sample::playing()` is polled inside the simulation step (`msg.cpp`). Confirm it can't affect simulation state; otherwise drive it by sample length in ticks so results don't depend on audio timing.
 - **Exit:** audio matches the original by ear: positioning, priorities, speech ducking and music per mission.
 
-### Phase 7: network (`1ee_netw`)
-- **ENet replaces DirectPlay.** Keep the engine's message layer (`NET_VERSION`, packed `Player_state`/`User_block`, chat inside the states). ENet takes over transport, sessions and the roster.
-- **Topology:** the original is a full mesh of up to 4 players. **Host relay** is proposed: clients only connect to the host, which forwards states. Only the host needs a reachable port, at the cost of one extra hop.
-- **Setup:** host or join by `address:port` from the command line and settings, with LAN discovery optional. This replaces the launcher's DirectPlay wizard and the registry `[eem]` values.
-- **Exit:** a 4-player game across Windows, Linux and macOS runs 30 minutes without a sync failure. This requires phase 5.
+### Phase 7: network play over LAN and the internet (`1ee_netw`)
+- **ENet replaces DirectPlay.**
+  - Keep the engine's message layer and lockstep model: packed `Player_state`/`User_block`, with chat inside the states.
+  - ENet takes over transport, sessions and the roster.
+  - The protocol becomes port-only (bump `NET_VERSION`). Compatibility with the original game isn't a goal.
+- **Topology: host relay.** The original is a full mesh of up to 4 players. In the port, clients connect only to the host, which forwards each player's per-frame state to the others. The simulation stays lockstep and peer-symmetric; the host is authoritative only for the session and the roster.
+- **Reachability, in order of implementation:**
+  1. **LAN:** join by address, or by LAN discovery broadcast.
+  2. **Internet, direct:** the host opens a UDP port, either automatically through UPnP/NAT-PMP (`miniupnpc`) or by manual port forwarding. IPv4 and IPv6.
+  3. **Internet, relay server:** a small standalone relay in `tools/relay/` (same CMake project, headless, runs on any cheap VPS).
+     - Host and clients connect outbound only, so no port forwarding is needed.
+     - Players join with a short session code.
+     - This also covers hosts behind carrier-grade NAT, where neither direct option works.
+- **Latency:**
+  - The original lockstep tolerates at most 4 frames (~132 ms) of delay, which suits a LAN but not internet round trips plus the extra relay hop.
+  - **Make the input delay a session parameter.** The host chooses it from round-trip times measured at join, and every peer uses the same value.
+  - The delay only shifts when inputs take effect; it doesn't change the simulation rules. So it is compatible with determinism, and games recorded online still replay.
+- **Hardening:** the original code trusts every packet, which was fine on a 1996 LAN. On the internet every received message is untrusted:
+  - validate length, type and player id before parsing;
+  - cap message rates;
+  - use a version handshake;
+  - offer an optional session password;
+  - fuzz the message parser in CI.
+- **Disconnects:** keep the original rules (a leaving player's state is zeroed, and the game ends if the host leaves). Add timeout detection so a vanished peer can't stall lockstep forever.
+- **Setup:** command-line `--host` / `--join <address|code>` first. This replaces the launcher's DirectPlay wizard and the registry `[eem]` values. The phase 8 menus then replace the command line.
+- **Exit:** a 4-player game across Windows, Linux and macOS runs 30 minutes without a sync failure, both on a LAN and over the internet through the relay with ~100 ms round trips. This requires phase 5.
 
 ### Phase 8: replace the launcher; packaging
-- **In-game options** for video (scaling, fullscreen), audio volumes, **key binding editing** (the original only edited bindings in the launcher; `menu.cpp:1049-1097` only shows them) and pilot management.
+- **In-game options**, extending the original `Menu` system, cover:
+  - video (scaling, fullscreen, square pixels or 4:3);
+  - audio volumes;
+  - **key binding editing** (the original only edited bindings in the launcher; `menu.cpp:1049-1097` only shows them);
+  - pilot management;
+  - **network host/join** (address, LAN list, relay session code, password).
 - **Packaging:** CPack Windows zip/installer, a macOS `.app` (signing and notarisation only if it is distributed), a Linux tarball/AppImage. CI publishes the artifacts.
 
 ## Risks
@@ -208,14 +239,21 @@ Each phase ends with something runnable and an exit check. Phases 5–7 can over
 | Simulation side effects in the render path (builders in `look_at`) | Headless runs or a different frame pacing change outcomes | Keep the original render cadence; investigate in phase 5 |
 | `FastAlloc` slot overflow on other ABIs (992/1024 bytes on MSVC x64; GCC/Clang unknown) | Memory corruption | `static_assert` all object sizes; enlarge the slot if needed. Doesn't affect determinism |
 | Blitter reimplementation not pixel-exact | Visual differences; collision order changes | Unit-test each mode against the asm semantics. Screenshot diffs |
-| Uninitialised `ACannon::global_time` | Behaviour depended on stale memory | Characterise its effect, then fix it deliberately (and document it) or emulate it |
-| Internet play through NAT | Full mesh rarely works | Host relay; optional relay server later |
-| Private-repo CI minutes (macOS multiplier) | Cost | macOS on `main`/nightly; Linux for most checks |
+| Uninitialised `ACannon::global_time` | Behaviour depended on stale memory | Bit-exact goal: characterise first. Emulate it if the original demos need it; otherwise fix it and document the change |
+| Internet play through NAT | Players can't connect | UPnP/NAT-PMP mapping, manual forwarding, and the relay server for everything else |
+| Internet latency and jitter | Lockstep stalls | Session-wide input delay chosen from measured round trips. The frame cap already slows the game rather than desyncing it |
+| Untrusted packets from the internet | Crashes or exploits through the 1996 parser | Validate before parsing, rate limits, parser fuzzing in CI |
+| Relay server hosting | Running cost; availability | A tiny stateless forwarder on a cheap VPS. LAN and direct connections still work without it |
+| Private-repo CI minutes (macOS multiplier) | Cost | macOS on `main`/nightly; daily testing on the local Mac; Linux for most checks |
 
-## Decisions needed
+## Decisions
 
-1. **Fidelity bar:** bit-exact replay of the original demos (proposed), or accept small divergences in exchange for cleaner fixes (e.g. fixing the `global_time` bug)?
-2. **Multiplayer scope:** LAN only, or internet play too? This decides host-relay vs a relay server and whether LAN discovery is needed.
-3. **Default presentation:** square pixels (640×400 letterboxed, as in the original 640×480 mode) or 4:3 CRT stretch?
-4. **macOS:** Apple Silicon only, or a universal binary? Is there a Mac for testing, or CI only?
-5. **Launcher replacement:** in-game options menus (proposed), or a config file plus a small separate settings tool?
+Recorded 2026-10-03.
+
+| # | Question | Decision | Effect on the plan |
+|---|---|---|---|
+| 1 | Fidelity bar | **Aim for bit-exact** | The phase 5 compat clones are required. A divergence is accepted only if it is proven to be a 1.0 → 1.1 change |
+| 2 | Multiplayer scope | **Internet as well as LAN** | Phase 7: relay server, UPnP/NAT-PMP, session-wide input delay, packet hardening |
+| 3 | Default presentation | **Square pixels** | 640×400 letterboxed with integer scaling. 4:3 stretch remains an option |
+| 4 | macOS | **Apple Silicon only; a local Mac is available** | arm64-only builds, macOS 11+. Day-to-day testing on the Mac, CI on `main`/nightly |
+| 5 | Launcher replacement | **In-game options** | Phase 8 menus: video, audio, key bindings, pilots, network host/join |
