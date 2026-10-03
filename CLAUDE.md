@@ -13,7 +13,7 @@ Everything was selected by rule from the original archive. `README.md` documents
 
 - **Version 1.1 only.** This source is v1.1 (Aug 1996). The retail CD is 1.2 and has a newer executable and `PARAMS.VOL`, but no 1.2 source exists. Don't try to reproduce 1.2 behaviour.
 - **Port plan:** SDL2 + CMake, in phases with exit criteria, in `docs/porting-plan.md`. Follow its phase order and its determinism rules.
-- **Status: phase 2 done, no video yet.** The original sources build on every platform. The runtime is on SDL2: entry point, event pump, a 30 Hz clock on the main thread, logging, settings, files and memory. Video, sound, input and network still go through `source/compat/`, whose inert Win32/DirectX stand-ins phases 3–7 replace. `firefight --headless` runs the title loop and its attract demos on the clock; without `--headless` it stops at "direct draw not installed".
+- **Status: phase 3 done; the game shows in a window but has no input or sound yet.** The original sources build on every platform. Runtime (phase 2) and video (phase 3) are on SDL2. Sound, input and network still go through `source/compat/`, whose inert Win32/DirectX stand-ins phases 4–7 replace. Without input, the game runs its title loop and attract demos; sound is inactive until phase 6.
 
 ## Build
 
@@ -21,16 +21,19 @@ Everything was selected by rule from the original archive. `README.md` documents
 - **Presets:** `windows-msvc`, `linux-gcc`, `linux-clang`, `macos-clang` (arm64 only, macOS 11+).
   - Build presets are `<preset>-debug` and `<preset>-release`; test presets use the same names.
   - All-in-one: `cmake --workflow --preset <preset>` (configure, build Debug and Release, run all tests).
-  - Single test: `ctest --preset <preset>-debug -R smoke`. Tests: `smoke` (dependencies) and `headless_run` (the game runs headless for 30 s against `data/`: title loop, then an attract demo).
+  - Single test: `ctest --preset <preset>-debug -R smoke`. Tests:
+    - `smoke`: the dependencies.
+    - `headless_run`: the game runs headless for 30 s against `data/` (title loop, then an attract demo).
+    - `golden_title`: in `--fast` mode, every 20th of the first 200 title frames must match `tests/golden/title_frames.sha256`. The frames are bit-identical on all platforms. If rendering changes on purpose, regenerate the hashes from `--headless --fast --shot-every 20 --quit-frames 200` (`tests/check_frames.cmake`).
 - **Windows on this machine:** MSVC is not on `PATH`. Run from an x64 Developer PowerShell, or call `C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Auxiliary\Build\vcvars64.bat` first. `VCPKG_ROOT` can be the bundled `…\BuildTools\VC\vcpkg`.
 - **Compile options:** `cmake/FFCompileOptions.cmake` sets them. `ff_common_options` (every target) adds `-fwrapv -fno-strict-aliasing -fsigned-char`; `ff_modern_options` (new code) adds strict warnings.
 - **Dependency targets:** `cmake/FFDependencies.cmake` normalises them to `ff::sdl2`, `ff::mixer` and `ff::enet`.
 - **Targets:** `tools/smoke/ff_smoke` is the dependency smoke test. `source/CMakeLists.txt` defines `compat`, `cwengine` (all engine modules), `regdata` and `firefight`. The original sources use `ff_legacy_options` (tolerates `char*` string literals and MSVC pragmas); new code uses `ff_modern_options`.
-- **Running:** `firefight [--data <dir>] [--pref <dir>] [--headless] [--quit-after <s>] [switch[=value] ...]` (see `source/game/main.cpp`).
+- **Running:** `firefight [--data <dir>] [--pref <dir>] [options] [switch[=value] ...]`. `source/game/main.cpp` lists the options: `--headless`, `--fullscreen`, `--stretch` (4:3), `--fast` (no clock: one simulation step per frame), `--demo <name>`, `--quit-after <s>`, `--quit-frames <n>`, `--shots <s>`, `--shot-every <n>` (frame dumps).
   - Data: `--data`, else `data/` next to the executable, else the repository's `data/` (development builds).
   - Preferences: `--pref`, else `SDL_GetPrefPath("Chaos Works", "Fire Fight")`. It holds the log (`Firefght.log`, also echoed to stderr), `settings.ini` (the former registry), the pilot files, recorded demos and screenshots.
   - Other arguments are the original engine switches (`debug=1`, `check`, ...).
-  - The first run rebuilds the sprite caches into `data/` (git-ignored).
+  - Sprites and palette tables are built from the FLC masters in memory on every start (about 1 s); nothing is written to `data/`.
 - **CI:** `.github/workflows/ci.yml` runs the workflow presets. Which platforms run:
   - branch pushes: Windows and Linux;
   - pull requests: macOS only;
@@ -67,7 +70,7 @@ Include paths for a build: `source`, `source/game`, `source/regdata`, `source/en
 - **Path resolution:** manifest paths are mixed-case DOS paths (the original engine `strupr()`s them). Resolve them as lowercase with `\` changed to `/`, relative to `data/`.
 - **Source files** are UTF-8. Git normalises their line endings.
 - **Port changes to the original code** stay minimal and say why in a short comment (`// was ...`, `// MSVC 4 ...`). The pristine original is `d73171a`.
-- **Build caches:** `*.sph`, `*.spc`, `*.spp` and `*.spl` are regenerated caches and are git-ignored. Don't commit them.
+- **Build caches:** the original's `*.sph`, `*.spc`, `*.spp` and `*.spl` caches are no longer written (phase 3 builds sprites in memory). They stay git-ignored in case old checkouts have them.
 
 ## Engine (`source/engine`, umbrella header `1cw.h`)
 
@@ -83,9 +86,10 @@ Modules are mostly static-class singletons with `init`/`quit`. Each header auto-
   - `Text`, the parser for every `area … endarea` / `key = value` data file.
 - **1ee** [eem]: input (keyboard, mouse, joystick, virtual keys), timer (main thread, serviced by the message pump), DirectPlay networking with sync checks, and demo record/playback.
 - **1sp** [spr]:
-  - DirectDraw 8-bit palettized video and sprites (hires plus collision).
+  - 8-bit palettized video on SDL (`VD_sdl` in `1sp_vdrv.cpp`: 640×400 framebuffer, palette → ARGB texture, letterboxed) and sprites (hires plus collision). Hires only, never upside down.
+  - The blitter `_uniput` (`1sp_asm.cpp`, ported from `asm/1sp_aput.asm`; its collision scan order feeds the simulation) and the fonts (`1sp_font.cpp`, generated by `tools/fonts/convert_fonts.py`).
   - The FLIC reader and `.def` level loading.
-  - Sprite rebuild from FLC masters (`1sp_lmai.cpp`, `1sp_lreb.cpp`, `1sp_ldsa.cpp`). **Palette index 255 is the transparent key colour.**
+  - Sprite build from FLC masters into memory (`1sp_lmai.cpp`, `1sp_lreb.cpp`, `1sp_ldsa.cpp`), including the lores bounds (`Lsprite::measure`). **Palette index 255 is the transparent key colour.**
 - **1ss** [sos]: DirectSound samples, mixer, songs, and MCI CD audio.
 - **1cw** [cwe]: `Cwe::init` reads `cwe.ini` and starts every other module.
 
@@ -118,9 +122,9 @@ Modules are mostly static-class singletons with `init`/`quit`. Each header auto-
   - Masters are 8-bit FLC files in `data/flics/`.
   - `hires` is built from `hsource` or else `source`, at 1×1.
   - `collis` is built from `csource` or else `source`, at 8×1.
-  - Palette `target` files are built from the palette FLC.
+  - Palette tables are built from the palette FLC.
+  - The target names (`hires = …sph`) are still required in the manifests, but the files are never read or written.
 - **Music:** song number N in `data/!global/missions.tdf` (`headersong`, `footersong`, `songs`, `netsongs`) means `music/track{N+1:02}.flac`. The original engine skipped the CD's data track.
 - **Platform-bound code to replace:**
-  - `1sp`: DirectDraw and the asm blitters.
   - `1ss`: DirectSound and MCI CD audio.
   - `1ee`: Win32 input and DirectPlay.

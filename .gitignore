@@ -1,5 +1,5 @@
-# Sprite build caches the engine regenerates from the FLC masters in data/flics
-# (hires .sph, collision .spc, palette tables .spp; .spl is lores, which the port does not use)
+# Sprite build caches the original engine wrote next to the data (hires .sph, collision .spc,
+# palette tables .spp, lores .spl). The port builds sprites in memory and never writes them.
 *.sph
 *.spc
 *.spp

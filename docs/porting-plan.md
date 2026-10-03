@@ -183,6 +183,20 @@ Each phase ends with something runnable and an exit check. Phases 5–7 can over
   - drop the Win32 progress dialog;
   - screenshots go to the pref path.
 - **Exit:** the title, menus, mission briefing and missions render and match reference screenshots from the original game. Capture those from the retail CD image, set up as described in the archive's `Instructions.txt`. Those instructions cover Windows Vista–8; Windows 11 is untested.
+- **Outcome** (2026-10-04). Everything above is in place except the comparison with the original game, which needs reference screenshots captured from the retail CD image (`--shot-every`/`--shots` dump the port's frames for the comparison).
+  - **Rendering is bit-identical across platforms.** The `golden_title` test runs the title sequence in `--fast` mode, whose logo flight uses float arithmetic. Every 20th of its first 200 frames is identical on Windows/MSVC x64, Linux GCC and Clang x86-64 and macOS arm64.
+  - **Floats:** that needed `-ffp-contract=off` on GCC/Clang. Clang on arm64 otherwise fuses `a*b+c` into one multiply-add, which rounds differently from x86. This matters for the simulation too.
+  - **Blitter:** `_uniput` is one row walker with a run operation per mode (`1sp_asm.cpp`). It follows the assembly's clipping, including its edge cases, and is commented in place. The collision scan keeps the right-to-left run order and the LIFO result order.
+  - **Fonts:** `tools/fonts/convert_fonts.py` runs each compiled glyph routine of `asm/1sp_afhi.asm`/`1sp_aflo.asm` symbolically and writes row bitmasks to `1sp_font.cpp`.
+  - **Video:** `VD_sdl` replaces both the DirectDraw and the GDI-bitmap devices; the window is created by `Spr::create_window`. Display options are command-line switches for now (`--fullscreen`, `--stretch`); the phase 8 menus take them over. The game draws on every batch of ticks, presented with vsync.
+  - **Sprites:** built in memory on every load in about 1 s (`keep_prepared`). Nothing is written to `data/`, and the "building …" screens the original showed for a missing cache are gone.
+    - Lores bounds come from `Lsprite::measure` (the `source` FLC at the lores scale, no pixels), for every sprite that has a `source` and wants lores.
+    - **Open question:** the removed manifest lines would show which sprites really had a lores target. The original manifests in the archive can settle it if phase 5 points here.
+  - **Test tools, pulled forward from phase 5:**
+    - `--fast` runs without the clock: one simulation step per frame, game time still 1/30 s per tick (`Eem::untimed`).
+    - `--demo <name>` plays one recorded demo.
+    - With both, `level1` desyncs at check number 0x109. That is expected until the phase 5 compat clones (MSVC `rand`, `qsort`, x87 conversions) are in place.
+  - **Not ported:** sound stays inactive until phase 6 (the DirectSound stub would fail init). Mouse mapping waits for phase 4.
 
 ### Phase 4: input; single player becomes playable
 - **Keyboard:**

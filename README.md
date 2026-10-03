@@ -17,7 +17,16 @@ This is the subset of the original Fire Fight (Chaos Works, 1996) material neede
 
 ## Building
 
-The port is in progress (see `docs/porting-plan.md`). Phases 1 and 2 are done: the original game compiles on all three platforms and its runtime (entry point, clock, event pump, logging, settings, files, memory) runs on SDL2. Video, sound, input and network are still inert stubs. The build produces `firefight` and the smoke test. `firefight --headless --quit-after 30` runs the title loop and an attract demo for 30 seconds without a window; the `headless_run` test runs exactly that. Settings, pilots and the log live in the SDL preferences directory (override with `--pref <dir>`).
+The port is in progress (see `docs/porting-plan.md`). Phases 1–3 are done: the original game compiles on all three platforms, its runtime runs on SDL2, and it draws in an SDL window. Input, sound and network are still inert stubs, so for now `firefight` shows the title sequence and the attract demos. Useful options (all in `source/game/main.cpp`):
+
+- `--fullscreen`: desktop full screen.
+- `--stretch`: 4:3 like a CRT; the default is square pixels.
+- `--headless`: no window.
+- `--fast`: no clock; one simulation step per frame.
+- `--demo level1`: play one recorded demo.
+- `--shot-every <n>` / `--shots <s>`: dump frames.
+
+Settings, pilots, the log and frame dumps live in the SDL preferences directory (override with `--pref <dir>`).
 
 **Requirements:** CMake ≥ 3.25, Ninja, a C++17 compiler, and [vcpkg](https://github.com/microsoft/vcpkg) with the `VCPKG_ROOT` environment variable pointing at it. vcpkg builds SDL2, SDL2_mixer (with FLAC) and ENet from `vcpkg.json` on first configure.
 
@@ -135,7 +144,7 @@ Per-entry flags: `o+` = one-colour (the weather overlays: fog, cloud, night), `m
 
 **Palette index 255 is the transparent key colour** (`key_color` in `1sp_lreb.cpp`). Keep it as alpha when converting frames to a modern format.
 
-The rebuild path that turns FLC frames into engine sprites is the reference for anything else a converter must preserve. It lives in `source/engine/1sp/1sp_lmai.cpp`, `1sp_lreb.cpp`, `1sp_ldsa.cpp` and `1sp_flic.cpp`. With the original engine in loose-file mode, missing targets are simply rebuilt on first load.
+The rebuild path that turns FLC frames into engine sprites is the reference for anything else a converter must preserve. It lives in `source/engine/1sp/1sp_lmai.cpp`, `1sp_lreb.cpp`, `1sp_ldsa.cpp` and `1sp_flic.cpp`. With the original engine in loose-file mode, missing targets were simply rebuilt on first load. The port builds every sprite in memory on load and never writes the target files.
 
 ## Music
 
