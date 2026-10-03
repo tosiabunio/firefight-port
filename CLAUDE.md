@@ -16,6 +16,7 @@ Everything was selected by rule from the original archive. `README.md` documents
   - It has the 1.1 executables built from this source, which confirm the MSVC `rand`/`qsort` and the x87 precision.
   - It has the shipped sprite caches, an exact oracle for the in-memory sprite build. The port's phase bounds match them for every sprite loaded.
   - `tools/archive/ffarchive.py` runs the checks.
+  - It is never committed. Look for it at `$FF_ARCHIVE` or `../FireFight` (next to this clone). If it isn't there or isn't in the session's directories, don't guess its contents. Ask the user to copy it or `/add-dir` it, as "Getting the archive" in `docs/original-archive.md` describes.
 - **Port plan:** SDL2 + CMake, in phases with exit criteria, in `docs/porting-plan.md`. Follow its phase order and its determinism rules.
 - **Status: phase 3 done; the game shows in a window but has no input or sound yet.** The original sources build on every platform. Runtime (phase 2) and video (phase 3) are on SDL2. Sound, input and network still go through `source/compat/`, whose inert Win32/DirectX stand-ins phases 4–7 replace. Without input, the game runs its title loop and attract demos; sound is inactive until phase 6.
 

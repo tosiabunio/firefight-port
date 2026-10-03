@@ -4,6 +4,33 @@ This repository was cut from the original Fire Fight archive: the developers' tr
 
 Paths below are relative to the archive root, the directory holding `FF/`, `LIB/` and `BIN/`. The root's location differs per machine. The archive's own `CLAUDE.md` describes its layout and how the original was built. `tools/archive/ffarchive.py` reproduces every check here (see [Tools](#tools)).
 
+## Getting the archive
+
+The archive is private material and is never committed. Each machine needs its own copy.
+
+- **What to copy:** the archive root without `Port/` and `CDAudio/`, about 620 MB.
+  - `Port/` is an old clone of this repository.
+  - `CDAudio/` holds rips whose FLACs are already in `music/`.
+  - Without the CD image the rest is about 205 MB: `FF/` 194 MB, `LIB/` 7 MB, `BIN/` 5 MB and the root `CLAUDE.md`. The CD image is needed only for `bin2iso`/`compare-cd`.
+
+  From the directory that holds `FireFight/` on the Windows PC (`D:\_Projects`), in Git Bash:
+
+  ```sh
+  tar -czf firefight-archive.tgz --exclude=FireFight/Port --exclude=FireFight/CDAudio FireFight
+  ```
+
+- **Where to put it:** next to the clone of this repository, as `FireFight/`. For example `~/Projects/FireFight` beside `~/Projects/firefight-port`; there `tar -xzf firefight-archive.tgz -C ~/Projects` unpacks it. Elsewhere, set `FF_ARCHIVE` to its root.
+  - `ffarchive.py` looks in this order: `--archive`, `$FF_ARCHIVE`, the repository's parent if it holds `FF/WORK.RTL`, then `../FireFight`.
+  - File names are mixed-case 8.3 names. The tools ignore case, so a case-sensitive file system is fine.
+- **Giving Claude Code access:** the archive is outside the repository, so add it to the session with `/add-dir <path>`. To make that stick on one machine, put it in `.claude/settings.local.json`:
+
+  ```json
+  { "permissions": { "additionalDirectories": ["../FireFight"] } }
+  ```
+- **Check it:** `python3 tools/archive/ffarchive.py bounds tests/golden/sprite_bounds.txt` must report `382 sprites checked, 0 differ from the shipped caches`.
+- **Disassembly** needs Capstone and pefile. Install them in a throwaway virtual environment: `python3 -m venv /tmp/ffvenv && /tmp/ffvenv/bin/pip install capstone pefile`. Don't name a script `dis.py`: it shadows the standard module Capstone imports.
+- **The archive's own `CLAUDE.md`** still says the port lives in its `Port/` folder. That is out of date: the port is this repository.
+
 ## Where things are
 
 | Archive path | What it is | Use for the port |
