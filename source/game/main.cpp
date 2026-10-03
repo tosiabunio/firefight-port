@@ -1,7 +1,8 @@
 // Port entry point (SDL_main): resolves the data and preferences directories, then runs the
 // original game (game_main in game.cpp, formerly WinMain).
 //
-//   firefight [--data <dir>] [--pref <dir>] [--headless] [--quit-after <seconds>] [switch ...]
+//   firefight [--data <dir>] [--pref <dir>] [--headless] [--quit-after <s>] [--fullscreen]
+//             [--stretch] [--shots <s>] [switch ...]
 //
 //   --data <dir>      directory holding cwe.ini and the *.dir manifests. Default: "data" next
 //                     to the executable, else the repository's data/ (development builds),
@@ -10,6 +11,10 @@
 //   --headless        no window, video, sound or input devices (adds the engine switches
 //                     headless=1 sos_none=1)
 //   --quit-after <s>  act as if the window were closed after s seconds (quit_after=<ms>)
+//   --fullscreen      desktop full screen (fullscreen=1)
+//   --stretch         show the 640x400 picture at 4:3 like a CRT (stretch=1); default: square pixels
+//   --shots <s>       save the displayed frame every s seconds as frame_NNNN.bmp in the
+//                     preferences directory (shots=<ms>)
 //
 // Everything else is passed through as an original engine switch (debug=1, check, ...).
 // The exit code is non-zero when the engine reported a critical error.
@@ -117,6 +122,12 @@ int main(int argc, char *argv[])
       line += " headless=1 sos_none=1";
     else if (arg == "--quit-after" && i + 1 < argc)
       line += " quit_after=" + std::to_string((int)(atof(argv[++i]) * 1000));
+    else if (arg == "--shots" && i + 1 < argc)
+      line += " shots=" + std::to_string((int)(atof(argv[++i]) * 1000));
+    else if (arg == "--fullscreen")
+      line += " fullscreen=1";
+    else if (arg == "--stretch")
+      line += " stretch=1";
     else
       line += " " + arg;
   }

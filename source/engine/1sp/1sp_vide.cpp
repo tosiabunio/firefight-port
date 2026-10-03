@@ -249,36 +249,9 @@ Screen *Video::get_screen (void)
     int real_sy=Screen::convert(screen_sy,mode_flag);
     screen_rsx=real_sx; screen_rsy=real_sy;
 
-    if((work_mode==Spr::work_normal)&&!headless)
-      video_device=&vd_ddraw;
-    else
-      video_device=&vd_bitmap;
+    video_device=&vd_sdl;  // port: was vd_ddraw (full screen) or vd_bitmap (windowed)
 
-    static int first_time=1;
-    if(first_time)
-    {
-      if(work_mode==Spr::work_debug)
-      {
-        RECT rc;
-        SetRect(&rc,0,0,screen_sx*2,screen_sy*2);
-        AdjustWindowRectEx(&rc,GetWindowStyle(Comm::hwnd),GetMenu(Comm::hwnd)!=NULL,GetWindowExStyle(Comm::hwnd));
-        SetWindowPos(Comm::hwnd,NULL,0,0,rc.right-rc.left,rc.bottom-rc.top,SWP_NOMOVE|SWP_NOZORDER|SWP_NOACTIVATE);
-      }
-      else //if(work_mode==Spr::work_safe)
-      {
-        SetWindowPos(Comm::hwnd,NULL,0,0,GetSystemMetrics(SM_CXSCREEN),GetSystemMetrics(SM_CYSCREEN),SWP_NOZORDER|SWP_NOACTIVATE);
-      }
-
-      ShowWindow(Comm::hwnd,SW_RESTORE);
-      SetForegroundWindow(Comm::hwnd);
-      first_time=0;
-    }
-
-    if(work_mode==Spr::work_debug)
-    {
-      Comm::reinit_mouse(NULL,screen_sx,screen_sy);
-    }
-    else if(work_mode==Spr::work_normal)
+    // TODO(phase 4): map mouse coordinates from the window.
     {
       RECT rc;
       rc.left  =0;
@@ -293,16 +266,6 @@ Screen *Video::get_screen (void)
         rc.top   =use_320x200 ?0   :0;   //?0          :20;
         rc.bottom=use_320x200 ?200 :240; //?screen_rsy :screen_rsy+20;
       }
-      Comm::reinit_mouse(&rc,screen_sx,screen_sy);
-    }
-    else
-    {
-      RECT crc,rc;
-      GetClientRect(Comm::hwnd,&crc);
-      rc.left  =crc.left;  //(crc.right-640)/2;
-      rc.right =crc.right; //(crc.right-640)/2+640;
-      rc.top   =crc.top;   //(crc.bottom-400)/2;
-      rc.bottom=crc.bottom;//(crc.bottom-400)/2+400;
       Comm::reinit_mouse(&rc,screen_sx,screen_sy);
     }
 
@@ -338,6 +301,9 @@ void Video::release_screen (void)
 void Video::set_mode (int mode_flag)
 {
   DBG_CHECK(initialized);
+  // Port: the port has no lores art, so a request for lores keeps hires.
+  if((mode_flag&Spr::mode_mask)==Spr::lores)
+    mode_flag=(mode_flag&~Spr::mode_mask)|Spr::hires;
   next_mode=mode_flag;
 }
 
@@ -391,27 +357,13 @@ void Video::show_screen (void)
       palette_changed=0;
     }
 
-    if(work_mode!=Spr::work_normal)
-    {
-      HDC hdc=GetDC(Comm::hwnd);
-      video_device->show_screen(hdc);
-      ReleaseDC(Comm::hwnd,hdc);
-    }
-    else
-      video_device->show_screen((HDC)NULL);
+    video_device->show_screen((HDC)NULL);
   }
 }
 
 void Video::clear_screen(void)
 {
-  if(work_mode!=Spr::work_normal)
-  {
-    HDC hdc=GetDC(Comm::hwnd);
-    video_device->clear_screen(hdc);
-    ReleaseDC(Comm::hwnd,hdc);
-  }
-  else
-    video_device->clear_screen((HDC)NULL);
+  video_device->clear_screen((HDC)NULL);
 }
 
 static char last_message[1024];
@@ -492,18 +444,13 @@ static Comm::wpp old_wp;
 void Video::init(void)
 {
   initialized=1;
-  if((work_mode==Spr::work_normal)&&!headless)
-  {
-    DBG_MESSAGE("loading DDRAW.DLL");
-    dd_hinstance = LoadLibrary("ddraw.dll");
-    if(dd_hinstance==NULL)
-      FAILURE2(Spr_error::ddraw_not_installed,"direct draw not installed");
-  }
   old_wp=Comm::set_window_proc(window_proc);
   video_device=&vd_none;
   current_mode=-1;
-  next_mode=Spr::lores;
-  upside_down=(work_mode==Spr::work_normal) ?0 :1;
+  // Port: hires only (the original started in lores), and never upside down (the windowed
+  // modes drew into a bottom-up Windows bitmap).
+  next_mode=Spr::hires;
+  upside_down=0;
   gamma=0;
   gamma_tab=gamma_tables[0];
   load_palette();
@@ -530,12 +477,6 @@ void Video::quit(void)
       ENGINFO("LORES frame rate: min=%d, max=%d, avg=%d",
         lores_min_frame_rate,lores_max_frame_rate,lores_frame_rate/lores_frame_count);
 
-    if(dd_hinstance)
-    {
-      DBG_MESSAGE("freeing DDRAW.DLL");
-      FreeLibrary(dd_hinstance);
-      dd_hinstance=NULL;
-    }
   }
 }
 
@@ -547,70 +488,8 @@ int Video::window_proc (int *result, HWND hwnd, UINT message, WPARAM wparam, LPA
     if(!old_wp(result,hwnd,message,wparam,lparam))
       switch(message)
       {
-        case WM_WINDOWPOSCHANGED: //WM_SIZE:
-          if(work_mode!=Spr::work_normal)
-            InvalidateRect(Comm::hwnd,NULL,TRUE);
-          break;
-        case WM_PAINT:
-          if((!changing_mode)&&(work_mode!=Spr::work_normal))
-          {
-            PAINTSTRUCT ps;
-            HDC hdc=BeginPaint(hwnd,&ps);
-            if (hdc)
-            {
-              if((work_mode==Spr::work_safe)&&ps.fErase)
-              {
-                HGDIOBJ gdio=SelectObject(hdc, GetStockObject(BLACK_BRUSH));
-                Rectangle(hdc,0,0,GetSystemMetrics(SM_CXSCREEN),GetSystemMetrics(SM_CYSCREEN));
-                SelectObject(hdc, gdio);
-              }
-              video_device->show_screen(hdc);
-            }
-            EndPaint(hwnd,&ps);
-            processed=1;
-          }
-          break;
-        case WM_PALETTECHANGED:
-          if((work_mode!=Spr::work_normal)&&((HWND)wparam!=hwnd))
-          {
-            DBG_MESSAGE("processing WM_PALETTECHANGED");
-            InvalidateRect(Comm::hwnd,NULL,TRUE);
-            processed=1;
-          }
-          break;
-        case WM_QUERYNEWPALETTE:
-          if(work_mode!=Spr::work_normal)
-          {
-            DBG_MESSAGE("processing WM_QUERYNEWPALETTE");
-            InvalidateRect(Comm::hwnd,NULL,TRUE);
-            (*result)=1;
-            processed=1;
-          }
-          break;
-        case WM_DISPLAYCHANGE:
-          if((!changing_mode)&&(work_mode==Spr::work_debug))
-          {
-            DBG_MESSAGE("processing WM_DISPLAYCHANGE (%dx%dx%d)",LOWORD(lparam),HIWORD(lparam),wparam);
-            update_palette();
-            processed=1;
-          }
-          break;
         case WM_ACTIVATEAPP:
           Video_device::active=LOWORD(wparam);
-          if((!changing_mode)&&(work_mode==Spr::work_safe))
-          {
-            if(LOWORD(wparam))
-            {
-              DBG_MESSAGE("activateapp (yes)");
-              ShowWindow(Comm::hwnd,SW_RESTORE);
-              SetWindowPos(Comm::hwnd,HWND_TOPMOST,0,0,GetSystemMetrics(SM_CXSCREEN),GetSystemMetrics(SM_CYSCREEN),SWP_NOACTIVATE);
-            }
-            else
-            {
-              DBG_MESSAGE("activateapp (no)");
-              ShowWindow(Comm::hwnd,SW_MINIMIZE);
-            }
-          }
           break;
       }
   }

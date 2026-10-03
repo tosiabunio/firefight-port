@@ -171,24 +171,13 @@ void Cwe::init (Cwe_param *param)
         spr_work_mode=Spr::work_normal;
     }
     
-	  if (param->hwnd==NULL)
-		{ 																										
-		  WNDCLASS wc;																				
-		  wc.hInstance       = param->hinstance;
-		  wc.lpszClassName   = (param->class_name?param->class_name:cwe_class_name);
-		  wc.lpfnWndProc     = Comm::window_proc;
-		  wc.style           = 0;
-      if (param->icon_handle)
-  		  wc.hIcon           = param->icon_handle;
-      else
-  		  wc.hIcon           = LoadIcon   (NULL,IDI_WINLOGO);
-		  wc.hCursor         = LoadCursor (NULL,IDC_ARROW);
-		  wc.lpszMenuName    = NULL;
-		  wc.cbClsExtra      = 0;
-		  wc.cbWndExtra      = 0;
-		  wc.hbrBackground   = NULL;
-		  if (!RegisterClass (&wc))
-        FAILURE2(Cwe_error::general, "unable to window class");
+    if (param->hwnd==NULL)
+    {
+      // Port: an SDL window (none when headless); was a Win32 window class and window.
+      Video::headless   = Comm::headless;
+      Video::fullscreen = Cmd_line::get_int("fullscreen",0);
+      Video::stretch_43 = Cmd_line::get_int("stretch",0);
+      Video::shot_interval = Cmd_line::get_int("shots",0);
       text.area(reg_area);
       main_hwnd=Spr::create_window (
         spr_work_mode,
@@ -319,7 +308,6 @@ void Cwe::init (Cwe_param *param)
       else if (ui==0)
         use_320x200 = text.value(spr_use_320x200);
 
-      Video::headless=Comm::headless;
       Spr::init(spr_work_mode, use_320x200, use_640x400);
     }
     text.endarea();
@@ -333,7 +321,8 @@ void Cwe::init (Cwe_param *param)
     //----------------------
     // Sos initialization
     //----------------------
-    if (Cmd_line::get_int("sos_none",0)==1)
+    // TODO(phase 6): sound stays inactive until 1ss runs on SDL_mixer (DirectSound is a stub).
+    if (true || Cmd_line::get_int("sos_none",0)==1)
       Sounds::init(0);
     else if (Cmd_line::get_int("sos_safe",0)==1)
       Sounds::init(1);

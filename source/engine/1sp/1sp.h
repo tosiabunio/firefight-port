@@ -295,7 +295,9 @@ public:
   static int headless;  // port: no DirectDraw; normal mode drawn into the memory device
   static Color palette [256], vpalette [10][256];
   static int vpalette_num;
-  static HINSTANCE dd_hinstance;
+  static int fullscreen;    // port: desktop full screen instead of a window
+  static int stretch_43;    // port: show 640x400 at 4:3 like a CRT instead of square pixels
+  static int shot_interval; // port: ms between frame dumps (frame_NNNN.bmp in the preferences); 0: off
 
   //----- metody operacji na palecie
   static void load_palette (char *name=NULL, int update_tsp=1);

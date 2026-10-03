@@ -33,6 +33,7 @@ add_library(cwengine STATIC
   engine/1sp/1sp_asm.cpp
   engine/1sp/1sp_data.cpp
   engine/1sp/1sp_flic.cpp
+  engine/1sp/1sp_font.cpp
   engine/1sp/1sp_ldsa.cpp
   engine/1sp/1sp_lev.cpp
   engine/1sp/1sp_lmai.cpp

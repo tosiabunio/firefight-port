@@ -18,7 +18,9 @@ Color Video::palette[256];
 Color Video::vpalette [10][256];
 int Video::vpalette_num;
 int Video::initialized;
-HINSTANCE Video::dd_hinstance;
+int Video::fullscreen;
+int Video::stretch_43;
+int Video::shot_interval;
 
 Tsp tsp;
 

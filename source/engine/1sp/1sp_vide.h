@@ -26,7 +26,11 @@ public:
 private:
 } static vd_none;
 
-class VD_bitmap: public Video_device
+// Port: the SDL device, replacing the DirectDraw (full screen) and GDI bitmap (windowed) devices.
+// It owns the 8-bit framebuffer the game draws into, converts it through the palette into a
+// streaming ARGB texture and draws that letterboxed in the window. Headless runs keep only the
+// framebuffer. The window outlives mode changes; quit(0) closes it.
+class VD_sdl: public Video_device
 {
 public:
   virtual void    init(int x, int y);
@@ -36,33 +40,11 @@ public:
   virtual void    release_screen (void);
   virtual void    show_screen (HDC hdc);
   virtual void    clear_screen (HDC hdc);
+  static  void    create_window (const char *title);
 private:
-  HPALETTE hpal;
-  char             *bitmap;
-  BITMAPINFOHEADER *bitmap_header;
-  RGBQUAD          *bitmap_colors;
-  void             *bitmap_surface;
-  HPALETTE          CreateIdentityPalette(RGBQUAD aRGB[], int nColors, HDC hdc);
-} static vd_bitmap;
-
-class VD_ddraw: public Video_device
-{
-public:
-  virtual void    init(int x, int y);
-  virtual void    quit(int changemode);
-  virtual void    update_palette (Color *palette, char *gamma);
-  virtual Screen *get_screen (int mode);
-  virtual void    release_screen (void);
-  virtual void    show_screen (HDC hdc);
-  virtual void    clear_screen (HDC hdc);
-private:
-  LPDIRECTDRAW        dd_main;
-  LPDIRECTDRAWSURFACE dd_primary;
-  LPDIRECTDRAWSURFACE dd_secondary;
-  LPDIRECTDRAWPALETTE dd_palette;
-  int                 old_assertbox;
-  unsigned char      *screen_buf;
-  HRESULT             lock_surface(LPDIRECTDRAWSURFACE surface, DDSURFACEDESC *ddsd);
-  HRESULT             unlock_surface(LPDIRECTDRAWSURFACE surface);
-  HRESULT             flip_surfaces(void);
-} static vd_ddraw;
+  void            present (void);
+  void            dump_frame (void);
+  unsigned char  *screen_buf;
+  int             width, height;
+  unsigned        argb[256];
+} static vd_sdl;

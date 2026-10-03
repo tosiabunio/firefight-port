@@ -1,4 +1,5 @@
 #include "1sp_hdrs.h"
+#include "1sp_vide.h"
 
 //----- komunikaty -----------------------------------------------------------
 
@@ -8,33 +9,19 @@ static char F_cantcopy[] = "trying to clone not initialized sprite";
 
 //----- czesc glowna sprajtow ------------------------------------------------
 
+// Port: opens the SDL window (none when headless). The engine still identifies "its window" by
+// Comm::hwnd, so this returns a placeholder handle.
 HWND Spr::create_window (Spr::work_modes work_mode, HINSTANCE hinstance, char *class_name, char *window_name)
 {
-  HWND hwnd;
-  if(work_mode==work_normal)
-  {
-    hwnd=CreateWindowEx(WS_EX_TOPMOST,class_name,window_name,
-      WS_POPUP,
-      0,0,0,0,
-      HWND_DESKTOP,NULL,hinstance,NULL);
-  }
-  else if(work_mode==work_debug)
-  {
-    hwnd=CreateWindow(class_name,window_name,
-      WS_OVERLAPPED|WS_THICKFRAME,
-      CW_USEDEFAULT,CW_USEDEFAULT,0,0,
-      HWND_DESKTOP,NULL,hinstance,NULL);
-  }
+  (void)work_mode;
+  (void)hinstance;
+  (void)class_name;
+  if(!Video::headless)
+    VD_sdl::create_window(window_name);
   else
-  {
-    hwnd=CreateWindowEx(WS_EX_TOPMOST,class_name,window_name,
-      WS_POPUP,
-      0,0,0,0,
-      HWND_DESKTOP,NULL,hinstance,NULL);
-  }
-
-  CHECK(hwnd!=NULL);
-  return(hwnd);
+    Video_device::active=1;  // nothing is shown, but frames are still produced (and dumped)
+  static char window;
+  return((HWND)&window);
 }
 
 int Screen::convert_accelerator[5]={0,0,1,0,2};
