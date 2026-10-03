@@ -17,7 +17,7 @@ This is the subset of the original Fire Fight (Chaos Works, 1996) material neede
 
 ## Building
 
-The port is in progress (see `docs/porting-plan.md`). Phase 1 is done: the original game compiles and links on all three platforms, but its video, sound, input and network drivers are still inert stubs. The build produces `firefight` and the smoke test. `firefight --headless --data data` loads the game data through `Game::init_all` and exits; the `headless_init` test runs exactly that.
+The port is in progress (see `docs/porting-plan.md`). Phases 1 and 2 are done: the original game compiles on all three platforms and its runtime (entry point, clock, event pump, logging, settings, files, memory) runs on SDL2. Video, sound, input and network are still inert stubs. The build produces `firefight` and the smoke test. `firefight --headless --quit-after 30` runs the title loop and an attract demo for 30 seconds without a window; the `headless_run` test runs exactly that. Settings, pilots and the log live in the SDL preferences directory (override with `--pref <dir>`).
 
 **Requirements:** CMake ≥ 3.25, Ninja, a C++17 compiler, and [vcpkg](https://github.com/microsoft/vcpkg) with the `VCPKG_ROOT` environment variable pointing at it. vcpkg builds SDL2, SDL2_mixer (with FLAC) and ENet from `vcpkg.json` on first configure.
 

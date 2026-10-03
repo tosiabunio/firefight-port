@@ -140,6 +140,16 @@ Each phase ends with something runnable and an exit check. Phases 5–7 can over
   - `SDL_QUIT` → throw `Closed`.
   - Focus loss → the original behaviour: single player freezes (`standby`); network play keeps simulating without drawing.
 - **Exit:** `--headless` boots to the title loop and runs the simulation on a clock.
+- **Outcome** (2026-10-03). Exit met: `headless_run` boots headless, runs the title loop on the 30 Hz clock until it starts an attract demo (level GREEN 6), and quits after 30 s as if the window were closed. Idle CPU is near zero.
+  - **Entry:** `main.cpp` is `SDL_main`; `WinMain` became `game_main(command_line)` and the command line reaches `Cmd_line` directly. New options: `--pref`, `--quit-after` (engine switch `quit_after=<ms>`). Data directory: `--data`, else `data/` next to the executable, else the repository's `data/` in development builds.
+  - **Shutdown stays implicit.** Phase 1's nifty counter already orders the final quits after every static destructor, on every compiler. An explicit call from `main` would run them before statics such as `Layout::text` free their heap blocks. The rule that follows: state used by a quit procedure must outlive static destruction (the registry stores are never destroyed).
+  - **Pump:** SDL events reach the original window-procedure chain as the Win32 messages they replace (`SDL_QUIT` as `WM_CLOSE`, focus as `WM_ACTIVATEAPP`), so `Eem`'s standby logic is unchanged. The pump also runs the timers. `Eem::read` sleeps until the next tick when the previous read found nothing.
+  - **Timer:** `Timer` keeps its API. A timer that falls more than 1 s behind skips ahead instead of firing a burst. `Eem` queues ticks directly in network mode too (the original's `WM_TIMER` detour existed only to leave the timer thread).
+  - **Heap:** zero-filled `malloc` blocks behind the original header. Zero-filling makes reads of uninitialised heap memory identical on every platform; the original arena started zeroed but recycled blocks with old contents.
+  - **Files:** stdio and `stat`; manifests merged in memory; volumes removed. Demo files, the log, screenshots and the build-mode report use stdio and the preferences directory. The original opened demo files in text mode on Windows (`O_BINARY` passed as the permission argument), and its screenshot name buffer could overflow.
+  - **Settings:** `settings.ini` with typed entries (`dword:`, `str:`, `hex:`). Only `spr/hires mode` and `spr/lores mode` need built-in launcher defaults; the key bindings already default to `RegData::DefControls`. Pilot progress: one file per pilot, same 3388 bytes. The `GUID` fields were already fixed-width (`compat/win32.h`).
+  - **Overload hazard:** C++11 and later only use the string-literal→`char*` conversion as a last resort, so `print(0,0,"%s",msg)` chose `Screen::print(char*,...)` with a NULL format and crashed. That overload set now takes `const char*`. A scan of all overload sets with `char*` parameters found no other case where a literal changes the choice.
+  - **compat:** the stand-ins nothing calls any more are gone (registry, command line, temp files, environment, message loop, mutexes, multimedia timer, message boxes), and so are the CRT file-descriptor and directory-search shims.
 
 ### Phase 3: video (`1sp`)
 - **Framebuffer and present:**
