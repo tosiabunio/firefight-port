@@ -1,0 +1,216 @@
+P386
+MODEL FLAT,C
+SMART
+
+INCLUDE         "bsp.asi"
+
+MACRO PROCEDURE name
+  PUBLIC        name
+  PROC          name
+ENDM
+
+MACRO ENDPROC
+  RET
+  ENDP
+ENDM
+
+MACRO fast_stosb
+  cmp ecx,16
+  $if ge
+    mov ah,al
+    push ax
+    push ax
+    pop eax
+    test edi,01h
+    $if nz
+      stosb
+      dec ecx
+    $endif
+    test edi,02h
+    $if nz
+      stosw
+      sub ecx,2
+    $endif
+    push ecx
+    shr ecx,2
+    rep stosd
+    pop ecx
+    and ecx,03h
+  $endif
+  rep stosb
+ENDM
+
+MACRO fast_movsb
+  cmp ecx,16
+  $if ge
+    test edi,01h
+    $if nz
+      mov al,[esi]
+      mov [edi],al
+      lea esi,[esi+1]
+      lea edi,[edi+1]
+      lea ecx,[ecx-1]
+    $endif
+    test edi,02h
+    $if nz
+      mov ax,[esi]
+      mov [edi],ax
+      lea esi,[esi+2]
+      lea edi,[edi+2]
+      lea ecx,[ecx-2]
+    $endif
+    push ecx
+    and ecx,0fffffff8h
+    lea esi,[esi+ecx]
+    lea edi,[edi+ecx]
+    neg ecx
+    push ebx
+    $do
+      mov eax,[esi+ecx]
+      mov ebx,[esi+ecx+4]
+      mov [edi+ecx],eax
+      mov [edi+ecx+4],ebx
+      add ecx,8
+    $enddo js
+    pop ebx
+    pop ecx
+    and ecx,07h
+  $endif
+
+  or ecx,ecx
+  $if nz
+    lea esi,[esi+ecx]
+    lea edi,[edi+ecx]
+    neg ecx
+    $do
+      mov al,[esi+ecx]
+      mov [edi+ecx],al
+      inc ecx
+    $enddo js
+  $endif
+ENDM
+
+MACRO fast_xlatedi
+  push edx
+  xor eax,eax
+  cmp ecx,16
+  $if ge
+    test edi,01h
+    $if nz
+      mov al,[edi]
+      mov dl,[ebx+eax]
+      mov [edi],dl
+      lea edi,[edi+1]
+      lea ecx,[ecx-1]
+    $endif
+    test edi,02h
+    $if nz
+      mov al,[edi+0]
+      mov dl,[ebx+eax]
+      mov al,[edi+1]
+      mov dh,[ebx+eax]
+      mov [edi],dx
+      lea edi,[edi+2]
+      lea ecx,[ecx-2]
+    $endif
+    push ecx
+    and ecx,0fffffffch
+    lea edi,[edi+ecx]
+    neg ecx
+    $do
+      mov al,[edi+ecx+2]
+      mov dl,[ebx+eax]
+      mov al,[edi+ecx+3]
+      mov dh,[ebx+eax]
+      ror edx,16
+
+      mov al,[edi+ecx+0]
+      mov dl,[ebx+eax]
+      mov al,[edi+ecx+1]
+      mov dh,[ebx+eax]
+      mov [edi+ecx],edx
+
+      add ecx,4
+    $enddo js
+    pop ecx
+    and ecx,03h
+  $endif
+
+  or ecx,ecx
+  $if nz
+    add edi,ecx
+    neg ecx
+    $do
+      mov al,[edi+ecx]
+      mov dl,[ebx+eax]
+      mov [edi+ecx],dl
+      inc ecx
+    $enddo js
+  $endif
+  pop edx
+ENDM
+
+MACRO fast_xlatesiedi
+  push edx
+  xor eax,eax
+  cmp ecx,16
+  $if ge
+    test edi,01h
+    $if nz
+      mov al,[esi]
+      mov dl,[ebx+eax]
+      mov [edi],dl
+      lea esi,[esi+1]
+      lea edi,[edi+1]
+      lea ecx,[ecx-1]
+    $endif
+    test edi,02h
+    $if nz
+      mov al,[esi+0]
+      mov dl,[ebx+eax]
+      mov al,[esi+1]
+      mov dh,[ebx+eax]
+      mov [edi],dx
+      lea esi,[esi+2]
+      lea edi,[edi+2]
+      lea ecx,[ecx-2]
+    $endif
+    push ecx
+    and ecx,0fffffffch
+    lea esi,[esi+ecx]
+    lea edi,[edi+ecx]
+    neg ecx
+    $do
+      mov al,[esi+ecx+2]
+      mov dl,[ebx+eax]
+      mov al,[esi+ecx+3]
+      mov dh,[ebx+eax]
+      ror edx,16
+
+      mov al,[esi+ecx+0]
+      mov dl,[ebx+eax]
+      mov al,[esi+ecx+1]
+      mov dh,[ebx+eax]
+      mov [edi+ecx],edx
+
+      add ecx,4
+    $enddo js
+    pop ecx
+    and ecx,03h
+  $endif
+
+  or ecx,ecx
+  $if nz
+    add esi,ecx
+    add edi,ecx
+    neg ecx
+    $do
+      mov al,[esi+ecx]
+      mov al,[ebx+eax]
+      mov [edi+ecx],al
+      inc ecx
+    $enddo js
+  $endif
+  pop edx
+ENDM
+

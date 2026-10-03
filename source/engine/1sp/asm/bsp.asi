@@ -1,0 +1,225 @@
+;
+;┌──────────────────────────────────────────────────────────────────────┐
+;│                   block  structure  preprocessor                     │
+;└──────────────────────────────────────────────────────────────────────┘
+;
+;  IDEAL mode
+;
+;  usage:
+;       $if   <condition>       $if   <condition>
+;       $else                   $endif
+;       $endif
+;
+;       $do
+;         $leave  <condition>, <number of levels>       ; break loop
+;         $next   <condition>, <number of levels>       ; next loop
+;       $enddo  <instruction>
+;
+?cnd_?          =       0               ; unknown condition
+?cnd_z          =       1               ; zero
+?cnd_nz         =      -1               ; not zero
+?cnd_e          =       2               ; equal to
+?cnd_ne         =      -2               ; not equal to
+?cnd_l          =       3               ; less than
+?cnd_nl         =      -3               ; not less than
+?cnd_le         =       4               ; less than or equal to
+?cnd_nle        =      -4               ; not less than or equal to
+?cnd_g          =       5               ; grater than
+?cnd_ng         =      -5               ; not grater than
+?cnd_ge         =       6               ; grater than or equal to
+?cnd_nge        =      -6               ; not grater than or equal to
+?cnd_b          =       7               ; below than
+?cnd_nb         =      -7               ; not below than
+?cnd_be         =       8               ; below than or equal to
+?cnd_nbe        =      -8               ; not below than or equal to
+?cnd_a          =       9               ; above than
+?cnd_na         =      -9               ; not above than
+?cnd_ae         =      10               ; above than or equal to
+?cnd_nae        =     -10               ; not above than or equal to
+?cnd_s          =      11               ; signed
+?cnd_ns         =     -11               ; not signed
+?cnd_c          =      12               ; carry
+?cnd_nc         =     -12               ; not carry
+?cnd_o          =      13               ; overflow
+?cnd_no         =     -13               ; not overflow
+?cnd_p          =      14               ; positive
+?cnd_np         =     -14               ; not positive
+?cnd_po         =      15               ; parity odd
+?cnd_pe         =     -15               ; parity even
+?cnd_cxz        =      16               ; CX==0
+?cnd_cxnz       =     -16               ; CX!=0
+;
+?if_lab         =       0               ; next label number
+?if_lev         =       0               ; level
+?if_s0          =       0               ; syntax flag [level]
+?if_l0          =       0               ; label [level]
+;
+?do_lab         =       0               ; next label number
+?do_lev         =       0               ; level
+?do_s0          =       0               ; syntax flag [level]
+?do_l0          =       0               ; label [level]
+?do_il0         =       0               ; "if" level
+?do_is0         =       0               ; "if" syntax
+;
+macro           ?cat    a, b, c, d, e, f, g
+a&b c&d e&f&g
+endm
+;
+macro           ?cas    a, b, c, d, e, f, g, h
+a&b&c&d&e&f&g&h
+endm
+;
+macro           ?error  m
+%out            error:  m
+endm
+;
+;       _c - condition
+;       _p - label prefix
+;       _n - label number
+;       _i - instruction
+;       _l - level
+;
+macro           ?if_jmp         _c, _p, _n
+   ifndef  ?cnd_&_c
+      ?error  <unknown condition "&_c">
+      exitm
+   endif
+   irp  x, <z,nz,e,ne,l,nl,le,nle,g,ng,ge,nge,b,nb,be,nbe,a,na,ae,nae,s,ns,c,nc,o,no,p,np,po,pe,cxz,cxnz>
+      ife  ?cnd_&&x - ?cnd_&&_c
+         irp  y, <nz,z,ne,e,nl,l,nle,le,ng,g,nge,ge,nb,b,nbe,be,na,a,nae,ae,ns,s,nc,c,no,o,np,p,pe,po,cxnz,cxz>
+            ife  ?cnd_&&&y + ?cnd_&&x
+               j&&&y  _p&&_n
+               exitm
+            endif
+         endm
+         exitm
+      endif
+   endm
+endm
+;
+macro   $if     _c
+   ?if_lab = ?if_lab + 1
+   ?if_lev = ?if_lev + 1
+   ?cat  <?if_s>, %?if_lev, <=>,, 1
+   ?cat  <?if_l>, %?if_lev, <=>,, %?if_lab
+   ?if_jmp  <_c>, ?if1_, %?if_lab
+endm
+;
+macro   $else
+   if  ?if_lev
+;      ?cat  <?B_i>,, <=>, <?B_T>, %?B_LEV
+;      ife  ?B_i
+;         error  <$ELSE after $DO>
+;         exitm
+;      endif
+      ?cat  <?if_s?>,, <=>,, <?if_s>, %?if_lev
+      ife  ?if_s? - 2
+         ?error  <$ELSE after $ELSE>
+         exitm
+      endif
+      ?cat  <?if_s>, %?if_lev, <=>,, 2
+      ?cat  <?if_l?>,,, <=>, <?if_l>, %?if_lev
+      ?cat  <jmp >,, <?if2_>, %?if_l?
+      ?cat  label,, <?if1_>, %?if_l?, near
+   else
+      ?error   <No $IF for $ELSE>
+   endif
+endm
+;
+macro   $endif
+   if  ?if_lev
+;      ife  ?B_i
+;         error  <$ENDIF after $DO>
+;         exitm
+;      endif
+      ?cat  <?if_l?>,, <=>,, <?if_l>, %?if_lev
+      ?cat  <?if_s?>,, <=>,, <?if_s>, %?if_lev
+      ?cas  <label >, <?if>, %?if_s?, <_>, %?if_l?, < near>
+      ?if_lev = ?if_lev - 1
+   else
+      ?error  <No $IF for $ENDIF>
+   endif
+endm
+;
+macro   $do
+   ?do_lab = ?do_lab + 1
+   ?do_lev = ?do_lev + 1
+   ?cat  <?do_s>, %?do_lev, <=>,, 1
+   ?cat  <?do_l>, %?do_lev, <=>,, %?do_lab
+   ?cat  label,, <?do1_>, %?do_lab, near
+   ?cat  <?if_l?>,, <=>,, <?if_l>, %?if_lev
+   ?cat  <?do_il>, %?do_lev, <=>,, ?if_l, %?if_lev
+   ?cat  <?do_is>, %?do_lev, <=>,, ?if_s, %?if_lev
+endm
+;
+macro   $enddo  _i
+   if  ?do_lev
+      ?cat  <?if_l?>,, <=>,, <?if_l>, %?if_lev
+      ?cat  <?do_il?>,, <=>,, <?do_il>, %?do_lev
+      ?cat  <?do_il@>,, <=>,, ?if_l, %?if_lev
+      ?cat  <?do_is?>,, <=>,, <?do_is>, %?do_lev
+      ?cat  <?do_is@>,, <=>,, ?if_s, %?if_lev
+;     if  (?do_il? ne ?do_il@) or (?do_is? ne ?do_is@)
+;        ?error  <$DO/$ENDDO intersection with $IF/$ELSE/$ENDIF>
+;     endif
+      ?cat  <?do_l?>,, <=>,, <?do_l>, %?do_lev
+      ifb  <_i>
+         ?cat  <jmp>,, <?do1_>, %?do_l?
+      else
+         ?cat  <_i>,, <?do1_>, %?do_l?
+      endif
+      ?cat  label,, <?do2_>, %?do_l?, near
+      ?do_lev = ?do_lev - 1
+   else
+      ?error  <No $DO for $ENDDO>
+   endif
+endm
+;
+macro   $leave  _c, _l
+   if  ?do_lev
+      ifb  <_l>
+         ?do_l? = 0
+      else
+         ?do_l? = _l - 1
+      endif
+      if  ?do_l? le ?do_lev
+         ?do_l? = ?do_lev - ?do_l?
+         ?cat  <?do_l?>,, <=>,, <?do_l>, %?do_l?
+      else
+         error  <$LEAVE can't leave so much levels>
+         exitm
+      endif
+      ifb  <_c>
+         ?cat  <jmp >,, <?do2_>, %?do_l?
+      else
+         ?cat  <j>, _c, <?do2_>, %?do_l?
+      endif
+   else
+      error   <$LEAVE outside $DO ... $ENDDO block>
+   endif
+endm
+;
+macro   $next   _c, _l
+   if  ?do_lev
+      ifb  <_l>
+         ?do_l? = 0
+      else
+         ?do_l? = _l - 1
+      endif
+      if  ?do_l? le ?do_lev
+         ?do_l? = ?do_lev - ?do_l?
+         ?cat  <?do_l?>,, <=>,, <?do_l>, %?do_l?
+      else
+         error  <$NEXT can't jump so much levels>
+         exitm
+      endif
+      ifb  <_c>
+         ?cat  <jmp >,, <?do1_>, %?do_l?
+      else
+         ?cat  <j>, _c, <?do1_>,% ?do_l?
+      endif
+   else
+      error  <$NEXT outside $DO ... $ENDDO block>
+   endif
+endm
+;
