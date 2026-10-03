@@ -104,4 +104,4 @@ ff_legacy_options(firefight)
 add_test(NAME headless_init COMMAND firefight --data "${FF_DATA_DIR}" --headless)
 set_tests_properties(headless_init PROPERTIES
   ENVIRONMENT "TEMP=${CMAKE_CURRENT_BINARY_DIR}"
-  TIMEOUT 600)
+  TIMEOUT 300)
