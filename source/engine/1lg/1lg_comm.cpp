@@ -1,8 +1,8 @@
 #include "1lg_hdrs.h"
 #include <atomic>
 #include <new>
+#include <SDL.h>
 #pragma init_seg(lib)
-#pragma comment(lib,"comctl32.lib")
 
 static char assert_message[]="assertion (%s) failed in %s";
 
@@ -11,10 +11,11 @@ HINSTANCE   Comm::hinstance=NULL;
 int         Comm::debug=0;;
 int         Comm::allow_assertbox=1;
 int         Comm::exit_code=0;
-char       *Comm::spawn_name=NULL;
-char       *default_argv[]={NULL};
-char      **Comm::spawn_argv=default_argv;
 int         Comm::standby=0;
+char        Comm::pref_path[_MAX_PATH]="";
+int         Comm::headless=0;
+unsigned    Comm::quit_time=0;
+void        (*Comm::tick_service) (void)=NULL;
 int         Comm::production=1;
 char        Comm::working_path[_MAX_PATH];
 
@@ -168,9 +169,27 @@ static WNDPROC def_window_proc = NULL;
 static int closed,cerror;
 static int last_standby=-1;
 
+// Port: SDL events are dispatched through the original window procedure chain as the Win32
+// messages they replace, so the engine modules keep their message handling.
+static void dispatch_sdl_event (SDL_Event &event)
+{
+  switch(event.type)
+  {
+    case SDL_QUIT:
+      Comm::window_proc(Comm::hwnd,WM_CLOSE,0,0);
+      break;
+    case SDL_WINDOWEVENT:
+      if(event.window.event==SDL_WINDOWEVENT_FOCUS_GAINED)
+        Comm::window_proc(Comm::hwnd,WM_ACTIVATEAPP,TRUE,0);
+      else if(event.window.event==SDL_WINDOWEVENT_FOCUS_LOST)
+        Comm::window_proc(Comm::hwnd,WM_ACTIVATEAPP,FALSE,0);
+      break;
+  }
+}
+
 void Comm::process_messages (void)
 {
-  MSG msg;
+  SDL_Event event;
   if((!standby)||closed)
   {
     if((last_standby!=standby)&&(!production))
@@ -178,11 +197,8 @@ void Comm::process_messages (void)
       last_standby=standby;
       MESSAGE("active mode entered");
     }
-    while (PeekMessage(&msg,NULL,0,0,PM_REMOVE))
-    {
-      TranslateMessage(&msg);
-      DispatchMessage(&msg);
-    }
+    while (SDL_PollEvent(&event))
+      dispatch_sdl_event(event);
   }
   else
   {
@@ -191,9 +207,16 @@ void Comm::process_messages (void)
       last_standby=standby;
       MESSAGE("stanby mode entered");
     }
-    GetMessage(&msg,NULL,0,0);
-    TranslateMessage(&msg);
-    DispatchMessage(&msg);
+    // Was GetMessage: block until something happens, but keep the timers running.
+    if(SDL_WaitEventTimeout(&event,100))
+      dispatch_sdl_event(event);
+  }
+  if(tick_service)
+    tick_service();
+  if((quit_time!=0)&&(closed==0)&&SDL_TICKS_PASSED(SDL_GetTicks(),quit_time))
+  {
+    MESSAGE("quit time reached");
+    closed=1;
   }
   if(cerror)
   {
@@ -205,6 +228,44 @@ void Comm::process_messages (void)
     closed=2;
     throw Closed();
   }
+}
+
+void Comm::wait_messages (unsigned ms)
+{
+  if(ms>0)
+    SDL_WaitEventTimeout(NULL,(int)ms);
+  process_messages();
+}
+
+void Comm::debug_break (void)
+{
+  SDL_TriggerBreakpoint();
+}
+
+// Returns 1 for "yes" (abort), 0 for "no" (continue) and -1 for "cancel" (debug); plain
+// messages (ask==0) return 1. Headless runs print to stderr and answer "yes".
+int Comm::show_message_box (char *text, int ask)
+{
+  fprintf(stderr,"[chaos works engine] %s\n",text);
+  if(headless)
+    return(1);
+  static const SDL_MessageBoxButtonData buttons[]={
+    {SDL_MESSAGEBOX_BUTTON_RETURNKEY_DEFAULT,1,"Yes"},
+    {0,0,"No"},
+    {SDL_MESSAGEBOX_BUTTON_ESCAPEKEY_DEFAULT,-1,"Cancel"}};
+  static const SDL_MessageBoxButtonData ok_button[]={
+    {SDL_MESSAGEBOX_BUTTON_RETURNKEY_DEFAULT|SDL_MESSAGEBOX_BUTTON_ESCAPEKEY_DEFAULT,1,"OK"}};
+  SDL_MessageBoxData data;
+  memset(&data,0,sizeof(data));
+  data.flags=ask ?SDL_MESSAGEBOX_WARNING :SDL_MESSAGEBOX_INFORMATION;
+  data.title="chaos works engine";
+  data.message=text;
+  data.numbuttons=ask ?3 :1;
+  data.buttons=ask ?buttons :ok_button;
+  int button=1;
+  if(SDL_ShowMessageBox(&data,&button)!=0)
+    return(1);
+  return(button);
 }
 
 LRESULT CALLBACK Comm::window_proc (HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
@@ -322,16 +383,14 @@ int Comm::assert_box (char *expression, char *fileline)
       format_message(assert_message,expression,fileline);
       sprintf(boxmessage,"%s\n\nAbort program? (Cancel to debug)", formated_message);
 
-      HWND _hwnd=GetWindowLong(Comm::hwnd,GWL_STYLE) ?Comm::hwnd :NULL;
-      switch(MessageBox(_hwnd,boxmessage,"chaos works engine",MB_ICONQUESTION|MB_YESNOCANCEL))
+      switch(show_message_box(boxmessage,1))
       {
-        case IDCANCEL:
+        case -1:
           result=a_debug;
           break;
-        case IDNO:
+        case 0:
           result=a_cont;
           break;
-        case IDOK:
         default:
           result=a_fail;
       }
@@ -377,30 +436,6 @@ void Comm::end_run_section()
   in_runsection=0;
 }
 
-static int check_dll (char *dll_name, char *function_name)
-{
-  int result=0;
-
-  HINSTANCE dll_hinstance = LoadLibrary(dll_name);
-  if(dll_hinstance!=NULL)
-    if(GetProcAddress(dll_hinstance,function_name)!=NULL)
-      result=1;
-
-  if(dll_hinstance)
-    FreeLibrary(dll_hinstance);
-
-  return(result);
-}
-
-int Comm::check_directx (int v)
-{
-  int result=0;
-  if((v&dplay_ok) &&(check_dll("dplay.dll", "DirectPlayCreate")))  result|=dplay_ok;
-  if((v&ddraw_ok) &&(check_dll("ddraw.dll", "DirectDrawCreate")))  result|=ddraw_ok;
-  if((v&dsound_ok)&&(check_dll("dsound.dll","DirectSoundCreate"))) result|=dsound_ok;
-  return((result&v)==v);
-}
-
 char *Comm::get_working_path(void)
 {
   return(working_path);
@@ -408,7 +443,7 @@ char *Comm::get_working_path(void)
 
 char *Comm::get_file_path(char *name)
 {
-  format_message("%s\\%s",working_path,name);
+  format_message("%s/%s",working_path,name);
   return(formated_message);
 }
 

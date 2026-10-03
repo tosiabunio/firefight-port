@@ -541,6 +541,8 @@ public:
   virtual void tick(void)=0;
 };
 //...........................................................................
+// Port: the timers run on the main thread. Comm::process_messages calls service(), which
+// fires every timer that is due (was a multimedia-timer thread, timeSetEvent).
 class Timer
 {                            
   struct Timer_item
@@ -550,15 +552,19 @@ class Timer
     Timer_object   *object;
     Timer_function function;
     unsigned int   *counter;
+    unsigned long long period;    // in SDL performance-counter units
+    unsigned long long next_due;
   };
   static Bitflag    status;
   static int        accuracy;
+  static int        last_id;
   static Timer_item timers[TIMER_ARRAY_SIZE];
 
   static void quit(void);
-  static void CALLBACK callback_timer (UINT  IDEvent, UINT  uReserved, DWORD_PTR dwUser,	
-                                      DWORD_PTR dwReserved1,	DWORD_PTR dwReserved2);	
+  static void fire(Timer_item &timer);
 public:
+  static void service(void);
+  static unsigned ms_to_next(void);
   static void init(int accuracy=1, int critical_accuracy=1);
   static int add(int interval, Timer_function function, 
                                Timer_object *object, 

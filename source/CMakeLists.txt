@@ -95,16 +95,20 @@ add_executable(firefight
   game/world.cpp)
 target_include_directories(firefight PRIVATE game)
 # UNPROTECT: no CD-ROM check (the original retail builds except "Production" defined it too).
-target_compile_definitions(firefight PRIVATE UNPROTECT)
+target_compile_definitions(firefight PRIVATE UNPROTECT
+  # Development fallback for the data directory (see game/main.cpp).
+  FF_DEFAULT_DATA_DIR="${FF_DATA_DIR}")
 target_link_libraries(firefight PRIVATE regdata cwengine)
 ff_legacy_options(firefight)
 
-# Phase 1 exit check: boot headless against data/ through Game::init_all, then shut down
-# cleanly. Rebuilds missing sprite caches in data/ (git-ignored); the log goes to TEMP and is
-# echoed to stderr, where the test requires the loaded sprite totals and a clean finish.
-add_test(NAME headless_init COMMAND firefight --data "${FF_DATA_DIR}" --headless)
-set_tests_properties(headless_init PROPERTIES
-  ENVIRONMENT "TEMP=${CMAKE_CURRENT_BINARY_DIR}"
-  PASS_REGULAR_EXPRESSION "99 sprites, 2510 phases.*heap ok.*Program status:  completed successfully"
+# Phase 2 exit check: boot headless against data/, run the title loop on the 30 Hz clock until
+# it starts an attract demo (after 20 s), then quit as if the window were closed. Rebuilds
+# missing sprite caches in data/ (git-ignored). The log is echoed to stderr, where the test
+# requires the loaded sprite totals, the demo's interactive section and a clean finish.
+add_test(NAME headless_run
+  COMMAND firefight --data "${FF_DATA_DIR}" --pref "${CMAKE_CURRENT_BINARY_DIR}/pref"
+          --headless --quit-after 30)
+set_tests_properties(headless_run PROPERTIES
+  PASS_REGULAR_EXPRESSION "99 sprites, 2510 phases.*INTERACTIVE section entered.*quit time reached.*heap ok.*Program status:  completed successfully"
   FAIL_REGULAR_EXPRESSION "execution failed"
   TIMEOUT 300)

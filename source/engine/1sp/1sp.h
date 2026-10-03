@@ -235,8 +235,10 @@ public:
   void rectangle (Tool &t, int x, int y, int sx, int sy);
   //----- metody pisania stringow
   void putstr (int x, int y, unsigned char *c);
-  void print (int x, int y, char *c, ...);
-  void print (char *c, ...);
+  // const: with char*, print(0,0,"%s",msg) resolved to print(char*,...) with c=NULL in
+  // C++11 and later, which only use the literal-to-char* conversion as a last resort.
+  void print (int x, int y, const char *c, ...);
+  void print (const char *c, ...);
   //----- metody pozostale
   void cls (int screen_color=-1);
   void capture (void);

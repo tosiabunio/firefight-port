@@ -15,8 +15,8 @@ const char Cmd_line::s_def_no[]       = "no";
 //=============================================================================
 // Cmd_line static variables
 //=============================================================================
-char    Cmd_line::command_line [_MAX_PATH];
-char    Cmd_line::return_buffer[_MAX_PATH];
+char    Cmd_line::command_line [Cmd_line::line_len];
+char    Cmd_line::return_buffer[Cmd_line::line_len];
 Bitflag Cmd_line::status(0);
 
 //=============================================================================
@@ -363,10 +363,8 @@ BOOL Registry::delete_application_key(void)
 void  Cmd_line::init (char *cmd_line)
 {
   DBG_CHECK(!status.is(cmd_Initialized));
-  if (cmd_line != NULL)
-    strcpy(command_line, cmd_line);
-  else
-    strcpy(command_line, GetCommandLine());
+  // Port: the entry point passes the command line (was GetCommandLine when NULL).
+  snprintf(command_line, line_len, "%s", cmd_line ? cmd_line : "");
   strupr(command_line);
   status.set(cmd_Initialized);
   Comm::quit_me(Cmd_line::quit, "cmd_line", "");

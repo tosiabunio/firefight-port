@@ -1,4 +1,5 @@
 #include "1lg_hdrs.h"
+#include <SDL.h>
 #pragma init_seg(lib)
 
 char formated_message[1024];
@@ -48,8 +49,8 @@ void Log::init (char *_name)
 {
   char path[MAX_PATH+MAX_COMPUTERNAME_LENGTH];
 
-  int cwd=GetEnvironmentVariable("cwdiags",path,MAX_PATH+MAX_COMPUTERNAME_LENGTH);
-  if(strcmpi(path,"extended")==0)
+  const char *diags=SDL_getenv("cwdiags");
+  if(diags&&(strcmpi((char*)diags,"extended")==0))
     Comm::production=0;
 
   sprintf(name,"%s",_name);  // was upper-cased, which breaks paths on case-sensitive systems
@@ -57,11 +58,8 @@ void Log::init (char *_name)
   int fh=_creat(name,_S_IWRITE);
   if(fh!=-1) _close( fh );
 
-  write_string("Exec info:       command '");
-  write_string(GetCommandLine());
-
   if ( !GetCurrentDirectory( MAX_PATH, path )) strcpy( path, unknown);
-  write_string("' working in '");
+  write_string("Exec info:       working in '");
   write_string(path);
   write_string("'\n");
   strcpy(Comm::working_path,path);
@@ -83,50 +81,12 @@ void Log::init (char *_name)
   write_string(Comm::date_stamp);
   write_string("\n");
 
-  write_string("System info:     ");
-
-  DWORD i=MAX_COMPUTERNAME_LENGTH;
-  if ( !GetUserName( path, &i )) strcpy( path, unknown);
-  write_string("user ");
+  // Port: was user name, Windows version, memory and a DirectX probe.
+  SDL_version linked;
+  SDL_GetVersion(&linked);
+  sprintf(path,"System info:     %s, physical memory: %dMB, SDL %d.%d.%d\n",
+    SDL_GetPlatform(),SDL_GetSystemRAM(),linked.major,linked.minor,linked.patch);
   write_string(path);
-  write_string(", ");
-  
-  MEMORYSTATUS memStat;
-  GlobalMemoryStatus( &memStat );
-
-  DWORD dwResult = GetVersion(); 
-  sprintf(path,"Windows version %d.%d, ",LOBYTE(LOWORD(dwResult)),HIBYTE(LOWORD(dwResult)));
-  write_string(path);
-
-  int pmem=memStat.dwTotalPhys/(1024*1024/10);
-  sprintf(path,"physical memory: %d.%dMB\n",pmem/10,pmem%10);
-  write_string(path);
-
-  write_string("DirectX info:    ");
-  write_string("dplay ");
-  if(Comm::check_directx(Comm::dplay_ok)) 
-    write_string("ok");
-  else
-    write_string("failed");
-
-  write_string(", ddraw ");
-  if(Comm::check_directx(Comm::ddraw_ok)) 
-    write_string("ok");
-  else
-    write_string("failed");
-
-  write_string(", dsound ");
-  if(Comm::check_directx(Comm::dsound_ok)) 
-    write_string("ok");
-  else
-    write_string("failed");
-
-  write_string(", status ");
-  if(Comm::check_directx()) 
-    write_string("ok");
-  else
-    write_string("failed");
-  write_string("\n");
 
   write_string("\n---log begin---- ");
 
@@ -136,8 +96,6 @@ void Log::init (char *_name)
 
   Comm::quit_me(quit,"*log","");
 }
-
-static const char *argv[100];
 
 void Log::quit (void)
 {
@@ -174,44 +132,13 @@ void Log::quit (void)
 
   if(critical_error_occurred)
   {
-    if((!Comm::spawn_name)||(!Comm::production))
-    {
-      char s[1024]; 
-      sprintf(s,"\nSee %s for details.",name);
-      add_to_info(msginfo,s);
-      HWND hwnd=GetWindowLong(Comm::hwnd,GWL_ID) ?Comm::hwnd :NULL;
-      MessageBox(NULL,msginfo,"chaos works engine",MB_ICONINFORMATION|MB_OK|MB_TASKMODAL);
-    }
+    char s[1024];
+    sprintf(s,"\nSee %s for details.",name);
+    add_to_info(msginfo,s);
+    Comm::show_message_box(msginfo,0);
   }
 
-  if(Comm::spawn_name)
-  {
-    if((critical_error_occurred)&&(Comm::exit_code==0))
-      Comm::exit_code=-1;
-
-    char error_param[100];
-    sprintf(error_param,"error=%d",Comm::exit_code);
-
-    argv[0]=Comm::spawn_name;
-    int i;
-    for(i=0; Comm::spawn_argv[i]; i++)
-      argv[i+1]=Comm::spawn_argv[i];
-    argv[i+1]=error_param;
-    argv[i+2]=NULL;
-
-    write_string("Executing '");
-    for(i=0; argv[i]; i++)
-    {
-      write_string((char*)argv[i]);
-      if(argv[i+1])
-        write_string(" ");
-      else
-        write_string("'\n");
-    }
-
-    int res = _execvp(argv[0], argv);
-    write_string("<<< EXECUTION FAILED >>>\n",1);
-  }
+  // Port: the original re-launched the launcher (LOADER.EXE) here.
 }
 
 char *Log::info (char *_file,int _line)
@@ -232,7 +159,7 @@ void Log::write_string (char *c, int flush)
   int fh=_open(name,_O_APPEND|_O_WRONLY|_O_TEXT);
   if(fh!=-1)
   {
-    OutputDebugString(c);
+    fputs(c,stderr);  // was OutputDebugString
     _write(fh,c,strlen(c));
     if ((flush)&&(!Comm::production)) 
       _commit(fh);

@@ -63,10 +63,6 @@ class Cwe
 private:
   static Text   text;
 	static BOOL   application_ready;
-  static HANDLE hMutex;
-  static char   spawn_prog[_MAX_PATH];
-
-  static void check_multiple_(void);
   static void quit(void);
 public:
 	static void init (Cwe_param* param);

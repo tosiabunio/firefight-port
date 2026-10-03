@@ -220,7 +220,7 @@ oops:
   crsy=y-oy;
 }
 
-void Screen::print (int x, int y, char *c, ...)
+void Screen::print (int x, int y, const char *c, ...)
 {
   char buffer[4096];
   va_list argptr;
@@ -230,7 +230,7 @@ void Screen::print (int x, int y, char *c, ...)
   putstr (x, y, (unsigned char*)buffer);
 }
 
-void Screen::print (char *c, ...)
+void Screen::print (const char *c, ...)
 {
   char buffer[4096];
   va_list argptr;

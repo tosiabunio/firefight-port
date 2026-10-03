@@ -59,20 +59,9 @@ void Eem::callback_timer (void) //#T 96:05:06:21:46
   {
     ping_counter++;
     Joy::callback_joy();
-    if ((status.in(eem_Debug))||(!status.is(eem_InNetActive)))
-      push_event(ev_Timer);
-    else
-    {
-      if (diag_win_queue_usage < max_allowed_win_queue_usage)
-      {
-        if (PostMessage (Comm::hwnd, WM_TIMER, 0, NULL))
-        {
-          diag_win_queue_usage++;
-          if (diag_win_queue_usage > diag_max_win_queue_usage)
-            diag_max_win_queue_usage = diag_win_queue_usage;
-        }
-      }
-    }
+    // Port: the timer runs on the main thread, so the tick is queued directly. In network
+    // mode the original posted WM_TIMER to move it from the timer thread to the main thread.
+    push_event(ev_Timer);
   } 
 }                                       
 //---------------------------------------------------------------------------
@@ -465,6 +454,11 @@ int Eem::pop_event(void)
 //---------------------------------------------------------------------------
 int Eem::read (unsigned user_sync_data, unsigned char user_flags)
 {
+  // Port: when the previous read found nothing to do, sleep until the next timer tick or an
+  // event instead of spinning (the caller has already drawn the frame by then).
+  static int previous_read_empty=0;
+  if (previous_read_empty&&!last_return_code&&status.is(eem_Timed))
+    Comm::wait_messages(Timer::ms_to_next());
   do
   {
     if (last_return_code)
@@ -533,6 +527,7 @@ int Eem::read (unsigned user_sync_data, unsigned char user_flags)
       chk_sync();
   }
   while ((!last_return_code) && (status.is(eem_Multi)) && (!status.is(eem_InNetActive)));
+  previous_read_empty=!last_return_code;
   return(last_return_code);
 }
 //---------------------------------------------------------------------------

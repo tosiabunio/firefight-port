@@ -62,8 +62,9 @@ class Cmd_line
 {
   static const  char s_def_yes[];
   static const  char s_def_no[];
-  static char        command_line [_MAX_PATH];
-  static char        return_buffer[_MAX_PATH];
+  enum { line_len=1024 };  // port: was _MAX_PATH, too short for a full executable path
+  static char        command_line [line_len];
+  static char        return_buffer[line_len];
   static Bitflag     status;
 public:
   enum

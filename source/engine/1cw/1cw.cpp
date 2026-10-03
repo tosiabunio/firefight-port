@@ -11,6 +11,7 @@
 # include <compat/win32.h>
 
 # include "1cw.h"
+# include <SDL.h>
 
 # include <1cw_strg.h>
 
@@ -79,8 +80,11 @@ const  char cl_default_no[]        = "no";
 
 Text    Cwe::text;
 BOOL    Cwe::application_ready=0;
-HANDLE  Cwe::hMutex=NULL; 
-char    Cwe::spawn_prog[_MAX_PATH];
+
+static void sdl_quit (void)
+{
+  SDL_Quit();
+}
 
 
 //=============================================================================
@@ -107,34 +111,28 @@ void Cwe::init (Cwe_param *param)
     //-------------------
     // LOG initialization
     //-------------------
+    // Port: the log goes to the preferences directory (was TEMP).
     char tmp[1024];
-    int tlen = 0;
-    tlen = GetEnvironmentVariable("TEMP", tmp, 1024);
-    if (!tlen)
-      tlen = GetEnvironmentVariable("TMP", tmp, 1024);
-    if (!tlen)
-      Log::init(param->log_file?param->log_file:cwe_log_file);
-    else
-    {
-      if ((tmp[tlen-1]!='\\')&&(tmp[tlen-1]!='/'))
-      {
-        tmp[tlen]='/';  // was '\\'; '/' also works on Windows
-        tmp[tlen+1]=0;
-      } 
-      strcat(tmp, param->log_file?param->log_file:cwe_log_file);
-      Log::init(tmp);
-    }
+    sprintf(tmp, "%s%s", Comm::pref_path, param->log_file?param->log_file:cwe_log_file);
+    Log::init(tmp);
     //------------------------
     // Command line processing
     //------------------------
-    Cmd_line::init();
-    char *sp = Cmd_line::get_string("loader",NULL);
-    if (sp)
-    {
-      strcpy(spawn_prog, sp);
-      Comm::spawn_name = spawn_prog;
-    }
+    Cmd_line::init(param->command_line);
     MESSAGE("command line: '%s'",Cmd_line::get());
+    //----------------------
+    // SDL initialization (port)
+    //----------------------
+    Comm::headless = Cmd_line::get_int("headless",0);
+    int quit_after = Cmd_line::get_int("quit_after",0);
+    if (SDL_Init(SDL_INIT_EVENTS|SDL_INIT_TIMER)!=0)
+      FAILURE2(Cwe_error::general, "unable to initialize SDL: %s", (char*)SDL_GetError());
+    Comm::quit_me(sdl_quit, "sdl", "log cmd_line");
+    if (quit_after>0)
+    {
+      Comm::quit_time = SDL_GetTicks()+quit_after;
+      MESSAGE("quitting after %d ms", quit_after);
+    }
     //----------------------------
     // Begin engine initialization
     //----------------------------
@@ -202,7 +200,6 @@ void Cwe::init (Cwe_param *param)
       FAILURE("Cwe::init - full screen game, user window not allowed");
     Comm::hinstance = param->hinstance;
     Comm::hwnd      = main_hwnd;
-    check_multiple_();
     //----------------------
     // Mmu initialization
     //----------------------
@@ -321,7 +318,7 @@ void Cwe::init (Cwe_param *param)
       else if (ui==0)
         use_320x200 = text.value(spr_use_320x200);
 
-      Video::headless=Cmd_line::get_int("headless",0);
+      Video::headless=Comm::headless;
       Spr::init(spr_work_mode, use_320x200, use_640x400);
     }
     text.endarea();
@@ -394,18 +391,3 @@ void Cwe::quit (void)
 {
   application_ready=0;
 }
-//-----------------------------------------------------------------------------
-void Cwe::check_multiple_(void)
-{ 
-  char win_name[_MAX_PATH];
-  int result = GetWindowText(Comm::hwnd, win_name, _MAX_PATH);
-  hMutex = OpenMutex( SYNCHRONIZE, FALSE, win_name);
-  if (hMutex != 0) 
-  {
-    CloseHandle(hMutex);  
-    raise(SIGABRT);
-    _exit(3);
-  }
-  hMutex = CreateMutex(NULL, TRUE, win_name);
-}
-//-----------------------------------------------------------------------------

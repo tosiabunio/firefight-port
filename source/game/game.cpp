@@ -53,15 +53,14 @@ static void progress_set(int position);
 static void progress(int percent);
 BOOL CALLBACK progress_proc(HWND,UINT msg,WPARAM w,LPARAM l);
 
-int WINAPI WinMain(HINSTANCE this_instance, HINSTANCE previous_instance,
-                   LPSTR command_line,int window_state)
+// Port: was WinMain; the SDL entry point (main.cpp) calls it with the full command line.
+int game_main(char *command_line)
 {                             
+  static char instance;  // Cwe::init requires a non-null instance handle
   try
   {
-    Game::init_all(this_instance,previous_instance,command_line,window_state);
-    // TODO(phase 2): a headless run stops here until the clock and event pump run on SDL.
-    if (!Cmd_line::get_int("headless",0))
-      Game::go();
+    Game::init_all((HINSTANCE)&instance,NULL,command_line,1);
+    Game::go();
   }
   catch (TerminateGame)    {}
   catch (Closed)           {DBG_MESSAGE("WinMain() - Closed caught.");}

@@ -1,5 +1,5 @@
 #include "1ee_hdrs.h"
-#include <algorithm>
+#include <SDL.h>
 
 //----------------------------------------------------------------------------
 // Status flags
@@ -14,24 +14,27 @@ Timer::Timer_item  Timer::timers[TIMER_ARRAY_SIZE];
 //===========================================================================
 // Timer
 //===========================================================================
+// Port: rewritten for the main thread. The original ran a multimedia timer (timeSetEvent)
+// whose thread called the timer functions; now Comm::process_messages calls service(), which
+// fires every timer that is due according to SDL_GetPerformanceCounter. That also removes the
+// unsynchronised access from the timer thread to the event queue.
+int Timer::last_id(0);
+
+// A timer that falls further behind than this (a breakpoint, a suspended machine) skips the
+// rest instead of firing a burst; the Eem queue would drop those ticks anyway.
+static const unsigned max_catch_up_ms = 1000;
+
 void Timer::init(int desired_accuracy, int critical_accuracy)
 {
   try
   {
     DBG_CHECK(!status.is(timer_Initialized));
     memset(timers, 0, sizeof(timers));
-    TIMECAPS tc;
-    if(timeGetDevCaps(&tc, sizeof(TIMECAPS)) != TIMERR_NOERROR)
-      FAILURE2 (Eem_error::general, "cannot initialize timer");
-    accuracy = std::min(std::max(tc.wPeriodMin, (UINT)desired_accuracy), tc.wPeriodMax);
-    if (accuracy > desired_accuracy)
-      WARNING("system timer slow. Accuracy: %d", accuracy);
-    if (accuracy > critical_accuracy)
-      FAILURE2(Eem_error::general, "system timer to slow");
-    timeBeginPeriod(accuracy);
-    ENGINFO ("timer status: accuracy desired = %d, critical = %d, current %d", 
+    accuracy = 1;
+    ENGINFO ("timer status: accuracy desired = %d, critical = %d, current %d (main thread)", 
              desired_accuracy, critical_accuracy, accuracy);
     status.set(timer_Initialized);
+    Comm::tick_service = service;
     Comm::quit_me(quit, "*timer", "log");
   }
   catch (Failure)
@@ -42,10 +45,8 @@ void Timer::init(int desired_accuracy, int critical_accuracy)
 //---------------------------------------------------------------------------
 void Timer::quit(void)
 {
-  for (int i=0; i<TIMER_ARRAY_SIZE; i++)
-    if (timers[i].id!=0)
-      timeKillEvent(timers[i].id);
-  timeEndPeriod (accuracy);
+  Comm::tick_service = NULL;
+  memset(timers, 0, sizeof(timers));
   status=0;
   MESSAGE("timer destructed");
 }
@@ -69,16 +70,16 @@ int Timer::add(int interval, Timer_function function, Timer_object *object,
     }
   if (found==-1)
     FAILURE("sorry no room for timer event '%s'  [Timer::add]", (char*)name?name:"unknown");
-  int id = timeSetEvent(interval, accuracy, callback_timer, (DWORD_PTR)found, TIME_PERIODIC);
-  if (id==0)
-    FAILURE ("cannot set timer event '%s' [Timer::add]", (char*)name?name:"unknown"); 
-  timers[found].id = id;
+  unsigned long long frequency = SDL_GetPerformanceFrequency();
+  timers[found].id = ++last_id;
   timers[found].name = name;
   timers[found].function = function;
   timers[found].object = object;
   timers[found].counter = counter;
+  timers[found].period = frequency*(unsigned)interval/1000;
+  timers[found].next_due = SDL_GetPerformanceCounter()+timers[found].period;
   MESSAGE("timer event '%s' initialized. interval = %d ms", (char*)name?name:"unknown", interval);
-  return (id);
+  return (timers[found].id);
 }
 //---------------------------------------------------------------------------
 int  Timer::add(int interval, Timer_function function, char *name)
@@ -109,7 +110,6 @@ void Timer::kill(int timer_id)
     }
   if (found==-1)
     FAILURE("timer not present [Timer::kill]"); 
-  timeKillEvent(timers[found].id);
   MESSAGE("timer event '%s' destructed", (char*)(timers[found].name?timers[found].name:"unknown"));
   memset(&timers[found],0,sizeof(timers[found]));
 }
@@ -126,28 +126,60 @@ void Timer::kill(char *name)
     }
   if (found==-1)
     FAILURE("timer '%s' not present [Timer::kill]", name); 
-  timeKillEvent(timers[found].id);
+  MESSAGE("timer event '%s' destructed", name);
   memset(&timers[found],0,sizeof(timers[found]));
-  MESSAGE("timer event '%s' destructed", (char*)timers[found].name?timers[found].name:"unknown");
 }
 //---------------------------------------------------------------------------
-void CALLBACK Timer::callback_timer (UINT  IDEvent, UINT  uReserved, DWORD_PTR dwUser,	
-                              DWORD_PTR dwReserved1,	DWORD_PTR dwReserved2)
+void Timer::fire(Timer_item &timer)
 {
-  if (timers[dwUser].counter!=NULL)
-    timers[dwUser].counter++;
-  if (timers[dwUser].function!=NULL)
-    timers[dwUser].function();
-  if (timers[dwUser].object!=NULL)
-    timers[dwUser].object->tick();
-  (void)uReserved;
-  (void)dwReserved1;
-  (void)dwReserved2;
-  (void)IDEvent;
+  if (timer.counter!=NULL)
+    (*timer.counter)++;  // the original incremented the pointer; no caller uses counters
+  if (timer.function!=NULL)
+    timer.function();
+  if (timer.object!=NULL)
+    timer.object->tick();
+}
+//---------------------------------------------------------------------------
+void Timer::service(void)
+{
+  if (!status.is(timer_Initialized))
+    return;
+  unsigned long long now = SDL_GetPerformanceCounter();
+  unsigned long long max_lag = SDL_GetPerformanceFrequency()*max_catch_up_ms/1000;
+  for (int i=0; i<TIMER_ARRAY_SIZE; i++)
+  {
+    Timer_item &timer = timers[i];
+    if ((timer.id==0)||(now<timer.next_due))
+      continue;
+    if (now-timer.next_due>max_lag)
+      timer.next_due = now-max_lag;
+    int id = timer.id;
+    while ((timer.id==id)&&(now>=timer.next_due))
+    {
+      timer.next_due += timer.period;
+      fire(timer);
+    }
+  }
+}
+//---------------------------------------------------------------------------
+unsigned Timer::ms_to_next(void)
+{
+  unsigned long long now = SDL_GetPerformanceCounter();
+  unsigned long long frequency = SDL_GetPerformanceFrequency();
+  unsigned result = 100;
+  for (int i=0; i<TIMER_ARRAY_SIZE; i++)
+    if (timers[i].id!=0)
+    {
+      if (timers[i].next_due<=now)
+        return(0);
+      unsigned long long ms = ((timers[i].next_due-now)*1000+frequency-1)/frequency;
+      if (ms<result)
+        result = (unsigned)ms;
+    }
+  return(result);
 }
 //---------------------------------------------------------------------------
 int Timer::is_initialized(void)
 {
   return (status.is(timer_Initialized));
 }
-//===========================================================================

@@ -36,7 +36,7 @@
 #define WARNING                   LOG_INFO Log::write_warning
 #define SYSINFO                   LOG_INFO Log::write_sysinfo
 #define ENGINFO                   LOG_INFO Log::write_enginfo
-#define CHECK(expr) if(!(expr))   {if(!Comm::assert_box(#expr,FILE_LINE)) DebugBreak();} else (void)0
+#define CHECK(expr) if(!(expr))   {if(!Comm::assert_box(#expr,FILE_LINE)) Comm::debug_break();} else (void)0
 #define CHECK_RANGE(v,rl,rh)      {if(((v)<(rl))||((v)>(rh))) FAILURE(Comm::m_outrange,#v,v,rl,rh);}
 #define RPTCNT                    LINEUNIQUE_LAST(id)
 #define REPEAT(count)             for(LINEUNIQUE_DECLARE(rptcnt); LINEUNIQUE(rptcnt)<(count); LINEUNIQUE(rptcnt)++)
@@ -106,7 +106,17 @@ public:
   static void      terminate (char *message, ...);
 
   static           LRESULT CALLBACK window_proc (HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
+  // Port: the message pump runs on SDL. It polls SDL events, runs the tick service (the
+  // timers, now on the main thread) and turns SDL_QUIT into Closed. wait_messages blocks
+  // until an event arrives or ms elapse.
   static void      process_messages (void);
+  static void      wait_messages (unsigned ms);
+  static void      (*tick_service) (void);
+  static void      debug_break (void);
+  static int       show_message_box (char *text, int ask);
+  static char      pref_path[];        // settings, pilots and log; ends with a separator
+  static int       headless;           // no window and no dialogs
+  static unsigned  quit_time;          // SDL_GetTicks() after which the pump acts as if closed; 0: never
 
   typedef int (*wpp) (int *result, HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
   static wpp       set_window_proc (wpp wp);
@@ -126,12 +136,7 @@ public:
   static void      begin_run_section();
   static void      end_run_section();
 
-  enum             {dplay_ok= 0x01, ddraw_ok= 0x02, dsound_ok=0x04, dx_ok= 0x07};
-  static int       check_directx (int v=dx_ok);
-
   static int       exit_code;
-  static char      *spawn_name;
-  static char      **spawn_argv;
   static int       standby;
   static void      (*init_info)  (char *text);
   static int       (*set_cancel_button) (int state);
