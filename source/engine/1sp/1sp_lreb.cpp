@@ -7,14 +7,11 @@ static char F_flcerr[] =   "error in flic frame number %d";
 static char F_cantrebu[] = "rebuild process failed";
 static char F_nomem[] =    "not enough memory for RLE buffer";
 
-static char M_flcconv[] = "building %s %s";
 static char *M_withm[] = {"no","yes"};
 static char *M_onec[] = {"no","yes"};
 static char *M_scale[] = {"","1x1","2x1","","4x1","","","","8x1"};
 
 //----- stale i zmienne ------------------------------------------------------
-
-static int progress_max, progress_current;
 
 struct Src
 {
@@ -188,8 +185,6 @@ unsigned char *RLE::compress (int _sx, int _sy, int _scale, int _sens)
 
   for (int y=0; y<sy; y++)
   {
-    Video::progress_bar(progress_current+1,progress_max);
-    progress_current++;
     compress_line(y);
   }
 
@@ -215,8 +210,6 @@ void Lsprite::Phase::rebuild(int _ox, int _oy, int scale, int sens, int mirrors)
   {
     for (int y=0; y<src.sy; y++)
     {
-      Video::progress_bar(progress_current+1,progress_max);
-      progress_current++;
       for (int x=0; x<src.sx/2; x++)
       {
         unsigned char c=src[y][x];
@@ -242,11 +235,8 @@ void Lsprite::rebuild(void)
     frame.llen=sx+2;
     phases=flic_desc.frames;
 
-    progress_max=phases*(sy+sy/scale);
-    if (mirrors)
-      progress_max+=phases*(sy+sy/scale);
-    progress_current=0;
-    Video::display_message(M_flcconv,master_name,name);
+    // Port: built on every load now, so without the on-screen "building" message and progress
+    // bar the original showed when its cache file was missing.
 
     src.init((unsigned char*)Heap::alloc(sx*sy,"[spr] tmp src buffer"),sx,sy);
 
@@ -272,8 +262,6 @@ void Lsprite::rebuild(void)
         unsigned keyc=frame[0][0];
         for (y=0; y<sy; y++)
         {
-          Video::progress_bar(progress_current+1,progress_max);
-          progress_current++;
           for (int x=0; x<sx; x++)
           {
             unsigned i=y*sx+x;
@@ -314,11 +302,9 @@ void Lsprite::rebuild(void)
 
     close_flic();
 
-    Video::restore_background();
+    keep_prepared();
 
-    save_prepared();
-
-    MESSAGE("%s %dx%d scale:%s mirr:%s 1col:%s (%s) rebuilt and saved",
+    if(!Comm::production) MESSAGE("%s %dx%d scale:%s mirr:%s 1col:%s (%s) built",
       master_name,sx+2,sy+2,
         M_scale[scale],
         M_withm[mirrors?1:0],
@@ -335,5 +321,58 @@ void Lsprite::rebuild(void)
   if (frame.buf) Heap::free(frame.buf,FILE_LINE);
   if (src.adr) Heap::free(src.adr,FILE_LINE);
   buffer.quit();
-  free();
+  // Port: the phases are kept (the original freed them and read the cache file back).
+}
+
+// Port: the lores variant is never drawn (hires only), but its bounds count towards each phase's
+// bounds (Sprite::load). The original built it from the source FLC at Spr::lores_scale; this
+// computes the same sizes and origins as rebuild() without building the pixels.
+void Lsprite::measure(void)
+{
+  frame.buf=NULL;
+  try
+  {
+    open_flic (source_name);
+    sx=flic_desc.x_size-2;
+    sy=flic_desc.y_size-2;
+    frame.buf=(unsigned char*)Heap::alloc((sx+2)*(sy+2),"[spr] tmp frame buffer");
+    frame.llen=sx+2;
+    phases=flic_desc.frames;
+    phase=(Phase*)Heap::alloc(phases*sizeof(Phase),"[spr] tmp phases");
+    memset(phase,0,phases*sizeof(Phase));
+
+    for (frame_num=1; frame_num<phases+1; frame_num++)
+    {
+      unsigned char pal[256][3];
+      get_frame(frame.buf,pal);
+      unsigned keyc=frame[0][0];
+      int ox=-1,oy=-1;
+      int i;
+      for (i=1; i<sx+1; i++)
+        if ((unsigned)frame[sy+1][i]!=keyc)
+          ox=i-1;
+      for (i=1; i<sy+1; i++)
+        if ((unsigned)frame[i][sx+1]!=keyc)
+          oy=i-1;
+      if ((ox==-1)||(oy==-1))
+      {
+        ox=sx/2;
+        oy=sy/2;
+      }
+      Phase &p=phase[frame_num-1];
+      p.def[0]=p.def[1]=NULL;
+      p.sx=(short)(sx/scale);
+      p.sy=(short)(sy/scale);
+      p.ox=(short)(ox/scale);
+      p.oy=(short)(oy/scale);
+    }
+    close_flic();
+  }
+  catch (Failure)
+  {
+    if (frame.buf) Heap::free(frame.buf,FILE_LINE);
+    free();
+    FAILURE(F_cantrebu);
+  }
+  if (frame.buf) Heap::free(frame.buf,FILE_LINE);
 }

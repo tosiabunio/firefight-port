@@ -45,13 +45,11 @@ Text Game::demo_text;
 #ifdef SHAREWARE
 Song Game::mission_song;
 #endif
-static HWND idd_progress,idc_progress,idc_progress_text;
 static void progress_text(char *text);
 static void progress_start(int range,HINSTANCE instance);
 static void progress_stop(void);
 static void progress_set(int position);
 static void progress(int percent);
-BOOL CALLBACK progress_proc(HWND,UINT msg,WPARAM w,LPARAM l);
 
 // Port: was WinMain; the SDL entry point (main.cpp) calls it with the full command line.
 int game_main(char *command_line)
@@ -869,6 +867,18 @@ void Game::draw_demoplay(Screen &screen)
 
 void Game::go(void)
 {
+  // Port: demo=<name> plays one recorded demo (a name from demo.tdf's demo_list) instead of
+  // the title loop, then quits.
+  char *demo=Cmd_line::get_string("demo",NULL);
+  if (demo)
+  {
+    static char name[64];
+    strncpy(name,demo,sizeof(name)-1);
+    MESSAGE("playing demo %s",name);
+    set_demo_properties(PLAY_FILENAME,name,0);
+    play_demo();
+    throw TerminateGame();
+  }
   if (Mp::BUILDSPRITESMODE)
   {
     while (1)
@@ -1194,44 +1204,26 @@ void Game::draw_progress(void)
 }
 
 //GAME PROGRESS (API)
+// Port: the Win32 progress dialog shown during startup is gone; the stages go to the log.
 void progress_text (char *text)
 {
-  SendMessage(idc_progress_text,WM_SETTEXT,0,(LPARAM)(LPCTSTR)text);
-}
-
-BOOL CALLBACK progress_proc(HWND,UINT msg,WPARAM w,LPARAM l)
-{
-  if((msg==WM_COMMAND)&&(HIWORD(w)==BN_CLICKED))
-  {
-    DestroyWindow(idd_progress);
-    idd_progress=idc_progress=idc_progress_text=NULL;
-    PostMessage(Comm::hwnd,WM_CLOSE,0,0);
-  }
-  return(0);
+  MESSAGE("%s",text);
 }
 
 void progress_start(int range,HINSTANCE hinstance)
 {
-  InitCommonControls();
-  idd_progress=CreateDialog(hinstance,MAKEINTRESOURCE(IDD_PROGRESS),Comm::hwnd,(DLGPROC)progress_proc);
-  idc_progress=GetDlgItem(idd_progress,IDC_PROGRESS);
-  idc_progress_text=GetDlgItem(idd_progress,IDC_PROGRESS_TEXT);
-  SendMessage(idc_progress,PBM_SETRANGE,0,MAKELPARAM(0, range));
+  (void)range;
+  (void)hinstance;
   Comm::init_info=progress_text;
 }
 
 void progress_stop(void)
 {
-  if(idd_progress)
-  {
-    DestroyWindow(idd_progress);
-    idd_progress=idc_progress=idc_progress_text=NULL;
-  }
 }
 
 void progress_set(int position)
 {
-  PostMessage(idc_progress,PBM_SETPOS,position,0);
+  (void)position;
   Comm::process_messages();
 }
 

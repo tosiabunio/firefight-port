@@ -4,12 +4,6 @@
 class Lsprite
 {
 public:
-  struct must_rebuild
-  {
-    static char *reason;
-    must_rebuild (char *r) { reason=r; }
-  };
-
   struct Phase
   {
     unsigned char *def[2];   // adresy definicji
@@ -50,8 +44,8 @@ public:
   int phases;
 
   void rebuild (void);
-  void load_prepared (void);
-  void save_prepared (void);
+  void measure (void);
+  void keep_prepared (void);
 
   void free(void);
   ~Lsprite();

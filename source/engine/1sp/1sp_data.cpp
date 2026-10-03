@@ -21,6 +21,9 @@ int Video::initialized;
 int Video::fullscreen;
 int Video::stretch_43;
 int Video::shot_interval;
+int Video::shot_every;
+int Video::quit_frames;
+int Video::frames;
 
 Tsp tsp;
 

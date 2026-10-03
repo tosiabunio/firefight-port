@@ -23,7 +23,6 @@ static char *gamma_tab;
 
 static unsigned char *closest_colors=NULL;
 static const int cc_size=64*64*64;
-struct pal_rebuild {};
 
 static int FrameRate;
 static int FrameCount;
@@ -89,64 +88,29 @@ void Video::load_palette (char *fname, int update_tsp)
       if((!File::volume)&&(!File::exist("source")))
         FAILURE(F_palnosrc,name);
       tmp=(unsigned char*)Heap::alloc(cc_size);
-      try
+      // Port: the tables are built in memory every time. The original cached them in the
+      // palette's "target" file (.spp) and rebuilt it, with a progress bar, when it was missing.
+      char pal[256][3];
+      open_flic("source");
+      for(int f=0; f<10; f++)
       {
-        int v;
-        if(!File::exist("target")) throw pal_rebuild();
-        File::open("target");
-        File::read((char*)&v,sizeof(int));
-        if(v!=pal_file_level) throw pal_rebuild();
-        File::read((char*)&v,sizeof(int));
-        if((!File::volume())&&((unsigned)v!=File::date("source"))) throw pal_rebuild();
-        File::read((char*)&vpalette[0][0],sizeof(vpalette));
+        get_frame(tmp,pal);
+        for(int i=0; i<256; i++)
+          vpalette[f][i]=Color(pal[i][0],pal[i][1],pal[i][2]);
         memcpy(&palette[0],&vpalette[0][0],sizeof(palette));
-        File::read(&tmp[0], cc_size);
-        File::read(&tsp.conv[0], 256*256);
-        File::close();
-      } catch (pal_rebuild)
-      {
-        File::close();
-
-        display_message("making %s",name);
-        char pal[256][3];
-        open_flic("source");
-        for(int f=0; f<10; f++)
-        {
-          get_frame(tmp,pal);
-          for(int i=0; i<256; i++)
-            vpalette[f][i]=Color(pal[i][0],pal[i][1],pal[i][2]);
-          memcpy(&palette[0],&vpalette[0][0],sizeof(palette));
-        }
-        close_flic();
-
-        for(int r=0; r<64; r++)
-        {
-          progress_bar(r,64);
-          for(int g=0; g<64; g++)
-            for(int b=0; b<64; b++)
-              tmp[r+g*64+b*64*64]=(unsigned char)closest(r,g,b);
-        }
-
-        closest_colors=tmp;
-        if(update_tsp)
-          tsp.update();
-        else
-          memset((char*)&tsp.conv[0], 0, 256*256);
-
-
-        int v;
-        File::create("target");
-        v=(unsigned)pal_file_level;
-        File::write((char*)&v,sizeof(int));
-        v=(unsigned)File::date("source");
-        File::write((char*)&v,sizeof(int));
-        File::write((char*)&vpalette[0][0], sizeof(vpalette));
-        File::write((char*)&tmp[0], cc_size);
-        File::write((char*)&tsp.conv[0], 256*256);
-        File::close();
-
-        restore_background();
       }
+      close_flic();
+
+      for(int r=0; r<64; r++)
+        for(int g=0; g<64; g++)
+          for(int b=0; b<64; b++)
+            tmp[r+g*64+b*64*64]=(unsigned char)closest(r,g,b);
+
+      closest_colors=tmp;
+      if(update_tsp)
+        tsp.update();
+      else
+        memset((char*)&tsp.conv[0], 0, 256*256);
       closest_colors=tmp;
       File::endarea();
     }

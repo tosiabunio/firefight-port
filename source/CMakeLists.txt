@@ -113,3 +113,15 @@ set_tests_properties(headless_run PROPERTIES
   PASS_REGULAR_EXPRESSION "99 sprites, 2510 phases.*INTERACTIVE section entered.*quit time reached.*heap ok.*Program status:  completed successfully"
   FAIL_REGULAR_EXPRESSION "execution failed"
   TIMEOUT 300)
+
+# Phase 3 rendering check: in fast mode (one simulation step per frame) the first title screen
+# must match its golden hash on every platform. It covers the palette tables, the sprite build
+# from the FLC masters, the blitter, the fonts and the palette conversion.
+add_test(NAME golden_title
+  COMMAND ${CMAKE_COMMAND}
+          -DFIREFIGHT=$<TARGET_FILE:firefight> -DDATA=${FF_DATA_DIR}
+          -DPREF=${CMAKE_CURRENT_BINARY_DIR}/golden_title
+          -DEXPECTED=${CMAKE_SOURCE_DIR}/tests/golden/title_frames.sha256
+          "-DARGS=--shot-every 100 --quit-frames 100"
+          -P ${CMAKE_SOURCE_DIR}/tests/check_frames.cmake)
+set_tests_properties(golden_title PROPERTIES TIMEOUT 300)

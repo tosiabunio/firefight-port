@@ -213,14 +213,24 @@ void    VD_sdl::dump_frame (void)
 {
   static Uint32 next_shot=0;
   static int shots=0;
-  if((Video::shot_interval<=0)||!screen_buf)
+  if(!screen_buf)
     return;
-  Uint32 now=SDL_GetTicks();
-  if(next_shot==0)
-    next_shot=now;
-  if(!SDL_TICKS_PASSED(now,next_shot))
-    return;
-  next_shot=now+Video::shot_interval;
+  if(Video::shot_every>0)
+  {
+    if(Video::frames%Video::shot_every!=0)
+      return;
+  }
+  else
+  {
+    if(Video::shot_interval<=0)
+      return;
+    Uint32 now=SDL_GetTicks();
+    if(next_shot==0)
+      next_shot=now;
+    if(!SDL_TICKS_PASSED(now,next_shot))
+      return;
+    next_shot=now+Video::shot_interval;
+  }
   SDL_Surface *shot=SDL_CreateRGBSurfaceWithFormat(0,width,height,32,SDL_PIXELFORMAT_ARGB8888);
   if(!shot)
     return;
@@ -232,7 +242,10 @@ void    VD_sdl::dump_frame (void)
       dst[x]=argb[src[x]];
   }
   char name[_MAX_PATH+32];
-  sprintf(name,"%sframe_%04d.bmp",Comm::pref_path,shots++);
+  if(Video::shot_every>0)
+    sprintf(name,"%sframe_%06d.bmp",Comm::pref_path,Video::frames);
+  else
+    sprintf(name,"%sframe_%04d.bmp",Comm::pref_path,shots++);
   if(SDL_SaveBMP(shot,name)==0)
     MESSAGE("frame saved: %s",name);
   SDL_FreeSurface(shot);
@@ -241,8 +254,16 @@ void    VD_sdl::dump_frame (void)
 void    VD_sdl::show_screen (HDC hdc)
 {
   (void)hdc;
+  Video::frames++;
   dump_frame();
   present();
+  if((Video::quit_frames>0)&&(Video::frames==Video::quit_frames))
+  {
+    SDL_Event quit;
+    memset(&quit,0,sizeof(quit));
+    quit.type=SDL_QUIT;
+    SDL_PushEvent(&quit);
+  }
 }
 
 void    VD_sdl::clear_screen (HDC hdc)

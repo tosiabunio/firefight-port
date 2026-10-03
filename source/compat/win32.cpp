@@ -1,9 +1,8 @@
 // Definitions for the Win32 stand-ins declared in win32.h.
 //
-// Creation calls the engine cannot start without (window class, window, hooks, timer events,
-// mutex) return inert dummy handles. DirectX is never loaded (LoadLibrary returns NULL), and
-// MCI, the mixer, wave-out and joysticks report that no device is present. The registry is
-// kept in memory for the run. The clocks, environment, temporary files and VirtualAlloc are real.
+// The input hooks return an inert dummy handle. DirectX is never loaded (LoadLibrary returns
+// NULL), and MCI, the mixer, wave-out and joysticks report that no device is present. The clocks,
+// GetUserName, SleepEx and VirtualAlloc (zero-filled) are real.
 
 #include <compat/win32.h>
 
@@ -26,7 +25,7 @@
 namespace {
 
 // Dummy objects whose addresses serve as handles.
-char dummy_window, dummy_dialog, dummy_hook, dummy_dc, dummy_palette, dummy_mutex;
+char dummy_hook;
 
 template <typename H>
 H dummy_handle(char &object)
@@ -97,34 +96,10 @@ DWORD SleepEx(DWORD milliseconds, BOOL)
 
 
 // --- windows and messages -----------------------------------------------------------------------
-BOOL RegisterClass(const WNDCLASS *) { return TRUE; }
 
-HWND CreateWindow(LPCSTR, LPCSTR, DWORD, int, int, int, int, HWND, HMENU, HINSTANCE, LPVOID)
-{
-  return dummy_handle<HWND>(dummy_window);
-}
-
-HWND CreateWindowEx(DWORD, LPCSTR, LPCSTR, DWORD, int, int, int, int, HWND, HMENU, HINSTANCE, LPVOID)
-{
-  return dummy_handle<HWND>(dummy_window);
-}
-
-HWND CreateDialog(HINSTANCE, LPCSTR, HWND, DLGPROC) { return dummy_handle<HWND>(dummy_dialog); }
 BOOL DestroyWindow(HWND) { return TRUE; }
-BOOL ShowWindow(HWND, int) { return FALSE; }
-BOOL SetForegroundWindow(HWND) { return TRUE; }
-BOOL SetWindowPos(HWND, HWND, int, int, int, int, UINT) { return TRUE; }
 LONG GetWindowLong(HWND, int) { return 0; }
 
-int GetWindowText(HWND, LPSTR text, int max_count)
-{
-  if (max_count > 0)
-    text[0] = 0;
-  return 0;
-}
-
-HMENU GetMenu(HWND) { return nullptr; }
-HWND  GetDlgItem(HWND, int) { return dummy_handle<HWND>(dummy_dialog); }
 
 BOOL GetClientRect(HWND, LPRECT rect)
 {
@@ -135,56 +110,20 @@ BOOL GetClientRect(HWND, LPRECT rect)
 }
 
 BOOL ClientToScreen(HWND, POINT *) { return TRUE; }
-BOOL AdjustWindowRectEx(LPRECT, DWORD, BOOL, DWORD) { return TRUE; }
 
-BOOL SetRect(LPRECT rect, int left, int top, int right, int bottom)
-{
-  rect->left = left;
-  rect->top = top;
-  rect->right = right;
-  rect->bottom = bottom;
-  return TRUE;
-}
-
-BOOL InvalidateRect(HWND, const RECT *, BOOL) { return TRUE; }
-int  GetSystemMetrics(int index) { return index == SM_CXSCREEN ? 640 : 480; }
 HICON   LoadIcon(HINSTANCE, LPCSTR) { return nullptr; }
-HCURSOR LoadCursor(HINSTANCE, LPCSTR) { return nullptr; }
 int  ShowCursor(BOOL) { return 0; }
 BOOL SetCursorPos(int, int) { return TRUE; }
 
-BOOL    PostMessage(HWND, UINT, WPARAM, LPARAM) { return TRUE; }
-LRESULT SendMessage(HWND, UINT, WPARAM, LPARAM) { return 0; }
 void    PostQuitMessage(int) {}
 LRESULT DefWindowProc(HWND, UINT, WPARAM, LPARAM) { return 0; }
 HHOOK   SetWindowsHookEx(int, HOOKPROC, HINSTANCE, DWORD) { return dummy_handle<HHOOK>(dummy_hook); }
 BOOL    UnhookWindowsHookEx(HHOOK) { return TRUE; }
 LRESULT CallNextHookEx(HHOOK, int, WPARAM, LPARAM) { return 0; }
 UINT    MapVirtualKey(UINT, UINT) { return 0; }
-void    InitCommonControls() {}
 
 // --- GDI ----------------------------------------------------------------------------------------
-HDC      GetDC(HWND) { return dummy_handle<HDC>(dummy_dc); }
-int      ReleaseDC(HWND, HDC) { return 1; }
-HDC      BeginPaint(HWND, PAINTSTRUCT *paint) { memset(paint, 0, sizeof(*paint)); return dummy_handle<HDC>(dummy_dc); }
-BOOL     EndPaint(HWND, const PAINTSTRUCT *) { return TRUE; }
-HGDIOBJ  GetStockObject(int) { return nullptr; }
-HGDIOBJ  SelectObject(HDC, HGDIOBJ) { return nullptr; }
-BOOL     DeleteObject(HGDIOBJ) { return TRUE; }
-BOOL     Rectangle(HDC, int, int, int, int) { return TRUE; }
-int      GetDeviceCaps(HDC, int) { return 0; }
 
-UINT GetSystemPaletteEntries(HDC, UINT, UINT count, LPPALETTEENTRY entries)
-{
-  if (entries)
-    memset(entries, 0, count * sizeof(PALETTEENTRY));
-  return count;
-}
-
-HPALETTE CreatePalette(const LOGPALETTE *) { return dummy_handle<HPALETTE>(dummy_palette); }
-HPALETTE SelectPalette(HDC, HPALETTE, BOOL) { return nullptr; }
-UINT     RealizePalette(HDC) { return 0; }
-int      StretchDIBits(HDC, int, int, int, int h, int, int, int, int, const void *, const BITMAPINFO *, UINT, DWORD) { return h; }
 
 // --- multimedia -----------------------------------------------------------------------------------
 DWORD timeGetTime() { return milliseconds_since_start(); }

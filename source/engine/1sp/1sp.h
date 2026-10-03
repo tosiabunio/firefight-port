@@ -298,6 +298,9 @@ public:
   static int fullscreen;    // port: desktop full screen instead of a window
   static int stretch_43;    // port: show 640x400 at 4:3 like a CRT instead of square pixels
   static int shot_interval; // port: ms between frame dumps (frame_NNNN.bmp in the preferences); 0: off
+  static int shot_every;    // port: frames between frame dumps; 0: off
+  static int quit_frames;   // port: request quit (as if the window were closed) after this many frames
+  static int frames;        // port: frames shown so far
 
   //----- metody operacji na palecie
   static void load_palette (char *name=NULL, int update_tsp=1);

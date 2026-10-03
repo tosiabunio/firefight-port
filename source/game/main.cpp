@@ -2,7 +2,8 @@
 // original game (game_main in game.cpp, formerly WinMain).
 //
 //   firefight [--data <dir>] [--pref <dir>] [--headless] [--quit-after <s>] [--fullscreen]
-//             [--stretch] [--shots <s>] [switch ...]
+//             [--stretch] [--shots <s>] [--fast] [--shot-every <n>] [--quit-frames <n>]
+//             [--demo <name>] [switch ...]
 //
 //   --data <dir>      directory holding cwe.ini and the *.dir manifests. Default: "data" next
 //                     to the executable, else the repository's data/ (development builds),
@@ -15,6 +16,11 @@
 //   --stretch         show the 640x400 picture at 4:3 like a CRT (stretch=1); default: square pixels
 //   --shots <s>       save the displayed frame every s seconds as frame_NNNN.bmp in the
 //                     preferences directory (shots=<ms>)
+//   --fast            no clock: one simulation step per frame, as fast as possible (fast=1)
+//   --shot-every <n>  save every n-th frame as frame_<frame>.bmp (shot_every=<n>)
+//   --quit-frames <n> act as if the window were closed after n frames (quit_frames=<n>)
+//   --demo <name>     play one recorded demo (level1 ... level4C) instead of the title loop,
+//                     then quit (demo=<name>)
 //
 // Everything else is passed through as an original engine switch (debug=1, check, ...).
 // The exit code is non-zero when the engine reported a critical error.
@@ -124,6 +130,14 @@ int main(int argc, char *argv[])
       line += " quit_after=" + std::to_string((int)(atof(argv[++i]) * 1000));
     else if (arg == "--shots" && i + 1 < argc)
       line += " shots=" + std::to_string((int)(atof(argv[++i]) * 1000));
+    else if (arg == "--fast")
+      line += " fast=1";
+    else if (arg == "--shot-every" && i + 1 < argc)
+      line += " shot_every=" + std::string(argv[++i]);
+    else if (arg == "--quit-frames" && i + 1 < argc)
+      line += " quit_frames=" + std::string(argv[++i]);
+    else if (arg == "--demo" && i + 1 < argc)
+      line += " demo=" + std::string(argv[++i]);
     else if (arg == "--fullscreen")
       line += " fullscreen=1";
     else if (arg == "--stretch")

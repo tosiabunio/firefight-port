@@ -7,9 +7,6 @@ static char F_notspec[]   = "none %s specified in volume directory";
 static char F_nosrc[]     = "%s specified in volume directory not exist";
 static char F_missfor[]   = "no %s specified for %s in volume directory";
 
-static char M_rebreq[]    = "rebuild requested for %s data: %s";
-static char F_badver[]    = "sprite '%s' improperly rebuilt: %s";
-static char F_volbadver[] = "invalid sprite data in volume";
 static char F_parterr[]   = "unable to load %s data";
 static char F_loaderr[]   = "loading sprite '%s' failed";
 static char F_pmis_e[]    = "prologue missing";
@@ -27,7 +24,6 @@ static char collis_id[]= "collis";
 
 static int hwanted,lwanted,cwanted;
 static int hmemused,lmemused,cmemused;
-char *Lsprite::must_rebuild::reason;
 
 static int minim (int a, int b, int c)
 {
@@ -159,37 +155,16 @@ void Lsprite::free (void)
   phase=NULL;
 }
 
+// Port: every sprite is built in memory from its FLC master. The original loaded the prepared
+// definitions from a cache file (.sph/.spc) and rebuilt that file when it was missing or stale.
 void Lsprite::load (void)
 {
   try
   {
     if (wanted&&specified)
     {
-      try
-      {
-        load_prepared();
-      }
-      catch (must_rebuild)
-      {
-        MESSAGE(M_rebreq,name,must_rebuild::reason);
-        if (!File::volume())
-        {
-          rebuild();
-          try
-          {
-            load_prepared();
-            ready=1;
-          }
-          catch (must_rebuild)
-          {
-            FAILURE (F_badver,name,must_rebuild::reason);
-          }
-        }
-        else
-        {
-          FAILURE (F_volbadver);
-        }
-      }
+      rebuild();
+      ready=1;
     }
   }
   catch (Failure)
@@ -235,6 +210,10 @@ void Sprite::load (char *_filename)
 
     memused=(int)Heap::mem_avail();
     l.load();
+    // Port: the port data has no lores targets, but the lores bounds still count towards the
+    // phase bounds below. The original built lores from the same source FLC, so measure it.
+    if (l.wanted&&!l.specified&&l.source_datetime)
+      l.measure();
     lmemused+=(int)memused-Heap::mem_avail();
 
     memused=(int)Heap::mem_avail();

@@ -1,12 +1,12 @@
 // Stand-ins for the Win32, DirectX 3 and multimedia APIs the original engine was written against.
 //
-// Phase 1 of the port (docs/porting-plan.md): the original code has to compile and link on every
-// platform with no behaviour change, before the drivers are rewritten on SDL2 in phases 2-7.
-// This header replaces <windows.h>, <windowsx.h>, <commctrl.h>, <mmsystem.h>, <ddraw.h>,
-// <dsound.h> and <dplay.h> on all platforms, Windows included, so every build sees the same
-// stubs. The definitions live in win32.cpp:
-//   - window, GDI, DirectX, MCI, mixer, wave-out and joystick calls are inert and report
-//     failure or "nothing there" (LoadLibrary returns NULL, so DirectX is never created);
+// Phase 1 of the port (docs/porting-plan.md) made the original code compile and link on every
+// platform against these stand-ins; phases 2-7 rewrite the drivers on SDL2 and remove them.
+// This header replaces <windows.h>, <windowsx.h>, <commctrl.h>, <mmsystem.h>, <dsound.h> and
+// <dplay.h> on all platforms, Windows included, so every build sees the same stubs. What is
+// left (phase 3 removed the window, GDI and DirectDraw parts) lives in win32.cpp:
+//   - input hooks, DirectSound, DirectPlay, MCI, mixer, wave-out and joystick calls are inert
+//     and report failure or "nothing there" (LoadLibrary returns NULL);
 //   - a few calls with an obvious portable meaning are implemented for real: the clocks
 //     (GetTickCount, timeGetTime), GetUserName, SleepEx and VirtualAlloc.
 // Only what the original sources use is declared. Layouts follow the Win32 SDK where the code
@@ -468,99 +468,13 @@ struct MCI_STATUS_PARMS { DWORD_PTR dwCallback; DWORD_PTR dwReturn; DWORD dwItem
 #define MCI_MAKE_TMSF(t, m, s, f) \
   ((DWORD)(((BYTE)(t) | ((WORD)(m) << 8)) | ((DWORD)(BYTE)(s) | ((WORD)(f) << 8)) << 16))
 
-// --- DirectDraw (DirectX 3) ---------------------------------------------------------------------
+// --- COM base --------------------------------------------------------------------------------
 struct IUnknown
 {
   virtual HRESULT QueryInterface(REFIID riid, LPVOID *ppv) = 0;
   virtual ULONG   AddRef() = 0;
   virtual ULONG   Release() = 0;
 };
-
-struct DDSCAPS { DWORD dwCaps; };
-struct DDPIXELFORMAT
-{
-  DWORD dwSize, dwFlags, dwFourCC, dwRGBBitCount;
-  DWORD dwRBitMask, dwGBitMask, dwBBitMask, dwRGBAlphaBitMask;
-};
-struct DDCOLORKEY { DWORD dwColorSpaceLowValue, dwColorSpaceHighValue; };
-struct DDSURFACEDESC
-{
-  DWORD         dwSize;
-  DWORD         dwFlags;
-  DWORD         dwHeight;
-  DWORD         dwWidth;
-  LONG          lPitch;
-  DWORD         dwBackBufferCount;
-  DWORD         dwRefreshRate;
-  DWORD         dwAlphaBitDepth;
-  DWORD         dwReserved;
-  LPVOID        lpSurface;
-  DDCOLORKEY    ddckCKDestOverlay;
-  DDCOLORKEY    ddckCKDestBlt;
-  DDCOLORKEY    ddckCKSrcOverlay;
-  DDCOLORKEY    ddckCKSrcBlt;
-  DDPIXELFORMAT ddpfPixelFormat;
-  DDSCAPS       ddsCaps;
-};
-typedef DDSURFACEDESC *LPDDSURFACEDESC;
-struct DDCAPS { DWORD dwSize, dwCaps, dwCaps2, dwCKeyCaps, dwFXCaps, dwFXAlphaCaps, dwPalCaps; };
-#define DDENUMRET_CANCEL 0
-#define DDENUMRET_OK     1
-typedef HRESULT (CALLBACK *LPDDENUMMODESCALLBACK)(LPDDSURFACEDESC, LPVOID);
-
-struct IDirectDrawPalette : IUnknown
-{
-  virtual HRESULT SetEntries(DWORD flags, DWORD start, DWORD count, LPPALETTEENTRY entries) = 0;
-};
-struct IDirectDrawSurface : IUnknown
-{
-  virtual HRESULT Flip(IDirectDrawSurface *target, DWORD flags) = 0;
-  virtual HRESULT GetAttachedSurface(DDSCAPS *caps, IDirectDrawSurface **surface) = 0;
-  virtual HRESULT GetCaps(DDSCAPS *caps) = 0;
-  virtual HRESULT GetFlipStatus(DWORD flags) = 0;
-  virtual HRESULT Lock(LPRECT rect, LPDDSURFACEDESC desc, DWORD flags, HANDLE event) = 0;
-  virtual HRESULT Unlock(LPVOID surface) = 0;
-  virtual HRESULT Restore() = 0;
-  virtual HRESULT SetPalette(IDirectDrawPalette *palette) = 0;
-};
-struct IDirectDraw : IUnknown
-{
-  virtual HRESULT CreatePalette(DWORD flags, LPPALETTEENTRY entries, IDirectDrawPalette **palette, IUnknown *outer) = 0;
-  virtual HRESULT CreateSurface(LPDDSURFACEDESC desc, IDirectDrawSurface **surface, IUnknown *outer) = 0;
-  virtual HRESULT EnumDisplayModes(DWORD flags, LPDDSURFACEDESC desc, LPVOID context, LPDDENUMMODESCALLBACK callback) = 0;
-  virtual HRESULT GetCaps(DDCAPS *driver_caps, DDCAPS *hel_caps) = 0;
-  virtual HRESULT SetCooperativeLevel(HWND hwnd, DWORD flags) = 0;
-  virtual HRESULT SetDisplayMode(DWORD width, DWORD height, DWORD bpp) = 0;
-  virtual HRESULT WaitForVerticalBlank(DWORD flags, HANDLE event) = 0;
-};
-typedef IDirectDraw        *LPDIRECTDRAW;
-typedef IDirectDrawSurface *LPDIRECTDRAWSURFACE;
-typedef IDirectDrawPalette *LPDIRECTDRAWPALETTE;
-
-#define DD_OK                    S_OK
-#define FF_DDERR(code)           ((HRESULT)(0x88760000u | (code)))
-#define DDERR_GENERIC            E_FAIL
-#define DDERR_SURFACELOST        FF_DDERR(450)
-#define DDERR_WASSTILLDRAWING    FF_DDERR(540)
-#define DDSD_CAPS                0x00000001L
-#define DDSD_BACKBUFFERCOUNT     0x00000020L
-#define DDSCAPS_BACKBUFFER       0x00000004L
-#define DDSCAPS_COMPLEX          0x00000008L
-#define DDSCAPS_FLIP             0x00000010L
-#define DDSCAPS_PRIMARYSURFACE   0x00000200L
-#define DDSCAPS_MODEX            0x00200000L
-#define DDSCL_FULLSCREEN         0x00000001L
-#define DDSCL_ALLOWREBOOT        0x00000002L
-#define DDSCL_EXCLUSIVE          0x00000010L
-#define DDSCL_ALLOWMODEX         0x00000040L
-#define DDPCAPS_8BIT             0x00000004L
-#define DDPCAPS_ALLOW256         0x00000040L
-#define DDLOCK_SURFACEMEMORYPTR  0x00000000L
-#define DDLOCK_WAIT              0x00000001L
-#define DDFLIP_WAIT              0x00000001L
-#define DDGFS_ISFLIPDONE         0x00000002L
-#define DDWAITVB_BLOCKBEGIN      0x00000001L
-#define DDWAITVB_BLOCKEND        0x00000004L
 
 // --- DirectSound --------------------------------------------------------------------------------
 struct DSCAPS
@@ -728,57 +642,19 @@ FARPROC GetProcAddress(HMODULE module, LPCSTR name);
 DWORD   WaitForSingleObject(HANDLE handle, DWORD milliseconds);
 DWORD   SleepEx(DWORD milliseconds, BOOL alertable);
 // windows and messages
-BOOL    RegisterClass(const WNDCLASS *wc);
-HWND    CreateWindow(LPCSTR class_name, LPCSTR window_name, DWORD style, int x, int y, int w, int h,
-                     HWND parent, HMENU menu, HINSTANCE instance, LPVOID param);
-HWND    CreateWindowEx(DWORD ex_style, LPCSTR class_name, LPCSTR window_name, DWORD style, int x, int y,
-                       int w, int h, HWND parent, HMENU menu, HINSTANCE instance, LPVOID param);
-HWND    CreateDialog(HINSTANCE instance, LPCSTR templ, HWND parent, DLGPROC proc);
 BOOL    DestroyWindow(HWND hwnd);
-BOOL    ShowWindow(HWND hwnd, int cmd);
-BOOL    SetForegroundWindow(HWND hwnd);
-BOOL    SetWindowPos(HWND hwnd, HWND after, int x, int y, int cx, int cy, UINT flags);
 LONG    GetWindowLong(HWND hwnd, int index);
-int     GetWindowText(HWND hwnd, LPSTR text, int max_count);
-HMENU   GetMenu(HWND hwnd);
-HWND    GetDlgItem(HWND dialog, int id);
 BOOL    GetClientRect(HWND hwnd, LPRECT rect);
 BOOL    ClientToScreen(HWND hwnd, POINT *point);
-BOOL    AdjustWindowRectEx(LPRECT rect, DWORD style, BOOL menu, DWORD ex_style);
-BOOL    SetRect(LPRECT rect, int left, int top, int right, int bottom);
-BOOL    InvalidateRect(HWND hwnd, const RECT *rect, BOOL erase);
-int     GetSystemMetrics(int index);
 HICON   LoadIcon(HINSTANCE instance, LPCSTR name);
-HCURSOR LoadCursor(HINSTANCE instance, LPCSTR name);
 int     ShowCursor(BOOL show);
 BOOL    SetCursorPos(int x, int y);
-BOOL    PostMessage(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
-LRESULT SendMessage(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
 void    PostQuitMessage(int exit_code);
 LRESULT DefWindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
 HHOOK   SetWindowsHookEx(int id, HOOKPROC proc, HINSTANCE instance, DWORD thread_id);
 BOOL    UnhookWindowsHookEx(HHOOK hook);
 LRESULT CallNextHookEx(HHOOK hook, int code, WPARAM wparam, LPARAM lparam);
 UINT    MapVirtualKey(UINT code, UINT map_type);
-void    InitCommonControls();
-#define GetWindowStyle(hwnd)   ((DWORD)GetWindowLong(hwnd, GWL_STYLE))
-#define GetWindowExStyle(hwnd) ((DWORD)GetWindowLong(hwnd, -20))
-// GDI
-HDC      GetDC(HWND hwnd);
-int      ReleaseDC(HWND hwnd, HDC hdc);
-HDC      BeginPaint(HWND hwnd, PAINTSTRUCT *paint);
-BOOL     EndPaint(HWND hwnd, const PAINTSTRUCT *paint);
-HGDIOBJ  GetStockObject(int index);
-HGDIOBJ  SelectObject(HDC hdc, HGDIOBJ object);
-BOOL     DeleteObject(HGDIOBJ object);
-BOOL     Rectangle(HDC hdc, int left, int top, int right, int bottom);
-int      GetDeviceCaps(HDC hdc, int index);
-UINT     GetSystemPaletteEntries(HDC hdc, UINT start, UINT count, LPPALETTEENTRY entries);
-HPALETTE CreatePalette(const LOGPALETTE *palette);
-HPALETTE SelectPalette(HDC hdc, HPALETTE palette, BOOL background);
-UINT     RealizePalette(HDC hdc);
-int      StretchDIBits(HDC hdc, int x, int y, int w, int h, int src_x, int src_y, int src_w, int src_h,
-                       const void *bits, const BITMAPINFO *info, UINT usage, DWORD rop);
 // multimedia
 DWORD    timeGetTime();
 MMRESULT waveOutOpen(LPHWAVEOUT handle, UINT device, const WAVEFORMATEX *format, DWORD_PTR callback,
