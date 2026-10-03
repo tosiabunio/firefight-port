@@ -12,6 +12,7 @@ This repo is the porting basis for **Fire Fight** (Chaos Works, 1996), a Win95/D
 Everything was selected by rule from the original archive. `README.md` documents the provenance, the selection rules, what was left out, and the full data, sprite and music details. Comments and many identifiers are in Polish.
 
 - **Version 1.1 only.** This source is v1.1 (Aug 1996). The retail CD is 1.2 and has a newer executable and `PARAMS.VOL`, but no 1.2 source exists. Don't try to reproduce 1.2 behaviour.
+- **Port plan:** SDL2 + CMake, in phases with exit criteria, in `docs/porting-plan.md`. Follow its phase order and its determinism rules.
 - **No build system yet.** The code is still the original MSVC 4 / Win32 / DirectX code. It is pre-standard C++ (`<iostream.h>`, implicit-`int` constants such as `const MAX_X=24;`), and the original makefiles aren't in the repo.
 - **Archive-only material:** the launcher, the LED level editor, makefiles, shareware data, lores art and the design docs exist only in the original archive, outside this repo.
 
