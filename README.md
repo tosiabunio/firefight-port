@@ -10,6 +10,77 @@ This is the subset of the original Fire Fight (Chaos Works, 1996) material neede
 | `source/regdata/` | The settings model (`RegData`) shared by the game and the launcher. `headers.h` is the launcher's header, and its MFC parts sit behind `#ifdef _MFC_VER` |
 | `data/` | Retail game data, laid out exactly as the `*.dir` manifests expect (see below) |
 | `music/` | CD-audio soundtrack, `track02.flac` … `track09.flac` (lossless rips of the CD tracks) |
+| `docs/porting-plan.md` | The port plan: SDL2 + CMake, phases, decisions |
+| `CMakeLists.txt`, `CMakePresets.json`, `vcpkg.json`, `cmake/` | Build system |
+| `tools/smoke/` | Dependency smoke test (SDL2 window and paletted present, SDL2_mixer FLAC/WAV, ENet loopback) |
+
+## Building
+
+The port is in progress (see `docs/porting-plan.md`). The game targets are switched off (`FF_BUILD_GAME=OFF`) until phase 1, so the build currently produces only the smoke test.
+
+**Requirements:** CMake ≥ 3.25, Ninja, a C++17 compiler, and [vcpkg](https://github.com/microsoft/vcpkg) with the `VCPKG_ROOT` environment variable pointing at it. vcpkg builds SDL2, SDL2_mixer (with FLAC) and ENet from `vcpkg.json` on first configure.
+
+- **Windows:**
+  - Visual Studio 2022 or its Build Tools, with the *Desktop development with C++* workload. It bundles CMake, Ninja and vcpkg.
+  - Build from an x64 Developer PowerShell. Set `VCPKG_ROOT` to your own vcpkg clone, or to the bundled one at `…\Microsoft Visual Studio\2022\<edition>\VC\vcpkg`.
+- **Linux:** GCC or Clang, `ninja-build`, and the X11/Wayland/audio development packages that SDL needs. The CI workflow (`.github/workflows/ci.yml`) has the exact `apt` list for Ubuntu.
+- **macOS (Apple Silicon only):** Xcode Command Line Tools and `brew install cmake ninja pkg-config autoconf automake libtool`.
+
+Presets: `windows-msvc`, `linux-gcc`, `linux-clang`, `macos-clang`.
+
+```sh
+cmake --workflow --preset linux-gcc            # configure, build Debug + Release, run tests
+# or step by step:
+cmake --preset linux-gcc
+cmake --build --preset linux-gcc-debug
+ctest --preset linux-gcc-debug
+```
+
+To see the smoke test's window and hear the audio, run it without `--headless`:
+
+```sh
+build/linux-gcc/tools/smoke/Debug/ff_smoke --music music/track02.flac --wav 'data/!global/sounds/beephi.wav'
+```
+
+### Quick start on macOS (Apple Silicon)
+
+1. Install the tools, one time only:
+
+   ```sh
+   xcode-select --install                      # Xcode Command Line Tools, if not installed yet
+   brew install cmake ninja pkg-config autoconf automake libtool
+   git clone https://github.com/microsoft/vcpkg ~/vcpkg
+   ~/vcpkg/bootstrap-vcpkg.sh -disableMetrics
+   ```
+
+2. Make `VCPKG_ROOT` permanent:
+
+   ```sh
+   echo 'export VCPKG_ROOT="$HOME/vcpkg"' >> ~/.zshrc && source ~/.zshrc
+   ```
+
+3. Get the repo. It is private, so log in first with `gh auth login` or use your Git credentials:
+
+   ```sh
+   gh repo clone tosiabunio/firefight-port      # or: git clone https://github.com/tosiabunio/firefight-port.git
+   cd firefight-port
+   ```
+
+4. Configure, build Debug + Release and run the tests:
+
+   ```sh
+   cmake --workflow --preset macos-clang
+   ```
+
+   The first run builds SDL2, SDL2_mixer, libFLAC and ENet through vcpkg, which takes a few minutes. Later runs reuse vcpkg's binary cache. The run should end with `100% tests passed` for both Debug and Release.
+
+5. Run the smoke test with a real window and sound:
+
+   ```sh
+   build/macos-clang/tools/smoke/Debug/ff_smoke --music music/track02.flac --wav 'data/!global/sounds/beephi.wav'
+   ```
+
+   **Expected:** a 640×400 window with moving diagonal colour bands for a few seconds. After it closes, you hear a short beep, then a quarter of a second of the title music. The terminal lists each check and ends with `PASSED (0 failed checks)`. The first lines report the SDL, SDL_mixer and ENet versions and the video/audio drivers in use (`cocoa` and `coreaudio`).
 
 ## Provenance and version
 

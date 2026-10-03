@@ -1,0 +1,109 @@
+name: CI
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+  schedule:
+    - cron: '0 3 * * *'   # nightly: includes macOS
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # Same commit as "builtin-baseline" in vcpkg.json.
+  VCPKG_COMMIT: 3cbc1db4d867ec83c89fba4c461321c11f78b5e3
+
+jobs:
+  # Which platforms run when. macOS runner minutes cost a multiple of Linux minutes:
+  #   push to a branch         -> Windows + Linux
+  #   pull request             -> macOS only (the push run already covers Windows + Linux
+  #                               for the same commit, and its checks show on the PR)
+  #   push to main, nightly,
+  #   manual run               -> everything
+  # Day-to-day macOS testing happens on a local Mac.
+  matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      include: ${{ steps.set.outputs.include }}
+    steps:
+      - id: set
+        shell: bash
+        run: |
+          winlinux='[{"preset":"windows-msvc","os":"windows-latest"},{"preset":"linux-gcc","os":"ubuntu-24.04"},{"preset":"linux-clang","os":"ubuntu-24.04"}]'
+          macos='[{"preset":"macos-clang","os":"macos-latest"}]'
+          if [[ "$GITHUB_EVENT_NAME" == "pull_request" ]]; then
+            m="$macos"
+          elif [[ "$GITHUB_EVENT_NAME" == "push" && "$GITHUB_REF" != "refs/heads/main" ]]; then
+            m="$winlinux"
+          else
+            m=$(jq -c --argjson a "$winlinux" --argjson b "$macos" -n '$a + $b')
+          fi
+          echo "include=$m" >> "$GITHUB_OUTPUT"
+
+  build:
+    needs: matrix
+    name: ${{ matrix.preset }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include: ${{ fromJSON(needs.matrix.outputs.include) }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Linux packages
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            ninja-build pkg-config autoconf autoconf-archive automake libtool \
+            libx11-dev libxft-dev libxext-dev libxrandr-dev libxcursor-dev libxi-dev libxss-dev \
+            libxkbcommon-dev libwayland-dev libegl1-mesa-dev libdecor-0-dev \
+            libpulse-dev libpipewire-0.3-dev
+          cmake --version && ninja --version
+
+      - name: Install macOS packages
+        if: runner.os == 'macOS'
+        run: brew install ninja pkg-config autoconf automake libtool
+
+      - name: Set up MSVC
+        if: runner.os == 'Windows'
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
+
+      - name: Set up vcpkg
+        shell: bash
+        run: |
+          VCPKG_ROOT="$RUNNER_TEMP/vcpkg"
+          VCPKG_BINARY_CACHE="$RUNNER_TEMP/vcpkg-cache"
+          echo "VCPKG_ROOT=$VCPKG_ROOT" >> "$GITHUB_ENV"
+          echo "VCPKG_BINARY_CACHE=$VCPKG_BINARY_CACHE" >> "$GITHUB_ENV"
+          git clone --filter=tree:0 https://github.com/microsoft/vcpkg.git "$VCPKG_ROOT"
+          git -C "$VCPKG_ROOT" checkout "$VCPKG_COMMIT"
+          if [[ "$RUNNER_OS" == "Windows" ]]; then "$VCPKG_ROOT/bootstrap-vcpkg.bat" -disableMetrics; else "$VCPKG_ROOT/bootstrap-vcpkg.sh" -disableMetrics; fi
+          mkdir -p "$VCPKG_BINARY_CACHE"
+          echo "VCPKG_BINARY_SOURCES=clear;files,$VCPKG_BINARY_CACHE,readwrite" >> "$GITHUB_ENV"
+
+      - name: Restore vcpkg binary cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.VCPKG_BINARY_CACHE }}
+          key: vcpkg-${{ matrix.preset }}-${{ hashFiles('vcpkg.json', 'cmake/triplets/**') }}
+          restore-keys: vcpkg-${{ matrix.preset }}-
+
+      - name: Configure, build and test (Debug + Release)
+        run: cmake --workflow --preset ${{ matrix.preset }}
+
+      - name: Upload vcpkg logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: vcpkg-logs-${{ matrix.preset }}
+          path: |
+            ${{ env.VCPKG_ROOT }}/buildtrees/*/*.log
+            build/${{ matrix.preset }}/vcpkg-manifest-install.log
+          if-no-files-found: ignore

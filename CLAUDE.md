@@ -13,7 +13,25 @@ Everything was selected by rule from the original archive. `README.md` documents
 
 - **Version 1.1 only.** This source is v1.1 (Aug 1996). The retail CD is 1.2 and has a newer executable and `PARAMS.VOL`, but no 1.2 source exists. Don't try to reproduce 1.2 behaviour.
 - **Port plan:** SDL2 + CMake, in phases with exit criteria, in `docs/porting-plan.md`. Follow its phase order and its determinism rules.
-- **No build system yet.** The code is still the original MSVC 4 / Win32 / DirectX code. It is pre-standard C++ (`<iostream.h>`, implicit-`int` constants such as `const MAX_X=24;`), and the original makefiles aren't in the repo.
+- **The game doesn't compile yet.** `source/` is still the original MSVC 4 / Win32 / DirectX code. It is pre-standard C++ (`<iostream.h>`, implicit-`int` constants such as `const MAX_X=24;`). Phase 1 makes it compile. Until then the game targets are behind `-DFF_BUILD_GAME=ON` (default OFF).
+
+## Build
+
+- **Build system:** CMake (≥ 3.25) with presets, Ninja Multi-Config, and vcpkg manifest mode (`vcpkg.json`, pinned baseline; `VCPKG_ROOT` must be set).
+- **Presets:** `windows-msvc`, `linux-gcc`, `linux-clang`, `macos-clang` (arm64 only, macOS 11+).
+  - Build presets are `<preset>-debug` and `<preset>-release`; test presets use the same names.
+  - All-in-one: `cmake --workflow --preset <preset>` (configure, build Debug and Release, run all tests).
+  - Single test: `ctest --preset <preset>-debug -R smoke`.
+- **Windows on this machine:** MSVC is not on `PATH`. Run from an x64 Developer PowerShell, or call `C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Auxiliary\Build\vcvars64.bat` first. `VCPKG_ROOT` can be the bundled `…\BuildTools\VC\vcpkg`.
+- **Compile options:** `cmake/FFCompileOptions.cmake` sets them. `ff_common_options` (every target) adds `-fwrapv -fno-strict-aliasing -fsigned-char`; `ff_modern_options` (new code) adds strict warnings.
+- **Dependency targets:** `cmake/FFDependencies.cmake` normalises them to `ff::sdl2`, `ff::mixer` and `ff::enet`.
+- **Targets:** `tools/smoke/ff_smoke` is the dependency smoke test. `source/CMakeLists.txt` defines `cwengine` (all engine modules), `regdata` and `firefight`.
+- **CI:** `.github/workflows/ci.yml` runs the workflow presets. Which platforms run:
+  - branch pushes: Windows and Linux;
+  - pull requests: macOS only;
+  - `main`, nightly and manual runs: everything.
+
+  Work on branches and merge to `main` through a PR, so `main` has been built on all three OSes.
 - **Archive-only material:** the launcher, the LED level editor, makefiles, shareware data, lores art and the design docs exist only in the original archive, outside this repo.
 
 ## Layout

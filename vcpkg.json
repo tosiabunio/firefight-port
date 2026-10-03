@@ -1,0 +1,24 @@
+{
+  "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
+  "name": "firefight",
+  "version-semver": "0.1.0",
+  "description": "Port of Fire Fight (Chaos Works, 1996) to SDL2",
+  "builtin-baseline": "3cbc1db4d867ec83c89fba4c461321c11f78b5e3",
+  "dependencies": [
+    {
+      "name": "sdl2",
+      "default-features": false,
+      "features": [
+        { "name": "x11", "platform": "linux" },
+        { "name": "wayland", "platform": "linux" },
+        { "name": "alsa", "platform": "linux" }
+      ]
+    },
+    {
+      "name": "sdl2-mixer",
+      "default-features": false,
+      "features": [ "libflac" ]
+    },
+    "enet"
+  ]
+}
