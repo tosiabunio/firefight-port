@@ -26,7 +26,12 @@ Everything was selected by rule from the original archive. `README.md` documents
 - **Compile options:** `cmake/FFCompileOptions.cmake` sets them. `ff_common_options` (every target) adds `-fwrapv -fno-strict-aliasing -fsigned-char`; `ff_modern_options` (new code) adds strict warnings.
 - **Dependency targets:** `cmake/FFDependencies.cmake` normalises them to `ff::sdl2`, `ff::mixer` and `ff::enet`.
 - **Targets:** `tools/smoke/ff_smoke` is the dependency smoke test. `source/CMakeLists.txt` defines `cwengine` (all engine modules), `regdata` and `firefight`.
-- **CI:** `.github/workflows/ci.yml` runs the workflow presets on Windows and Linux for every push, and adds macOS on `main`, nightly and manual runs.
+- **CI:** `.github/workflows/ci.yml` runs the workflow presets. Which platforms run:
+  - branch pushes: Windows and Linux;
+  - pull requests: macOS only;
+  - `main`, nightly and manual runs: everything.
+
+  Work on branches and merge to `main` through a PR, so `main` has been built on all three OSes.
 - **Archive-only material:** the launcher, the LED level editor, makefiles, shareware data, lores art and the design docs exist only in the original archive, outside this repo.
 
 ## Layout

@@ -17,8 +17,13 @@ env:
   VCPKG_COMMIT: 3cbc1db4d867ec83c89fba4c461321c11f78b5e3
 
 jobs:
-  # macOS runner minutes cost a multiple of Linux minutes, so macOS only runs on main,
-  # nightly and manual runs. Day-to-day macOS testing happens on a local Mac.
+  # Which platforms run when. macOS runner minutes cost a multiple of Linux minutes:
+  #   push to a branch         -> Windows + Linux
+  #   pull request             -> macOS only (the push run already covers Windows + Linux
+  #                               for the same commit, and its checks show on the PR)
+  #   push to main, nightly,
+  #   manual run               -> everything
+  # Day-to-day macOS testing happens on a local Mac.
   matrix:
     runs-on: ubuntu-latest
     outputs:
@@ -27,9 +32,14 @@ jobs:
       - id: set
         shell: bash
         run: |
-          m='[{"preset":"windows-msvc","os":"windows-latest"},{"preset":"linux-gcc","os":"ubuntu-24.04"},{"preset":"linux-clang","os":"ubuntu-24.04"}]'
-          if [[ "$GITHUB_REF" == "refs/heads/main" || "$GITHUB_EVENT_NAME" == "schedule" || "$GITHUB_EVENT_NAME" == "workflow_dispatch" ]]; then
-            m=$(jq -c '. + [{"preset":"macos-clang","os":"macos-latest"}]' <<< "$m")
+          winlinux='[{"preset":"windows-msvc","os":"windows-latest"},{"preset":"linux-gcc","os":"ubuntu-24.04"},{"preset":"linux-clang","os":"ubuntu-24.04"}]'
+          macos='[{"preset":"macos-clang","os":"macos-latest"}]'
+          if [[ "$GITHUB_EVENT_NAME" == "pull_request" ]]; then
+            m="$macos"
+          elif [[ "$GITHUB_EVENT_NAME" == "push" && "$GITHUB_REF" != "refs/heads/main" ]]; then
+            m="$winlinux"
+          else
+            m=$(jq -c --argjson a "$winlinux" --argjson b "$macos" -n '$a + $b')
           fi
           echo "include=$m" >> "$GITHUB_OUTPUT"
 
