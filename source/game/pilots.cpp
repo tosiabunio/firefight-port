@@ -1,5 +1,6 @@
-#include "headers.h"
+// Before headers.h: it defines _INC_MATH, which keeps MSVC's <math.h> out of <string>.
 #include <string>
+#include "headers.h"
 
 // Port: the pilot record keeps its original layout and scrambling, but lives in its own file in
 // the preferences directory (was a registry value: section "Player:<name>", key easy/hard/ntrk).
