@@ -1,0 +1,135 @@
+;=====================================================================
+;
+;                              NET TYPY 1
+;
+;=====================================================================
+
+
+;---------------------------------------- STATKI
+
+
+
+;---------------------------------------- DESTROY
+
+
+area  big_flame
+        type          = obj_destroy10
+        life          = LOW_SHIELDS
+        explode       = 1
+        morph         = 1
+        ch_sprite     = b_flame
+        range         = 60
+        frame_delay   = 0.04
+        visible       = 0
+endarea
+
+ area  medium_flame
+        type          = obj_destroy11
+        life          = LOW_SHIELDS
+        morph         = 1
+        explode       = 1
+        ch_sprite     = m_flame
+        range         = 60
+        frame_delay   = 0.04
+        visible       = 0
+ endarea
+
+ area  small_flame
+        type          = obj_destroy12
+        life          = LOW_SHIELDS
+        morph         = 1
+        explode       = 1
+        ch_sprite     = s_flame
+        range         = 60
+        frame_delay   = 0.04
+        visible       = 0
+ endarea
+
+
+
+;---------------------------------------- MISJA
+
+
+;-------------
+
+ area 5cel1
+        type            = obj_unblockcel1
+        serv_type       = visual
+        unblocked_type   = odblok
+ endarea
+
+ area 5cel2
+        type            = obj_unblockcel2
+        serv_type       = visual
+        unblocked_type   = odblok
+ endarea
+
+ area 5cel3
+        type            = obj_unblockcel3
+        serv_type       = visual
+        unblocked_type   = odblok
+ endarea
+
+ area 5cel4
+        type            = obj_unblockcel4
+        serv_type       = visual
+        unblocked_type   = odblok
+ endarea
+
+ area 5cel5
+        type            = obj_unblockcel5
+        serv_type       = visual
+        unblocked_type   = odblok
+ endarea
+
+ area 5cel6
+        type            = obj_unblockcel6
+        serv_type       = visual
+        unblocked_type   = odblok
+ endarea
+
+ area 5cel7
+        type            = obj_unblockcel7
+        serv_type       = visual
+        unblocked_type   = odblok
+ endarea
+;----------------
+ area 5flameboss
+        type          = obj_destroy5fb
+        action        = enable_after
+        life          = IMMORTAL
+        ch_sprite     = s_flame
+        range         = 60
+        frame_delay   = 0.04
+        visible       = 0
+ endarea
+
+;---------------------------------------- BRONIE & LOTNISKA
+
+area landplace
+        type          = landplaceA
+endarea
+
+area landplaceA
+        type          = landplaceA
+endarea
+
+area landplaceB
+        type           = landplaceB
+endarea
+
+area Bronie
+        type           = obj_capsule
+        range          = 30
+endarea
+
+area Bronie1
+        type           = obj_capsule
+        range          = 30
+endarea
+
+area odblok
+        type            = obj_unblock
+        serv_type       = visual
+        unblocked_type   = odblok
+endarea

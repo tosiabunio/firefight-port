@@ -1,0 +1,68 @@
+;旼컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴커
+;�                              WHITE3 LEVEL                                  �
+;읕컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴켸
+
+
+
+area white
+
+ area baza1
+    source = -flics\white\baza1.flc
+    hires  =  white\sprites\baza1.sph
+    collis =  white\sprites\baza1.spc
+ endarea
+
+
+ area baza2
+    source = -flics\white\baza2.flc
+    csource= -flics\white\baza2k.flc
+    hires  =  white\sprites\baza2.sph
+    collis =  white\sprites\baza2.spc
+ endarea
+
+ area baza3a
+    source = -flics\white\baza3a.flc
+    hires  =  white\sprites\baza3a.sph
+    collis =  white\sprites\baza3a.spc
+ endarea
+
+ area baza3b
+    source = -flics\white\baza3b.flc
+    hires  =  white\sprites\baza3b.sph
+    collis =  white\sprites\baza3b.spc
+ endarea
+
+ area baza3c
+    source = -flics\white\baza3c.flc
+    hires  =  white\sprites\baza3c.sph
+    collis =  white\sprites\baza3c.spc
+ endarea
+
+
+ area baza4a
+    source = -flics\white\baza4a.flc
+    hires  =  white\sprites\baza4a.sph
+    collis =  white\sprites\baza4a.spc
+ endarea
+
+ area baza4b
+    source = -flics\white\baza4b.flc
+    hires  =  white\sprites\baza4b.sph
+    collis =  white\sprites\baza4b.spc
+ endarea
+
+ area baza4c
+    source = -flics\white\baza4c.flc
+    hires  =  white\sprites\baza4c.sph
+    collis =  white\sprites\baza4c.spc
+ endarea
+
+ area generac
+    source = -flics\white\generac.flc
+    hires  =  white\sprites\generac.sph
+    ;collis =  white\sprites\generac.spc
+ endarea
+
+
+endarea
+

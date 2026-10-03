@@ -1,0 +1,325 @@
+;=====================================================================
+;
+;                               GREEN TYPY 2
+;
+;=====================================================================
+
+
+
+;---------------------------------------- ROZWALAJACE SIE MURY
+
+area mur1
+        type           = door_mur1
+        action         = disable_after
+        delay          = 9999999
+        open           = 0
+endarea
+
+area mur2
+        type           = door_mur2
+        action         = disable_after
+        delay          = 9999999
+        open           = 0
+endarea
+
+area mur3
+        type           = door_mur3
+        action         = disable_after
+        delay          = 9999999
+        open           = 0
+endarea
+
+area mur4
+        type           = door_mur4
+        action         = disable_after
+        delay          = 9999999
+        open           = 0
+endarea
+
+area mur5
+        type           = door_mur5
+        action         = disable_after
+        delay          = 9999999
+        open           = 0
+endarea
+
+area mur6
+        type           = door_mur6
+        action         = disable_after
+        delay          = 9999999
+        open           = 0
+endarea
+
+;---------------------------------------- ANTENKI
+
+;---------------------------------------- przelacznik do aktywowania anteny
+area antena_activate
+        type           = obj_destroy_antena
+        life           = LOW_SHIELDS
+        ch_sprite      = 2sw_on
+        range          = 100
+        frame_delay    = 0.05
+endarea
+;---------------------------------------- antena aktywna
+area antena_active1
+        type           = obj_destroy_antena1
+        life           = IMMORTAL
+        ch_sprite      = 2antena_on
+        anim_sprite    = 2antena1
+        range          = 100
+        frame_delay    = 0.05
+endarea
+
+area antena_active2
+        type           = obj_destroy_antena2
+        life           = IMMORTAL
+        ch_sprite      = 2antena_on
+        anim_sprite    = 2antena1
+        range          = 100
+        frame_delay    = 0.05
+endarea
+
+area antena_active3
+        type           = obj_destroy_antena3
+        life           = IMMORTAL
+        ch_sprite      = 2antena_on
+        anim_sprite    = 2antena1
+        range          = 100
+        frame_delay    = 0.05
+endarea
+
+area antena_active4
+        type           = obj_destroy_antena4
+        life           = IMMORTAL
+        ch_sprite      = 2antena_on
+        anim_sprite    = 2antena1
+        range          = 100
+        frame_delay    = 0.05
+endarea
+
+area antena_active5
+        type           = obj_destroy_antena5
+        life           = IMMORTAL
+        ch_sprite      = 2antena_on
+        anim_sprite    = 2antena1
+        range          = 100
+        frame_delay    = 0.05
+endarea
+
+;---------------------------------------- bumkry dla ludkow
+
+area destroy_bunkier1 ; - srodek zmieniajacy sie w krater do ludka
+        type         = obj_destroy_bunkier1
+        action       = enable_after
+        explode      = 1
+        life         = MEDIUM_SHIELDS
+        ch_sprite    = ruiny1z
+        range        = 60
+        frame_delay  = 0.05
+endarea
+
+area destroy_bunkier2 ; - srodek zmieniajacy sie w krater do ludka
+        type         = obj_destroy_bunkier2
+        action       = enable_after
+        explode     = 1
+        life         = MEDIUM_SHIELDS
+        ch_sprite    = ruiny1z
+        range        = 60
+        frame_delay  = 0.05
+endarea
+
+area destroy_bunkier3 ; - srodek zmieniajacy sie w krater do ludka
+        type         = obj_destroy_bunkier3
+        action       = enable_after
+        explode      = 1
+        life         = MEDIUM_SHIELDS
+        ch_sprite    = ruiny1z
+        range        = 60
+        frame_delay  = 0.05
+endarea
+area destroy_bunkier4 ; - srodek zmieniajacy sie w krater do ludka
+        type         = obj_destroy_bunkier4
+        action       = enable_after
+        explode      = 1
+        life         = MEDIUM_SHIELDS
+        ch_sprite    = ruiny1z
+        range        = 60
+        frame_delay  = 0.05
+endarea
+area destroy_bunkier5 ; - srodek zmieniajacy sie w krater do ludka
+        type         = obj_destroy_bunkier5
+        action       = enable_after
+        explode      = 1
+        life         = MEDIUM_SHIELDS
+        ch_sprite    = ruiny1z
+        range        = 60
+        frame_delay  = 0.05
+endarea
+
+;---------------------------------------- ladunki
+
+area load1
+        type           = obj_destroy_load
+        life           = IMMORTAL
+        explode        = 1
+        ch_sprite      = 2loadz
+        range          = 100
+        frame_delay    = 0.05
+endarea
+
+;---------------------------------
+
+;--------------------------------- WIEZA NR 1 W BAZIE (od gory po lewej)
+
+area destroy_wieza1
+        type         = obj_destroy_wieza1
+        life         = MEDIUM_SHIELDS
+        explode      = 1
+        ch_sprite    = ruiny2gz
+        range        = 60
+        frame_delay  = 0.05
+endarea
+
+;-------------------------------- WIEZA NR 1 W BAZIE (od gory po prawej)
+
+area destroy_wieza2
+        type         = obj_destroy_wieza2
+        life         = MEDIUM_SHIELDS
+        explode      = 1
+        ch_sprite    = ruiny2gz
+        range        = 60
+        frame_delay  = 0.05
+endarea
+
+;--------------------------------- plaski bunkier
+;--------------------------------- ze srodkiem zmieniajacym sie w krater
+;--------------------------------- ten miedzy murami
+
+area destroy_srodek1
+        type         = obj_destroy_srodek1
+        action       = enable_after
+        explode        = 1
+        life         = MEDIUM_SHIELDS
+        ch_sprite    = ruiny1z
+        range        = 60
+        frame_delay  = 0.05
+endarea
+
+;--------------------------------- plaski bunkier
+;--------------------------------- ze srodkiem zmieniajacym sie w krater
+;--------------------------------- ten na dole miedzy wiezami
+
+area destroy_srodek2
+        type         = obj_destroy_srodek2
+        action       = enable_after
+        explode        = 1
+        life         = MEDIUM_SHIELDS
+        ch_sprite    = ruiny1z
+        range        = 60
+        frame_delay  = 0.05
+endarea
+
+
+
+
+
+
+;======================================== GENERAL DESTROY
+
+area destroy_1 ;- plonaca palma
+        type          = obj_destroy1
+        life          = LOW_SHIELDS
+        ch_sprite     = palma_z
+        morph         = 1
+        range         = 100
+        frame_delay   = 0.05
+        explode_sample= tree_burning_1
+endarea
+
+area destroy_2 ; - sam ogien - wybucha krzaczek
+        type         = obj_destroy2
+        life         = LOW_SHIELDS
+        morph         = 1
+        ch_sprite    = firez
+        range        = 60
+        frame_delay  = 0.05
+        explode_sample= tree_burning_2
+endarea
+
+area destroy_4 ; - do wysokiego domku, rozdupczona gora
+        type         = obj_destroy4
+        life         = MEDIUM_SHIELDS
+        morph         = 1
+        explode        = 1
+        ch_sprite    = ruiny2gz
+        range        = 60
+        frame_delay  = 0.05
+endarea
+
+area destroy_5 ; - plonace beczki
+        type         = obj_destroy5
+        life         = LOW_SHIELDS
+        explode        = 1
+        ch_sprite    = beczki_z
+        range        = 60
+        frame_delay  = 0.05
+endarea
+
+area destroy_6 ; - srodek zmieniajacy sie w krater
+        type         = obj_destroy6
+        action       = enable_after
+        explode        = 1
+        life         = MEDIUM_SHIELDS
+        ch_sprite    = ruiny1z
+        range        = 60
+        frame_delay  = 0.05
+endarea
+
+area marker1
+        type            = obj_unblockm1
+        serv_type       = collis
+        unblocked_type  = marker1
+endarea
+
+;area marker2
+;        type            = obj_unblockm2
+;        serv_type       = collis
+;        unblocked_type  = marker2
+;endarea
+
+area destroy_sekret_1 ; - plonace beczki
+        type         = obj_destroy_s2l
+        action       = disable_after
+        life         = low_shields
+        explode      = 1
+        ch_sprite    = beczki_z
+        range        = 60
+        frame_delay  = 0.04                  ;----- 0,03
+endarea
+
+
+;------------------------------------------- LOTNISKA & BRONIE
+
+area landplaceA
+        type         = landplaceA
+endarea
+
+area landplaceB
+        type         = landplaceB
+endarea
+
+area Bronie
+        type         = obj_capsule
+        range        = 30
+endarea
+
+area Bronie1
+        type         = obj_capsule
+        range        = 30
+endarea
+
+area odblok
+        type            = obj_unblock
+        serv_type       = visual
+        unblocked_type  = odblok
+endarea

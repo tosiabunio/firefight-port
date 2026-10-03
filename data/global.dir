@@ -1,0 +1,759 @@
+;旼컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴커
+;�                               NEW ORDER                                    �
+;읕컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴켸
+
+; WEATHER
+
+area fog
+  source = -flics\!global\cloud.flc
+  hires  =  !global\sprites\cloud.sph o+
+endarea
+
+area cloud
+  source = -flics\!global\cloud.flc
+  hires  =  !global\sprites\cloud.sph o+
+endarea
+
+area night
+  source  = -flics\!global\noc.flc
+  hires   =  !global\sprites\noc.sph o+
+endarea
+
+; TITLE
+area title_sprite_in
+  source = -flics\!global\menu_in.flc
+  hires  =  !global\sprites\menu_in.sph
+endarea
+
+area title_sprite_out
+  source = -flics\!global\menu_out.flc
+  hires  =  !global\sprites\menu_out.sph
+endarea
+
+area missions_pics_nor
+  source  = -flics\!global\prgnor.flc
+  hires   =  !global\sprites\prgnor.sph
+endarea
+
+area missions_pics_dark
+  source  = -flics\!global\prgdrk.flc
+  hires   =  !global\sprites\prgdrk.sph
+endarea
+
+area indicatore
+  source  = -flics\!global\damagee.flc
+  hires   =  !global\sprites\damagee.sph
+endarea
+
+area frame
+  source  = -flics\!global\ramka.flc
+  hires   =  !global\sprites\ramka.sph
+endarea
+
+area header
+  source  = -flics\!global\intro.flc
+  hires   =  !global\sprites\intro.sph
+endarea
+
+area palette
+  source = -flics\!global\palette.flc
+  target = !global\sprites\palette.spp
+endarea
+
+area level_pictures
+  source  = -flics\!global\level.flc
+  hires   =  !global\sprites\level.sph
+endarea
+
+; PRINT
+area small_letters
+  source  = -flics\!global\sletter.flc
+  hires   =  !global\sprites\sletter.sph
+endarea
+
+area small_italic_letters
+  source  = -flics\!global\siletter.flc
+  hires   =  !global\sprites\siletter.sph
+endarea
+
+area big_letters
+  source  = -flics\!global\bletter.flc
+  hires   =  !global\sprites\bletter.sph
+endarea
+
+area big_italic_letters
+  source  = -flics\!global\biletter.flc
+  hires   =  !global\sprites\biletter.sph
+endarea
+
+; GAMEMANAGER
+
+area patern
+  hsource = -flics\!global\title_h2.flc
+  hires  =  !global\sprites\title_hi.sph
+endarea
+
+area pointer
+  source  = -flics\!global\pointer.flc
+  hires   =  !global\sprites\pointer.sph
+endarea
+
+area active_mission
+  source = -flics\!global\active.flc
+  hires  =  !global\sprites\active.sph
+endarea
+
+; GLOBAL SPRITES
+
+area radar
+  source = -flics\!global\raaa1.flc
+;  hires  =  !global\sprites\raaa1.sph
+;  lores  =  !global\sprites\raaa1.spl 1x1
+endarea
+
+area radar_landing
+  source = -flics\!global\lanpoint.flc
+  hires  =  !global\sprites\lanpoint.sph
+endarea
+
+area indicator
+  source = -flics\!global\damage.flc
+  hires  =  !global\sprites\damage.sph
+endarea
+
+area radar_point
+  source = -flics\!global\raaa2.flc
+  hires  =  !global\sprites\raaa2.sph
+endarea
+
+area radar_target
+  source = -flics\!global\direkt.flc
+  hires  =  !global\sprites\direkt.sph
+endarea
+
+area radar_scope
+  source = -flics\!global\radpoint.flc
+  hires  =  !global\sprites\radpoint.sph
+endarea
+
+area cinder_cannon
+  source  = -flics\!global\dzialo1z.flc
+  hires   =  !global\sprites\dzialo1z.sph
+  collis  = !global\sprites\dzialo1z.spc
+endarea
+
+area cinder_pulse
+  source  = -flics\!global\dzialo2z.flc
+  hires   =  !global\sprites\dzialo2z.sph
+  collis  = !global\sprites\dzialo2z.spc
+endarea
+
+;*************************************
+
+area expl_destroy
+  source = -flics\!global\gexplp.flc
+  hires  =  !global\sprites\gexplp.sph
+endarea
+
+area expl_dest_small
+  source = -flics\!global\gexpl.flc
+  hires  =  !global\sprites\gexpl.sph
+endarea
+
+area expl_air
+  source = -flics\!global\blow3.flc
+  hires  =  !global\sprites\blow3.sph
+endarea
+
+area expl_rocket
+  source = -flics\!global\homeexpl.flc
+  hires  =  !global\sprites\homeexpl.sph
+endarea
+
+area expl_laser
+  source = -flics\!global\lsrexpl.flc
+  hires  =  !global\sprites\lsrexpl.sph
+endarea
+
+area expl_swarm
+  source = -flics\!global\swrmexpl.flc
+  hires  =  !global\sprites\swrmexpl.sph
+endarea
+
+;*************************************
+
+area flame
+  source = -flics\!global\explode.flc
+  hires  =  !global\sprites\explode.sph
+  collis =  !global\sprites\explode.spc
+endarea
+
+area dymki
+  source = -flics\!global\dym2.flc
+  hires  =  !global\sprites\dym2.sph
+  collis =  !global\sprites\dym2.spc
+endarea
+
+area myswarmersmoke
+  source = -flics\!global\swarmsmk.flc ;dym.flc
+  hires  =  !global\sprites\swarmsmk.sph ;dym.sph
+endarea
+
+area myswarmer
+  source = -flics\!global\missile2.flc
+  hires  =  !global\sprites\missile2.sph
+  collis =  !global\sprites\missile2.spc
+endarea
+
+area mybomb
+  source = -flics\!global\bolt.flc
+  hires  =  !global\sprites\bolt.sph
+  collis =  !global\sprites\bolt.spc
+endarea
+
+area snail
+  source = -flics\!global\slimak.flc
+  hires  =  !global\sprites\slimak.sph
+endarea
+
+area destsmoke
+  source = -flics\!global\grzesdym.flc
+  hires  =  !global\sprites\grzesdym.sph
+endarea
+
+area dym
+  source = -flics\!global\dymek.flc
+  hires  =  !global\sprites\dymek.sph
+endarea
+
+area boom
+  source = -flics\!global\fire.flc
+  hires  =  !global\sprites\fire.sph
+endarea
+
+area cursor
+  hsource = -flics\!global\cel.flc
+  hires   =  !global\sprites\cel.sph
+endarea
+
+area arocket
+  source = -flics\!global\wkapusta.flc
+  hires  =  !global\sprites\wkapusta.sph
+  collis =  !global\sprites\wkapusta.spc
+endarea
+
+;****************************************
+
+area ship
+  source = -flics\!global\bohater2.flc
+  hires  =  !global\sprites\bohater2.sph
+  collis = !global\sprites\bohater2.spc
+endarea
+
+area shiptower
+  source = -flics\!global\bohtow2.flc
+  hires  =  !global\sprites\bohtow2.sph
+endarea
+
+area shiptowerpoint
+  source = -flics\!global\bohtowp2.flc
+  hires  =  !global\sprites\bohtowp2.sph
+endarea
+
+
+area shipexhaust1
+  source = -flics\!global\jet_s.flc
+  hires  =  !global\sprites\jet_s.sph
+endarea
+
+area shipexhaust2
+  source = -flics\!global\jet_b.flc
+  hires  =  !global\sprites\jet_b.sph
+endarea
+
+area shipborder
+  source = -flics\!global\bohborh.flc
+  hires  =  !global\sprites\bohborh.sph
+endarea
+
+area shipborderstrong
+  source = -flics\!global\bosup2b.flc
+  hires  =  !global\sprites\bohbosh.sph
+endarea
+
+area shipshield
+  source = -flics\!global\bohasup2.flc
+  hires  =  !global\sprites\bohasup2.sph
+endarea
+
+area shipskin
+  source = -flics\!global\skorka.flc
+  hires  =  !global\sprites\skorka.sph
+  collis =  !global\sprites\skorka.spc
+endarea
+
+area weap1fire
+  source = -flics\!global\w1fire.flc
+  hires  =  !global\sprites\w1fire.sph
+endarea
+
+area shotgunfire
+  source = -flics\!global\w5shoot.flc
+  hires  =  !global\sprites\w5shoot.sph
+endarea
+
+;***************************************
+
+area dispfigsmall
+  source  = -flics\!global\num_sml.flc
+  hires   =  !global\sprites\num_sml.sph
+endarea
+
+area dispfigbig
+  source  = -flics\!global\num_big.flc
+  hires   =  !global\sprites\num_big.sph
+endarea
+
+;***************************************
+
+area teportu
+  source  = -flics\!global\teportu.flc
+  hires   =  !global\sprites\teportu.sph
+endarea
+
+area teportd
+  source  = -flics\!global\teportd.flc
+  hires   =  !global\sprites\teportd.sph
+endarea
+
+area coll_up
+  source = -flics\!global\beamupx.flc
+  hires  =  !global\sprites\beamupx.sph
+endarea
+;*************** HERO FIRE *************
+
+area asplash
+  source = -flics\!global\laserbar.flc
+  hires  =  !global\sprites\laserbar.sph
+  collis =  !global\sprites\laserbar.spc
+endarea
+
+area CannonSplash
+  source = -flics\!global\strzal.flc
+  hires  =  !global\sprites\strzal.sph
+  csource= -flics\!global\strzal_k.flc
+  collis =  !global\sprites\strzal.spc
+endarea
+
+area myrocket
+  source = -flics\!global\kapusta3.flc
+  hires  =  !global\sprites\kapusta3.sph
+  collis =  !global\sprites\kapusta3.spc
+endarea
+
+area cannonpoint2
+  source = -flics\brown\cannon2p.flc
+  hires  =  brown\sprites\cannon2p.sph
+endarea
+
+area cannonpoint1
+  source = -flics\brown\cannongp.flc
+  hires  =  brown\sprites\cannongp.sph
+endarea
+
+area fireball
+  source = -flics\!global\laser2.flc
+  hires  =  !global\sprites\laser2.sph
+  collis =  !global\sprites\laser2.spc
+endarea
+
+area gunfire
+  source = -flics\!global\gunsht.flc
+  hires  =  !global\sprites\gunsht.sph
+  collis =  !global\sprites\gunsht.spc
+endarea
+
+area mboss3_fire_left
+  source = -flics\!global\mboss3l.flc
+  hires  =  !global\sprites\mboss3l.sph
+  collis =  !global\sprites\mboss3l.spc
+endarea
+
+area mboss3_fire_right
+  source = -flics\!global\mboss3r.flc
+  hires  =  !global\sprites\mboss3r.sph
+  collis =  !global\sprites\mboss3r.spc
+endarea
+
+area strzal
+  source = -flics\!global\strzal.flc
+  hires  =  !global\sprites\strzal.sph
+  csource= -flics\!global\strzal_k.flc
+  collis =  !global\sprites\strzal.spc
+endarea
+
+area odlamek0
+  source = -flics\!global\odd2.flc
+  hires  =  !global\sprites\odd2.sph
+endarea
+
+area odlamek1
+  source = -flics\!global\odd1.flc
+  hires  =  !global\sprites\odd1.sph
+endarea
+
+area odlamek2
+  source = -flics\!global\odlamek2.flc
+  hires  =  !global\sprites\odlamek2.sph
+endarea
+
+area odlamek3
+  source = -flics\!global\odlamek3.flc
+  hires  =  !global\sprites\odlamek3.sph
+endarea
+
+area odlamek4
+  source = -flics\!global\odd3.flc
+  hires  =  !global\sprites\odd3.sph
+endarea
+
+area odlamek5
+  source = -flics\!global\odd4.flc
+  hires  =  !global\sprites\odd4.sph
+endarea
+
+area odlamek6
+  source = -flics\!global\odd5.flc
+  hires  =  !global\sprites\odd5.sph
+endarea
+
+area odlamek7
+  source = -flics\!global\odd6.flc
+  hires  =  !global\sprites\odd6.sph
+endarea
+
+area odlamek8
+  source = -flics\!global\odd7.flc
+  hires  =  !global\sprites\odd7.sph
+endarea
+
+area mbosssplinter
+  source = -flics\!global\odboss.flc
+  hires  =  !global\sprites\odboss.sph
+  collis =  !global\sprites\odboss.spc
+endarea
+
+area mine
+  source = -flics\!global\sbomb.flc
+  csource= -flics\!global\mine_k.flc
+  hires  =  !global\sprites\sbomb.sph
+  collis =  !global\sprites\sbomb.spc
+endarea
+
+area defmine
+  source = -flics\!global\defmine.flc
+  hires  =  !global\sprites\defmine.sph
+  collis =  !global\sprites\defmine.spc
+endarea
+
+area staticmine1
+  source = -flics\!global\mine.flc
+  hires  =  !global\sprites\mine.sph
+  collis =  !global\sprites\mine.spc
+endarea
+
+area staticmine2
+  source = -flics\!global\mine2.flc
+  hires  =  !global\sprites\mine2.sph
+  collis =  !global\sprites\mine2.spc
+endarea
+
+area staticmine3
+  source = -flics\!global\mine3.flc
+  hires  =  !global\sprites\mine3.sph
+  collis =  !global\sprites\mine3.spc
+endarea
+
+area staticmine4
+  source = -flics\!global\mine4.flc
+  hires  =  !global\sprites\mine4.sph
+  collis =  !global\sprites\mine4.spc
+endarea
+
+area photo_cross
+  source = -flics\!global\badpic.flc
+  hires  =  !global\sprites\badpic.sph
+  collis =  !global\sprites\badpic.spc
+endarea
+
+
+area bomb
+  source = -flics\!global\bomb.flc
+  hires  =  !global\sprites\bomb.sph
+  collis =  !global\sprites\bomb.spc
+endarea
+
+area upgrade
+  source = -flics\!global\upgrade.flc
+  hires  =  !global\sprites\upgrade.sph
+ csource = -flics\!global\upgradek.flc
+  collis =  !global\sprites\upgrade.spc
+endarea
+
+area brick
+  source = -flics\net\brick.flc
+  hires  =  net\sprites\brick.sph
+ csource = -flics\net\brick_k.flc
+  collis =  net\sprites\brick.spc
+endarea
+
+area lightexpl
+  hsource = -flics\!global\elipsy.flc
+  hires   =  !global\sprites\elipsy.sph
+endarea
+
+area expl_mine
+  source  = -flics\!global\mineexp.flc
+  hires   =  !global\sprites\mineexp.sph
+endarea
+
+;STATKI
+
+area taran
+  source = -flics\!global\spider.flc
+  hires  =  !global\sprites\spider.sph
+  collis = !global\sprites\spider.spc
+endarea
+
+area simple1
+  source = -flics\!global\mucha.flc
+  hires  =  !global\sprites\mucha.sph
+  collis = !global\sprites\mucha.spc
+endarea
+
+area simple2
+  source = -flics\!global\buc.flc
+  hires  =  !global\sprites\buc.sph
+  collis = !global\sprites\buc.spc
+endarea
+
+area simple3
+  source = -flics\!global\bug.flc
+  hires  =  !global\sprites\bug.sph
+  collis = !global\sprites\bug.spc
+endarea
+
+area mboss1
+  source = -flics\!global\mboss1.flc
+  hires  =  !global\sprites\mboss1.sph
+  collis = !global\sprites\mboss1.spc
+endarea
+
+area mboss2
+  source = -flics\!global\mboss2.flc
+  hires  =  !global\sprites\mboss2.sph
+  collis = !global\sprites\mboss2.spc
+endarea
+
+area mboss3
+  source = -flics\!global\mboss3.flc
+  hires  =  !global\sprites\mboss3.sph
+  collis = !global\sprites\mboss3.spc
+endarea
+
+area mboss4
+  source = -flics\!global\mboss4.flc
+  hires  =  !global\sprites\mboss4.sph
+  collis = !global\sprites\mboss4.spc
+endarea
+
+area persons
+  source  = -flics\!global\persons.flc
+  hires   =  !global\sprites\persons.sph
+endarea
+
+area generat
+  source  = -flics\!global\shipgene.flc
+  hires   =  !global\sprites\shipgene.sph
+endarea
+
+
+; SOUNDS
+
+  vulcan                  = sounds\computer\c48.wav           7
+  swarmers                = sounds\computer\c49.wav           7
+  plasma                  = sounds\computer\c50.wav           7
+  missiles                = sounds\computer\c51.wav           7
+  cannon                  = sounds\computer\c52.wav           7
+  grenade                 = sounds\computer\c53.wav           7
+  emshock                 = sounds\computer\c54.wav           7
+  dshield                 = sounds\computer\c55.wav           7
+  mine                    = sounds\computer\c56.wav           7
+  cloak                   = sounds\computer\c57.wav           7
+  shield                  = sounds\computer\c58.wav           7
+  collected               = sounds\computer\c60.wav           7
+  selected                = sounds\computer\c59b.wav          7
+  player                  = sounds\computer\c22.wav           7
+  chatreqby               = sounds\computer\c62.wav           7
+  chatterm                = sounds\computer\c64.wav           7
+  incomingmsg             = sounds\computer\c65.wav           7
+  youkilled               = sounds\computer\c68.wav           7
+  youbeenkilledby         = sounds\computer\c69.wav           7
+  youkilledyourself       = sounds\computer\c70.wav           7
+  haskilled               = sounds\computer\c71.wav           7
+  haskilledhimself        = sounds\computer\c72.wav           7
+  leftgame                = sounds\computer\c67.wav           7
+  shldlow                 = sounds\computer\c1.wav            7
+  shldcritical            = sounds\computer\c2.wav            7
+  shldrecharged           = sounds\computer\c3.wav            7
+  cloakactive             = sounds\computer\c34.wav           7
+  cloak10deactive         = sounds\computer\c35.wav           7
+  cloakdeactive           = sounds\computer\c36.wav           7
+  dshieldactive           = sounds\computer\c37.wav           7
+  dshield10deactive       = sounds\computer\c38.wav           7
+  dshielddeactive         = sounds\computer\c39.wav           7
+  outofammo               = sounds\computer\c15.wav           7
+  alldestroyed            = sounds\computer\c16.wav           7
+  youclearland            = sounds\computer\c24.wav           7
+  clearland               = sounds\computer\c25.wav           7
+  secretplace             = sounds\computer\c26.wav           7
+  misncomplete            = sounds\computer\c5.wav            7
+  misnfailed              = sounds\computer\c6.wav            7
+  timeisup                = sounds\computer\c23.wav           7
+  reachfrag               = sounds\computer\c21.wav           7
+  youreachfrag            = sounds\computer\c21.wav           7
+  you                     = sounds\computer\c201.wav          7
+  are                     = sounds\computer\c202.wav          7
+  is                      = sounds\computer\c204.wav          7
+  thewinner               = sounds\computer\c203.wav          7
+  beamsuccess             = sounds\computer\c8.wav            7
+  beaminterrupt           = sounds\computer\c9.wav            7
+  incomemissile           = sounds\computer\c10.wav           7
+  incomefire              = sounds\computer\c11.wav           7
+  incomeenemy             = sounds\computer\c12.wav           7
+  largeshiprange          = sounds\computer\c13.wav           7
+  largeshipdetect         = sounds\computer\c14.wav           7
+  underattack             = sounds\computer\c80.wav           7
+  basethreat              = sounds\computer\c81.wav           7
+  youarefirst             = sounds\computer\c97.wav           7
+  youaresecond            = sounds\computer\c98.wav           7
+  youarethird             = sounds\computer\c99.wav           7
+  youarefourth            = sounds\computer\c100.wav          7
+  youarelast              = sounds\computer\c102.wav          7
+  colors1                 = sounds\computer\c17.wav           7
+  colors2                 = sounds\computer\c20.wav           7
+  colors3                 = sounds\computer\c18.wav           7
+  colors4                 = sounds\computer\c19.wav           7
+  fuelleak                = sounds\computer\c74.wav           7
+  hulldamage              = sounds\computer\c76.wav           7
+  cargounstable           = sounds\computer\c77.wav           7
+  explosion               = sounds\computer\c78.wav           7
+  coolingfail             = sounds\computer\c75.wav           7
+  activated               = sounds\computer\c200.wav          7
+
+  ;SHIP
+  ship_wallcollis         = !global\sounds\collwall.wav        4  ;kolizja ze sciana
+  ship_aliencollis        = !global\sounds\collship.wav        4  ;kolizja ze statkiem
+  ship_lifeincrease       = !global\sounds\increase.wav        4  ;zwiekszenie energii
+  ship_lifedecrease       = !global\sounds\decrease.wav        4  ;zmniejszenie energii
+  ship_turboon            = !global\sounds\turboon3.wav        4  ;wlaczenie turbo
+  ship_turbooff           = !global\sounds\turboof3.wav        4  ;wylaczenie turbo
+  ship_weap_collect       = !global\sounds\colammo2.wav        5  ;zebrana bron
+  ship_life_collect       = !global\sounds\colammo2.wav        5  ;zebrane zycie
+  ship_invent_collect     = !global\sounds\colsegy2.wav        5  ;zebrana rzecz z inventory
+  ship_brick_collect      = !global\sounds\pickup.wav          5  ;zebrana cegla
+  ship_start              = !global\sounds\takeoff.wav         4  ;start statku (z lotniska)
+  ship_land               = !global\sounds\landing.wav         4  ;ladowanie statku (na lotnisku)
+  ship_strongmorph_on     = !global\sounds\ds_on.wav           4  ;wlaczanie oslon statku (invulnerablility)
+  ship_strongmorph_off    = !global\sounds\ds_off.wav          4  ;wylaczanie oslon statku (invulnerablility)
+
+  ;SHIP WEAPONS
+  ship_chaingun_shot      = !global\sounds\chaingun.wav        5  ;strzal bron 1
+  ship_swarmers_shot      = !global\sounds\launchsw.wav        5  ;strzal bron 2
+  ship_plasma_shot        = !global\sounds\pulsegun.wav        5  ;strzal bron 3
+  ship_homing_shot        = !global\sounds\launchhm.wav        5  ;strzal bron 4
+  ship_shotgun_shot       = !global\sounds\cannon.wav          5  ;strzal bron 5
+  ship_bomb_shot          = !global\sounds\cobain.wav          5  ;strzal bron 6
+  ship_mine_shot          = !global\sounds\laymine.wav         5  ;mina sieciowa
+  ship_emshock_shot       = !global\sounds\magshock.wav        5  ;goldeneye
+
+  respawning              = !global\sounds\respawn2.wav        5  ;respawniecie kapsulki
+  beaming                 = !global\sounds\beamup.wav          5  ;beaming obiektow
+
+  ;CANNON
+  cannon_bullet           = !global\sounds\laser2.wav          6
+  cannon_rocket           = !global\sounds\missturr.wav        6
+
+  ;ALIEN
+  simple1_wepon           = !global\sounds\shiplas2.wav        6
+  simple2_wepon           = !global\sounds\shipchng.wav        6
+  simple3_wepon           = !global\sounds\launchmb.wav        6
+  simple4_wepon           = !global\sounds\ramming.wav         6
+
+  ;STORM
+  storm1                  = !global\sounds\thunder3.wav        4
+  storm2                  = !global\sounds\thunder4.wav        4
+
+  explode1                = !global\sounds\explode1.wav        6
+  explode2                = !global\sounds\explode2.wav        6
+  explode3                = !global\sounds\explode3.wav        6
+  explode4                = !global\sounds\explode5.wav        6
+  explode5                = !global\sounds\explode6.wav        6
+  explode6                = !global\sounds\explnew1.wav        6
+  explode7                = !global\sounds\explnew7.wav        6
+  explode8                = !global\sounds\explnew9.wav        6
+
+  object_shotgun_explode  = !global\sounds\explode2.wav        6
+  object_collect          = !global\sounds\pickup.wav          5
+  object_respawn          = !global\sounds\respawn2.wav        5
+  object_mine_non_active  = !global\sounds\mine3.wav           4
+  object_mine_active      = !global\sounds\mine1.wav           5
+
+  splinter1               = !global\sounds\ricchn1.wav         4
+  splinter2               = !global\sounds\ricchn2.wav         4
+  splinter3               = !global\sounds\ricchn3.wav         4
+  splinter4               = !global\sounds\ricchn4.wav         4
+  splinter5               = !global\sounds\ricchn5.wav         4
+  splinter6               = !global\sounds\ricchn6.wav         4
+
+  ship_splinter1          = !global\sounds\riccan1.wav         4
+  ship_splinter2          = !global\sounds\riccan2.wav         4
+  ship_splinter3          = !global\sounds\riccan3.wav         4
+
+  mboss1_fire             = !global\sounds\bosslase.wav        6
+  mboss2_fire             = !global\sounds\launchmb.wav        6
+  mboss3_fire             = !global\sounds\boschain.wav        6
+  mboss4_fire             = !global\sounds\bosplant.wav        6
+
+  options_updown          = !global\sounds\menumov.wav         5
+  options_accept          = !global\sounds\menu_ok.wav         5
+  options_switch          = !global\sounds\menu_ok.wav         5
+  options_na              = !global\sounds\menunot.wav         5
+  options_fx              = !global\sounds\explode1.wav        5
+  options_init            = !global\sounds\beephi.wav          5
+  options_quit            = !global\sounds\beephi.wav          5
+  cheat_on                = !global\sounds\cheater.wav         7
+  cheat_off               = !global\sounds\firefigh.wav        7
+
+  generator               = !global\sounds\shipapr1.wav        5
+
+  mission_failed          = sounds\computer\c6.wav             7
+  mission_completed       = sounds\computer\c5.wav             7
+
+  ringing                 = !global\sounds\message.wav         7
+  buffer_overflow         = !global\sounds\beephi.wav          7
+  titlemove               = !global\sounds\turboon3.wav        7
+  countdown               = !global\sounds\beephi.wav          5
+
+  szzzz1                  = !global\sounds\front1.wav          9
+  szzzz2                  = !global\sounds\front2.wav          9
+  szzzz3                  = !global\sounds\front3.wav          9
+  szzzzend1               = !global\sounds\back1.wav           9
+  szzzzend2               = !global\sounds\back2.wav           9
+  szzzzend3               = !global\sounds\back3.wav           9
+
+  logo1                   = !global\sounds\logo_ea.wav         7
+  logo2                   = !global\sounds\logo_em.wav         7
+  logo3                   = !global\sounds\logo_cw.wav         7
+  logo4                   = !global\sounds\logo_ff.wav         7
+  chaosupgrade            = !global\sounds\logo_cw.wav         7

@@ -1,0 +1,125 @@
+;=====================================================================
+;
+;                               GREEN TYPY 4
+;
+;=====================================================================
+
+;----------------------------------------  DESTROY
+
+area destroy_1 ;- plonaca palma
+        type          = obj_destroy1
+        life          = LOW_SHIELDS
+        ch_sprite     = palma_z
+        morph         = 1
+        range         = 100
+        frame_delay   = 0.05
+        explode_sample= tree_burning_1
+endarea
+
+area destroy_2 ; - sam ogien - wybucha krzaczek
+        type         = obj_destroy2
+        life         = LOW_SHIELDS
+        morph        = 1
+        ch_sprite    = firez
+        range        = 60
+        frame_delay  = 0.05
+        explode_sample= tree_burning_1
+endarea
+
+area destroy_3 ; - srodek zmieniajacy sie w krater
+        type         = obj_destroy3
+        life         = MEDIUM_SHIELDS
+        explode      = 1
+        action       = enable_after
+        morph        = 1
+        ch_sprite    = ruiny1z
+        range        = 60
+        frame_delay  = 0.05
+endarea
+
+area destroy_4 ; - do wysokiego domku, rozdupczona gora
+        type         = obj_destroy4
+        life         = MEDIUM_SHIELDS
+        explode      = 1
+        morph        = 1
+        ch_sprite    = ruiny2gz
+        range        = 60
+        frame_delay  = 0.05
+endarea
+
+area destroy_5 ; - plonace beczki
+        type         = obj_destroy5
+        life         = LOW_SHIELDS
+        explode      = 1
+        action       = enable_after
+        morph        = 1
+        ch_sprite    = beczki_z
+        range        = 60
+        frame_delay  = 0.05
+endarea
+
+area destroy4_sekret1 ; - plonace beczki
+        type         = obj_destroy5
+        life         = LOW_SHIELDS
+        explode      = 1
+        action       = disable_after
+        morph        = 1
+        ch_sprite    = beczki_z
+        range        = 60
+        frame_delay  = 0.05
+endarea
+
+;------------------------------------------- misja
+
+
+
+
+;------------------------------------------- LOTNISKA & BRONIE
+
+area landplaceA
+        type         = landplaceA
+endarea
+
+area landplaceB
+        type         = landplaceB
+endarea
+
+area Bronie
+        type         = obj_capsule
+        range        = 30
+endarea
+
+area Bronie1
+        type         = obj_capsule
+        range        = 30
+endarea
+
+area odblok
+        type            = obj_unblock
+        serv_type       = visual
+        unblocked_type   = odblok
+endarea
+
+area marker1
+        type            = obj_unblock_m1
+        serv_type       = visual
+        unblocked_type   = odblok
+endarea
+
+area marker2
+        type            = obj_unblock_m2
+        serv_type       = visual
+        unblocked_type   = odblok
+endarea
+
+area marker3
+        type            = obj_unblock_m3
+        serv_type       = visual
+        unblocked_type   = odblok
+endarea
+
+area marker4
+        type            = obj_unblock_m4
+        serv_type       = visual
+        unblocked_type   = odblok
+endarea

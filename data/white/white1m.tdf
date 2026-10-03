@@ -1,0 +1,134 @@
+dx=4096
+dy=4096
+  weather = snow2
+
+  CheckPoints
+
+  "dest_alien1"
+  "do_cel1"
+  "dest_alien2"
+  "do_cel2"
+  "dest_alien3"
+  "do_cel3"
+  "dest_alien4"
+  "do_cel4"
+  "dest_alien5"
+  "land"
+
+;------------------------------------
+
+ area dest_alien1
+    type        = obj_alien1_sektor1
+    count       = all
+    OBJ_TEXT "white_1_1"
+    DISPL_TEXT
+    "white_1_1_1" "white_1_1_1" "JAXON"
+    "white_1_1_2" "white_1_1_2" "RILEY"
+    "white_1_1_3" "white_1_1_3" "JAXON"
+    "white_1_1_4" "white_1_1_4" "RILEY"
+    disable_action  "sciany1_sektor1"
+    ;HANDLE  "DESTROY_OBJ destroy1_sektor1"
+ endarea
+
+ area do_cel1
+    type        = marker1
+    count       = all
+    radar       = 1
+    OBJ_TEXT "white_1_2"
+    DISPL_TEXT
+    "white_1_2_1" "white_1_2_1" "RILEY"
+    "white_1_2_2" "white_1_2_2" "RILEY"
+ endarea
+
+;--
+
+ area dest_alien2
+    type        = obj_alien1_sektor2
+    count       = all
+    OBJ_TEXT "white_1_3"
+    DISPL_TEXT
+    "white_1_3_1" "white_1_3_1" "RILEY"
+    "white_1_3_2" "white_1_3_2" "JAXON"
+    "white_1_3_3" "white_1_3_3" "RILEY"
+    disable_action "sciany1_sektor2"
+    ;HANDLE  "DESTROY_OBJ destroy1_sektor2"
+ endarea
+
+ area do_cel2
+    type        = marker2
+    count       = all
+    radar       = 1
+    OBJ_TEXT "white_1_4"
+    DISPL_TEXT
+    "white_1_4_1" "white_1_4_1" "RILEY"
+ endarea
+
+;--
+
+ area dest_alien3
+    type        = obj_alien1_sektor3
+    count       = all
+    OBJ_TEXT "white_1_5"
+    DISPL_TEXT
+    "white_1_5_1" "white_1_5_1" "RILEY"
+    disable_action  "sciany1_sektor3"
+    ;HANDLE  "DESTROY_OBJ destroy1_sektor3"
+ endarea
+
+ area do_cel3
+    type        = marker3
+    count       = all
+    radar       = 1
+    OBJ_TEXT "white_1_6"
+    DISPL_TEXT
+    "white_1_6_1" "white_1_6_1" "RILEY"
+ endarea
+
+;--
+
+ area dest_alien4
+    type        = obj_alien1_sektor4
+    count       = all
+    OBJ_TEXT "white_1_7"
+    DISPL_TEXT
+    "white_1_7_1" "white_1_7_1" "RILEY"
+    disable_action  "sciany1_sektor4"
+    ;HANDLE  "DESTROY_OBJ destroy1_sektor4"
+ endarea
+
+ area do_cel4
+    type        = marker4
+    count       = all
+    radar       = 1
+    OBJ_TEXT "white_1_8"
+    DISPL_TEXT
+    "white_1_8_1" "white_1_8_1" "RILEY"
+ endarea
+
+;--
+
+ area dest_alien5
+    type        = obj_alien1_sektor5
+    count       = all
+    OBJ_TEXT "white_1_9"
+    DISPL_TEXT
+    "white_1_9_1" "white_1_9_1" "RILEY"
+    "white_1_9_2" "white_1_9_2" "RILEY"
+    disable_action  "sciany1_sektor5"
+    ;HANDLE  "DESTROY_OBJ destroy1_sektor5"
+ endarea
+
+ area land
+    quit        = true
+    type        = landplaceA
+    count       = 1
+    radar       = 1
+    enable_action "bronie1"
+    OBJ_TEXT "white_1_10"
+    DISPL_TEXT
+    "white_1_10_1" "white_1_10_1" "RILEY"
+    "white_1_10_2" "white_1_10_2" "RILEY"
+    "white_1_10_3" "white_1_10_3" "RILEY"
+ endarea
+
+

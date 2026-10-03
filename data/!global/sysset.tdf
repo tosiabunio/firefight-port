@@ -1,0 +1,17 @@
+;This file contains an information about default system settings.
+
+input_device=0
+autohide_life=1
+autohide_inv=1
+autohide_stat=1
+hide_radar=0
+background=1
+environment=1
+special_fx=1
+monochrome=0
+resolution=1
+gamma=0
+fx_vol=32500
+music_vol=32500
+reverse_stereo=0
+mute=0

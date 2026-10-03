@@ -1,0 +1,80 @@
+area lotniskoA
+  type = landplaceA
+endarea
+
+area upgrade
+  type = obj_capsule
+  range = 30
+endarea
+
+area loteryjka
+  type = obj_capsule
+  range = 30
+endarea
+
+area unblock
+  type = obj_unblock
+  serv_type = visual
+  unblocked_type = unblock
+endarea
+
+area unblock2
+  type = obj_unblock
+  serv_type = visual
+  unblocked_type = unblock
+endarea
+
+area unblock3
+  type = obj_unblock
+  serv_type = visual
+  unblocked_type = unblock
+endarea
+
+area kompresor
+  type = obj_destroy
+  life = medium_shields
+  range = 60
+  explode =1
+  ch_sprite = blow1d
+  action = enable_after
+  frame_delay = 0.05
+  morph =1
+endarea
+
+area bar
+  type = obj_destroy
+  life = low_shields
+  range = 60
+  ch_sprite = bardest
+  anim_sprite = barani
+  frame_delay = 0.05
+  action = enable_after
+  explode_sample= bar
+endarea
+
+area elektrownia
+  type = obj_destroy
+  life = medium_shields
+  range = 60
+  explode=1
+  ch_sprite = 5elektrowniad
+  action = enable_after
+  frame_delay = 0.05
+  morph =1
+endarea
+
+area dest_1
+  type = obj_destroy
+  life = immortal
+  range = 60
+  frame_delay = 0.05
+  action = disable_after
+endarea
+
+area dest_2
+  type = obj_destroy
+  life = immortal
+  range = 60
+  frame_delay = 0.05
+  action = disable_after
+endarea

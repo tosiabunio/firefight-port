@@ -1,0 +1,147 @@
+  weather = none
+  dx=4096
+  dy=4096
+
+  CheckPoints
+       "1"
+       "2"
+       "3"
+       "4"
+       "5"
+       "6"
+       "65"
+       "7"
+       "8"
+       "9"
+   Bonus
+       "sec1"
+       "sec2"
+
+  area 1
+    type        = obj_collect_ludek_1
+    count       = 1
+    radar       = 1
+    obj_text "brown_4_1"
+    DISPL_TEXT
+    "brown_4_1_1" "brown_4_1_1" "STACY"
+    "brown_4_1_2" "brown_4_1_2" "JAXON"
+  endarea
+
+  area 2
+    type        = lotniskoA
+    count       = 1
+    radar       = 1
+    obj_text "brown_4_2"
+    DISPL_TEXT
+    "brown_4_2_1" "brown_4_2_1" "SHADOW"
+    enable_action = unblock2
+    timer = 5
+  endarea
+
+  area 3
+    type         = unblock2
+    count        = 1
+    radar        = 1
+    shake_screen =1
+    obj_text "brown_4_3"
+    DISPL_TEXT
+    "brown_4_3_1" "brown_4_3_1" "SHADOW"
+    sample "wallexplode"
+    handle      "destroy_obj dest_1"
+    quit_timer = 1
+  endarea
+
+  area 4
+    type        = wiatrak
+    count       = 3
+    radar       = 1
+    obj_text "brown_4_4"
+    DISPL_TEXT
+    "brown_4_4_1" "brown_4_4_1" "SHADOW"
+    "brown_4_4_2" "brown_4_4_2" "JAXON"
+    "brown_4_4_3" "brown_4_4_3" "RILEY"
+    "brown_4_4_4" "brown_4_4_4" "RILEY"
+    handle      "destroy_obj dest_2"
+  endarea
+
+  area 5
+    type        = obj_collect_ludek_2
+    radar       = 1
+    SET_RADAR   = 1
+    count       = 2
+    enable_action = unblock3
+    obj_text "brown_4_5"
+    DISPL_TEXT
+    "brown_4_5_1" "brown_4_5_1" "JAXON"
+    "brown_4_5_2" "brown_4_5_2" "STACY"
+    "brown_4_5_3" "brown_4_5_3" "JAXON"
+    "brown_4_5_4" "brown_4_5_4" "STACY"
+  endarea
+
+  area 6
+    type          = unblock3
+    count         = 1
+    radar         = 1
+    enable_action = obj_collect_ludek_3
+    obj_text "brown_4_6"
+    DISPL_TEXT
+    "brown_4_6_1" "brown_4_6_1" "JAXON"
+  endarea
+
+  area 65
+    type        = obj_collect_ludek_3
+    radar       = 1
+    count       = 1
+    obj_text "brown_4_7"
+    DISPL_TEXT
+    "brown_4_7_1" "brown_4_7_1" "JAXON"
+    "brown_4_7_2" "brown_4_7_2" "SHADOW"
+    handle      "door doo4"
+  endarea
+
+  area 7
+    type        = wiatrak2
+    count       = all
+    radar       = 1
+    enable_action "obj_aliend4"
+    obj_text "brown_4_8"
+    DISPL_TEXT
+    "brown_4_8_1" "brown_4_8_1" "SHADOW"
+    "brown_4_8_2" "brown_4_8_2" "JAXON"
+    "brown_4_8_3" "brown_4_8_3" "STACY"
+    "brown_4_8_4" "brown_4_8_4" "JAXON"
+  endarea
+
+  area 8
+    type        = obj_aliend4
+    count       = 1
+    radar       = 1
+    obj_text "brown_4_9"
+    DISPL_TEXT
+    "brown_4_9_1" "brown_4_9_1" "RILEY"
+    "brown_4_9_2" "brown_4_9_2" "RILEY"
+    "brown_4_9_3" "brown_4_9_3" "STACY"
+    "brown_4_9_4" "brown_4_9_4" "STACY"
+    "brown_4_9_5" "brown_4_9_5" "STACY"
+  endarea
+
+  area 9
+    type        = lotniskoC
+    obj_text    "brown_4_9"
+    count       = 1
+    radar       = 1
+    quit        = 1
+    enable_action "loteryjka"
+  endarea
+
+  area sec1
+    type          = unblock4
+    count         = 1
+    handle "destroy_obj dest_3"
+  endarea
+
+  area sec2
+    type          = unblock4
+    count         = 1
+    handle "destroy_obj dest_4"
+  endarea

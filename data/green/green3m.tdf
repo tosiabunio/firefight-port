@@ -1,0 +1,251 @@
+
+
+ ;=============== GREEN 3 MISSION ===============================
+
+  dx=4096
+  dy=4096
+
+  weather = night
+
+  CheckPoints
+  "Ludek1"
+  "Ludek2"
+  "Ludek3"
+  "Ludek4"
+  "Ludek5&RozwalBaza1"
+  "Odwozenie_Ludkow"
+  "Baza_Radary"
+  "Zbieranie_Skrzynek"
+  "Odwozenie_Skrzynek"
+  "Baza_Glowna"
+  "BOSS"
+  "Landing"
+
+  Bonus
+  "baza_teleport1"
+  "baza_teleport2"
+  "baza_teleport3"
+  "baza_teleport4"
+
+
+
+
+ ;===============================================================
+
+  area Ludek1
+
+    type            "obj_collect1"
+    count           = ALL
+    radar           = 1
+    quit            = FALSE
+    OBJ_TEXT        "green_3_1"
+    DISPL_TEXT
+    "green_3_1_1" "green_3_1_1" "RILEY"
+  endarea
+
+  area Ludek2
+    type            "obj_collect2"
+    count           = ALL
+    radar           = 1
+    quit            = FALSE
+    OBJ_TEXT        "green_3_2"
+    DISPL_TEXT
+    "green_3_2_1" "green_3_2_1" "JAXON"
+    "green_3_2_2" "green_3_2_2" "JAXON"
+  endarea
+
+  area Ludek3
+
+    type            "destroy3_ludek3"
+                    "obj_collect3"
+    count           = ALL
+    radar           = 1
+    quit            = FALSE
+    OBJ_TEXT        "green_3_3"
+    DISPL_TEXT
+    "green_3_3_1" "green_3_3_1" "JAXON"
+    "green_3_3_2" "green_3_3_2" "JAXON"
+  endarea
+
+  area Ludek4
+
+    type            "destroy3_ludek4"
+                    "obj_collect4"
+
+    count           = ALL
+    radar           = 1
+    quit            = FALSE
+    OBJ_TEXT        "green_3_4"
+    DISPL_TEXT
+    "green_3_4_1" "green_3_4_1" "JAXON"
+  endarea
+
+  area Ludek5&RozwalBaza1
+
+    type           "obj_collect5"
+                   "destroy3_ludek5"
+                   "destroy3_baza1"
+                   "destroy3_baza11"
+    count           = ALL
+    timer           = OFF
+    radar           = 1
+    quit            = FALSE
+    HANDLE          "DESTROY_OBJ kopulka_baza1"
+    OBJ_TEXT        "green_3_5"
+    DISPL_TEXT
+    "green_3_5_1" "green_3_5_1" "JAXON"
+    "green_3_5_2" "green_3_5_2" "JAXON"
+    "green_3_5_3" "green_3_5_3" "RILEY"
+  endarea
+
+  area Odwozenie_Ludkow
+    type     = landplaceA
+    count    = 1
+    radar    = 1
+    quit     = FALSE
+    OBJ_TEXT "green_3_6"
+    DISPL_TEXT
+    "green_3_6_1" "green_3_6_1" "JAXON"
+    "green_3_6_2" "green_3_6_2" "RILEY"
+    "green_3_6_3" "green_3_6_3" "RILEY"
+  endarea
+
+;---------------------------------------------------------------
+
+  area Baza_Radary
+
+    type            "destroy3_baza2"
+    count           = ALL
+    timer           = OFF
+    radar           = 1
+    quit            = FALSE
+    HANDLE          "DESTROY_OBJ antena_active1"
+                    "DESTROY_OBj  kopulka_baza2"
+    OBJ_TEXT        "green_3_7"
+    DISPL_TEXT
+    "green_3_7_1" "green_3_7_1" "JAXON"
+    "green_3_7_2" "green_3_7_2" "RILEY"
+    "green_3_7_3" "green_3_7_3" "RILEY"
+    "green_3_7_4" "green_3_7_4" "RILEY"
+  endarea
+
+  area Zbieranie_Skrzynek
+
+    type            "obj_collect6"
+    count           = ALL
+    timer           = 40
+    radar           = 1
+    quit            = FALSE
+    OBJ_TEXT        "green_3_8"
+    DISPL_TEXT
+    "green_3_8_1" "green_3_8_1" "SHADOW"
+    "green_3_8_2" "green_3_8_2" "SHADOW"
+    "green_3_8_3" "green_3_8_3" "SHADOW"
+  endarea
+
+  area Odwozenie_Skrzynek
+    type     = landplaceC
+    count    = 1
+    radar    = 1
+    quit_timer      = 1
+    quit     = FALSE
+    shake_screen = 1
+    OBJ_TEXT "green_3_9"
+    DISPL_TEXT
+    "green_3_9_1" "green_3_9_1" "SHADOW"
+    "green_3_9_2" "green_3_9_2" "SHADOW"
+    "green_3_9_3" "green_3_9_3" "JAXON"
+    HANDLE          "DESTROY_OBJ destroy3_skrzynki1"
+                    "DESTROY_OBJ destroy3_skrzynki2"
+                    "DESTROY_OBJ destroy3_skrzynki3"
+
+  endarea
+
+  area Baza_Glowna
+
+    type            "destroy3_baza3"
+                    "destroy3_baza31"
+    count           = ALL
+    timer           = OFF
+    radar           = 1
+    quit            = FALSE
+    HANDLE          "DESTROY_OBj  kopulka_baza3"
+    OBJ_TEXT        "green_3_10"
+    DISPL_TEXT
+    "green_3_10_1" "green_3_10_1" "SHADOW"
+    "green_3_10_2" "green_3_10_2" "SHADOW"
+    "green_3_10_3" "green_3_10_3" "JAXON"
+    "green_3_10_4" "green_3_10_4" "RILEY"
+    "green_3_10_5" "green_3_10_5" "RILEY"
+  endarea
+
+;-------------------- to w teleporcie
+
+  area baza_teleport1
+
+      type            "destroy3_telep1"
+      count           = ALL
+      timer           = OFF
+      radar           = 1
+      quit            = FALSE
+      HANDLE          "DESTROY_OBj  kopulka_telep1"
+  endarea
+
+  area baza_teleport2
+
+      type            "destroy3_telep2"
+      count           = ALL
+      timer           = OFF
+      radar           = 1
+      quit            = FALSE
+      HANDLE          "DESTROY_OBj  kopulka_telep2"
+  endarea
+
+  area baza_teleport3
+
+      type            "destroy3_telep3"
+      count           = ALL
+      timer           = OFF
+      radar           = 1
+      quit            = FALSE
+      HANDLE          "DESTROY_OBj  kopulka_telep3"
+  endarea
+
+  area baza_teleport4
+
+      type            "destroy3_telep4"
+      count           = ALL
+      timer           = OFF
+      radar           = 1
+      quit            = FALSE
+      HANDLE          "DESTROY_OBj  kopulka_telep4"
+  endarea
+
+;------------------------------------------------
+
+  area BOSS
+    type     = obj_alien3_boss
+    count    = 1
+    radar    = 1
+    quit     = FALSE
+    OBJ_TEXT "green_3_11"
+    DISPL_TEXT
+    "green_3_11_1" "green_3_11_1" "STACY"
+    "green_3_11_2" "green_3_11_2" "STACY"
+    "green_3_11_3" "green_3_11_3" "JAXON"
+  endarea
+
+
+  area Landing
+    type     = landplaceB
+    count    = 1
+    radar    = OFF
+    enable_action "bronie1"
+    quit     = TRUE
+    OBJ_TEXT "green_3_12"
+    DISPL_TEXT
+    "green_3_12_1" "green_3_12_1" "JAXON"
+    "green_3_12_2" "green_3_12_2" "JAXON"
+    "green_3_12_3" "green_3_12_3" "RILEY"
+    "green_3_12_4" "green_3_12_4" "RILEY"
+  endarea

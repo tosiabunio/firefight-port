@@ -1,0 +1,131 @@
+
+  dx=4096
+  dy=4096
+  weather = smoke_below
+
+  CheckPoints
+     "rebelianci1"
+     "rebelianci2"
+     "landing"
+
+  Bonus
+     "open_door_A"
+     "open_door_B"
+     "open_door_E"
+     "open_door_D"
+     "marker2"
+     "marker3"
+     "marker4"
+
+;=========================================
+
+
+area rebelianci1
+
+   type "destroy_bun1"
+        "destroy_bun2"
+        "obj_collect"
+
+   count = all
+   radar = 1
+   obj_text "grey_3_1"
+   DISPL_TEXT
+   "grey_3_1_1" "grey_3_1_1" "RILEY"
+   "grey_3_1_2" "grey_3_1_2" "RILEY"
+ HANDLE "DOOR door3_F"
+
+endarea
+
+
+area rebelianci2
+
+   type "marker1"
+
+   count = all
+   rebel = 1
+   radar = 1
+   obj_text "grey_3_2"
+   DISPL_TEXT
+   "grey_3_2_1" "grey_3_2_1" "JAXON"
+   "grey_3_2_2" "grey_3_2_2" "STACY"
+   "grey_3_2_3" "grey_3_2_3" "JAXON"
+   "grey_3_2_4" "grey_3_2_4" "STACY"
+endarea
+
+
+area Landing
+  type        = landplaceA
+  count       = 1
+  radar       = 1
+  obj_text    "grey_3_2"
+  quit_rebel  = 1
+  enable_action "bronie1"
+  quit        = TRUE
+endarea
+
+
+area open_door_A
+
+   type "destroy3_A"
+   count = ALL
+   radar = 1
+ HANDLE "DOOR door3_A"
+
+endarea
+
+area open_door_B
+
+   type "destroy3_B"
+   count = ALL
+   radar = 1
+ HANDLE "DOOR door3_B"
+
+endarea
+
+
+area open_door_D
+
+   type "obj_alien3_D"
+   count = ALL
+   radar = 1
+ HANDLE "DOOR door3_D"
+
+endarea
+
+
+area open_door_E
+
+   type "destroy3_E"
+   count = ALL
+   radar = 1
+ HANDLE "DOOR door3_E"
+
+endarea
+
+area marker2
+
+   type "marker2"
+   count = ALL
+   radar = 1
+   DISPL_TEXT "grey_3_a_1" "grey_3_a_1" "STACY"
+
+endarea
+
+area marker3
+
+   type "marker3"
+   count = ALL
+   radar = 1
+   DISPL_TEXT "grey_3_b_1" "grey_3_b_1" "JAXON"
+
+endarea
+
+area marker4
+
+   type "marker4"
+   count = ALL
+   radar = 1
+   DISPL_TEXT "grey_3_c_1" "grey_3_c_1" "STACY"
+endarea
+
+

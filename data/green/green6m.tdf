@@ -1,0 +1,48 @@
+  dx=4096
+  dy=4096
+  ;NIGHT, FOG, SMOKE_BELOW, SMOKE_ABOVE, RAIN
+  weather = none
+
+  CheckPoints
+  "baza1"
+  "baza2"
+  "Landing"
+
+
+ ;====================================================
+
+  area baza1
+    type     = destroy6_baza1
+    count    = ALL
+    radar    = 1
+    OBJ_TEXT "green_6_1"
+    DISPL_TEXT
+    "green_6_1_1" "green_6_1_1" "RILEY"
+    "green_6_1_2" "green_6_1_2" "JAXON"
+  endarea
+
+  area baza2
+    type     = destroy6_baza2
+    count    = ALL
+    radar    = 1
+    OBJ_TEXT "green_6_2"
+    DISPL_TEXT
+    "green_6_2_1" "green_6_2_1" "RILEY"
+    "green_6_2_2" "green_6_2_2" "RILEY"
+    "green_6_2_3" "green_6_2_3" "STACY"
+    "green_6_2_4" "green_6_2_4" "STACY"
+  endarea
+
+  area Landing
+    type     = landplaceA
+    count    = 1
+    radar    = 1
+    quit     = TRUE
+    OBJ_TEXT "green_6_3"
+    DISPL_TEXT
+    "green_6_3_1" "green_6_3_1" "RILEY"
+    "green_6_3_2" "green_6_3_2" "RILEY"
+    enable_action "bronie1"
+  endarea
+
+

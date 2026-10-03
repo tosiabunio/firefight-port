@@ -1,0 +1,72 @@
+;旼컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴커
+;�                              BROWN LEVEL 2                                 �
+;읕컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴켸
+area brown
+  area tratwa                           ; skaly do wybuchania dol
+    source = -flics\brown\tratwa.flc
+    hires = brown\sprites\tratwa.sph
+    csource = -flics\brown\tratwa.flc
+    collis = brown\sprites\tratwa.spc
+  endarea
+
+  area buoy                             ; skaly do wybuchania dol
+    source = -flics\brown\buoy.flc
+    hires = brown\sprites\buoy.sph
+    csource = -flics\brown\buoy.flc
+    collis = brown\sprites\buoy.spc
+  endarea
+
+  area border6                            ; skaly otaczajace
+    source = -flics\brown\border.flc
+    hires  = brown\sprites\border.sph
+  endarea
+
+ area river6
+    source = -flics\brown\river.flc
+    hires  = brown\sprites\river.sph
+  endarea
+
+  area water6                            ; rzeka woda
+    source = -flics\brown\waterA.flc
+    hires  = brown\sprites\waterA.sph
+    csource = -flics\brown\watere.flc
+    collis = brown\sprites\waterA.spc
+  endarea
+
+  area water26                            ; rzeka poczatek wody
+    source = -flics\brown\water2.flc
+    hires  = brown\sprites\water2.sph
+    csource = -flics\brown\water2e.flc
+    collis = brown\sprites\water2.spc
+  endarea
+
+  area 6cooler                         ; wentylatorek
+    source = -flics\brown\cooler.flc
+    hires = brown\sprites\cooler.sph
+  endarea
+
+  area 6pipes                           ; rury
+    source = -flics\brown\pipes.flc
+    hires = brown\sprites\pipes.sph
+  endarea
+
+  area bridge                           ; rury most
+    source = -flics\brown\bridge.flc
+    hires = brown\sprites\bridge.sph
+  endarea
+
+  area destup6                          ; skaly do wybuchania gora
+    source = -flics\brown\destup.flc
+    hires = brown\sprites\destup.sph
+    csource = -flics\brown\destupk.flc
+    collis = brown\sprites\destup.spc
+  endarea
+
+  area destdwn6                         ; skaly do wybuchania dol
+    source = -flics\brown\destdwn.flc
+    hires = brown\sprites\destdwn.sph
+    csource = -flics\brown\destdwnk.flc
+    collis = brown\sprites\destdwn.spc
+  endarea
+
+endarea

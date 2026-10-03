@@ -1,0 +1,77 @@
+;Gdy na poczatku bedzie znak <case_term>, to caly tekst zostanie wypisany
+;malymi literkami, w preciwnym wypadku tekst bedzie wypisany literkami duzymi.
+;Gdy w tekscie pojawi sie znak <italic_term>, to od nastepnego znaku do ponownego
+;wystapienia <italic_term> lub konca tekst bedzie wypisywany kursywa.
+
+case_term=*;
+italic_term=^;
+space_x=0;
+space_y=-2;
+sh_offset_x=2;
+sh_offset_y=3;
+
+;Poszczegolne kolory odpowidaja (w odpowiedniej kolejnosci) typom:
+;NORMAL
+;HIGHLIGHTED
+;DISABLED
+;STATIC
+;WARNING
+;JAXON
+;RILEY
+;STACY
+;SHADOW
+;INVUND
+;INVOVR
+;MENULEVELPANEL
+;MENULEVELMISSIONS
+;MENULEVELTEXT
+;PLAYER1
+;PLAYER2
+;PLAYER3
+;PLAYER4
+
+
+tools_definition
+        "00,00,00,32,36,40"
+        "00,00,00,53,53,53"
+        "00,00,00,22,22,22"
+        "00,00,00,30,60,30"
+        "00,00,00,34,36,40"
+        "00,00,00,32,36,48"       ;JAXON
+        "00,00,00,32,48,36"       ;RILEY
+        "00,00,00,48,32,36"       ;STACY
+        "00,00,00,48,48,28"       ;SHADOW
+        "00,00,00,00,00,00"
+        "63,63,63,63,63,63"
+        "00,00,00,53,53,53"
+        "00,00,00,32,36,40"
+        "00,00,00,32,36,40"
+        "00,00,00,23,23,23"         ;PLAYER1
+        "00,00,00,00,00,63"         ;PLAYER2
+        "00,00,00,00,63,00"         ;PLAYER3
+        "00,00,00,63,00,00"         ;PLAYER4
+
+colors_definition
+        "40,40,40"
+        "63,63,63"
+        "20,20,20"
+        "30,30,30"
+        "34,36,40"
+        "20,20,20"
+        "20,20,30"
+        "32,48,36"
+        "32,48,36"
+        "00,00,00"
+        "63,63,63"
+        "63,63,63"
+        "40,40,40"
+        "40,40,40"
+        "23,23,23"                  ;PLAYER1
+        "00,00,63"                  ;PLAYER2
+        "00,63,00"                  ;PLAYER3
+        "63,00,00"                  ;PLAYER4
+
+shadow_power=-46
+
+conv_table
+        " _!?%().,-:\"0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'ÄÅÇÉ–ÖÜáà»… ÀÃÕ"

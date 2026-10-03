@@ -1,0 +1,159 @@
+
+
+;=====================================================================
+;
+;                               GRAY TYPY 1
+;
+;=====================================================================
+
+
+
+
+
+ ;---------------------------------------- DRZWI
+
+
+
+
+ ;---------------------------------------- DESTROY
+
+
+
+
+
+
+ area destroy_5
+        type          = obj_destroy5
+        life          = low_shields
+        explode       = 1
+        ch_sprite     = scianyz
+        range         = 60
+        colis         = 1
+        frame_delay   = 0.07
+ endarea
+
+ area destroy_6
+        type          = obj_destroy6
+        life          = low_shields
+        explode       = 1
+        ch_sprite     = sb4_z
+        range         = 60
+        collis        = 1
+        frame_delay   = 0.07
+ endarea
+
+ area destroy_8
+        type          = obj_destroy8
+        life          = low_shields
+        explode       = 1
+        ch_sprite     = sb2_z
+        range         = 60
+        frame_delay   = 0.07
+ endarea
+
+ area destroy_9
+        type          = obj_destroy9
+        life          = low_shields
+        explode       = 1
+        ch_sprite     = rad2_z
+        range         = 60
+        frame_delay   = 0.07
+ endarea
+
+area  big_flame
+        type          = obj_destroy10
+        life          = low_shields
+        explode       = 1
+        visible       = 0
+        ch_sprite     = b_flame
+        range         = 60
+        frame_delay   = 0.07
+ endarea
+
+ area  medium_flame
+        type          = obj_destroy11
+        life          = low_shields
+        explode       = 1
+        visible       = 0
+        ch_sprite     = m_flame
+        range         = 60
+        frame_delay   = 0.07
+ endarea
+
+ area  small_flame
+        type          = obj_destroy12
+        life          = low_shields
+        visible       = 0
+        explode       = 1
+        ch_sprite     = s_flame
+        range         = 60
+        frame_delay   = 0.07
+ endarea
+
+ ;------------------------------------------
+
+
+area obj_rakieta_4
+  type=obj_mycannon
+  appear_level= 3
+  cannon_type = 1
+  angle = 360
+endarea
+
+;area obj_rakieta_4
+;  type=obj_mycannon
+;  appear_level= 4
+;  cannon_type = 1
+;  angle = 360
+;endarea
+
+
+area obj_laser_2
+  type=obj_mycannon
+  appear_level= 1
+  cannon_type = 2
+  angle = 360
+endarea
+
+
+area obj_laser_3
+  type=obj_mycannon
+  appear_level= 2
+  cannon_type = 2
+  angle = 360
+endarea
+
+
+ ;------------------------------------------- LOTNISKA & BRONIE
+
+ area landplace
+        type = landplaceA
+ endarea
+
+ area landplaceA
+        type = landplaceA
+ endarea
+
+ area landplaceB
+        type = landplaceB
+ endarea
+
+ area Bronie
+        type         = obj_capsule
+        range        = 30
+ endarea
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

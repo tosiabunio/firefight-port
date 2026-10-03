@@ -1,0 +1,65 @@
+ area night
+  light_edge=350
+  light_param=6
+  R=0
+  G=0
+  B=0
+  begin=100
+ endarea
+
+ area fog
+  light_edge=350
+  light_param=1
+  R=8
+  G=9
+  B=12
+  begin=75
+ endarea
+
+ area smoke_above
+  R=60
+  G=60
+  B=60
+  begin=60
+  plane=8
+  vx=-1
+  vy=0
+  time = 2
+ endarea
+
+ area smoke_below
+  R=60
+  G=60
+  B=60
+  begin=80
+  plane=2
+  vx=-1
+  vy=1
+  time = 1
+ endarea
+
+ area snow
+  weather_time_change=0.05
+  weather_time_stay=120
+  flake_count=900
+  move_count=60
+  R=35
+  G=34
+  B=42
+  tool_time_change = 2
+  Tool_RGB   = 8 9 12
+  Tool_begin = 0
+  Tool_end   = 96
+ endarea
+
+ area rain
+  weather_time_change=0.1
+  weather_time_stay=120
+  flake_count=300
+  move_count=60
+  R=31
+  G=37
+  B=41
+  vx=4
+  vy=4
+ endarea

@@ -1,0 +1,32 @@
+;旼컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴커
+;�                              BROWN LEVEL                                   �
+;읕컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴켸
+
+
+area gray
+
+ area brick
+    source = -flics\gray\energy.flc
+    hires  =  gray\sprites\energy.sph
+    collis =  gray\sprites\energy.spc
+  endarea
+
+  area base                             ; baza do sieci
+    source = -flics\gray\base.flc
+    hires  =  gray\sprites\base.sph
+   csource = -flics\gray\base_k.flc
+    collis =  gray\sprites\base.spc
+  endarea
+
+  area gunbase                             ; podstawka dziala do sieci
+    source = -flics\gray\gunbase.flc
+    hires  =  gray\sprites\gunbase.sph
+  endarea
+
+  area netplace                             ; lotnisko na siec
+    source = -flics\gray\lplace.flc
+    hires  =  gray\sprites\lplace.sph
+    collis =  gray\sprites\lplace.spc
+  endarea
+
+endarea

@@ -1,0 +1,193 @@
+
+
+;=====================================================================
+;
+;                               GRAY TYPY 1
+;
+;=====================================================================
+
+
+
+
+ ;---------------------------------------- STATKI
+
+
+
+ ;---------------------------------------- DRZWI
+
+
+ area green_door
+        type         = doorgreen
+        delay        = 60
+        open         = 0
+ endarea
+
+
+ area green_switch
+        type         = switchgreen
+        standtime    = 60
+        door_type    = green_door
+ endarea
+
+
+ area yellow_door
+        type         = dooryellow
+        delay        = 60
+        open         = 0
+ endarea
+
+
+ area yellow_switch
+        type         = switchyellow
+        standtime    = 60
+        door_type    = yellow_door
+ endarea
+
+ area red_door
+        type          = doorred
+        delay         = 60
+        open          = 0
+ endarea
+
+ area red_switch
+        type          = switchred
+        standtime     = 60
+        door_type     = red_door
+ endarea
+
+ area neutral_door
+        type          = doorneutral
+        delay         = 45
+        open          = 0
+ endarea
+
+ area neutral_switch
+        type          = switchneutral
+        standtime     = 45
+        door_type     = neutral_door
+ endarea
+
+
+ ;---------------------------------------- DESTROY
+
+
+
+
+ area destroy_3
+        type          = obj_destroy3
+        life          = 100
+        ch_sprite     = zgliszcz
+        range         = 60
+        frame_delay   = 0.1
+ endarea
+
+ area destroy_5
+        type          = obj_destroy5
+        life          = 1500
+        ch_sprite     = scianyz
+        range         = 60
+        collis        = 1
+        frame_delay   = 0.1
+ endarea
+
+ area destroy_6
+        type          = obj_destroy6
+        life          = 700
+        ch_sprite     = sb4_z
+        range         = 60
+        collis        = 1
+        frame_delay   = 0.1
+ endarea
+
+ area destroy_8
+        type          = obj_destroy8
+        life          = 200
+        ch_sprite     = sb2_z
+        range         = 60
+        frame_delay   = 0.1
+ endarea
+
+ area destroy_9
+        type          = obj_destroy9
+        life          = 200
+        ch_sprite     = rad2_z
+        range         = 60
+        frame_delay   = 0.1
+ endarea
+
+
+
+
+
+ ;------------------------------------------ DZIALA
+
+
+ area cannon1
+        type = obj_cannon1
+        shootfrq = 1
+        prepare_time = 1
+        anglerange   = 200
+        bullet_speed = 200
+        life         = 700
+        range        = 60
+ endarea
+
+ area statcannon_05
+        type          = obj_statcannon05
+        shoot_frq     = 0.5
+        shoot_range   = 600
+        bullet_speed  = 200
+        range         = 50
+        life          = 1200
+ endarea
+
+ area statcannon_10
+        type          = obj_statcannon10
+        shoot_frq     = 1
+        shoot_range   = 600
+        bullet_speed  = 200
+        range         = 50
+        life          = 1200
+ endarea
+
+ area statcannon_15
+        type          = obj_statcannon15
+        shoot_frq     = 1.5
+        shoot_range   = 600
+        bullet_speed  = 200
+        range = 50
+        life=1200
+ endarea
+
+
+ ;------------------------------------------- LOTNISKA & BRONIE
+
+
+ area landplaceA
+        type = landplaceA
+ endarea
+
+ area landplaceB
+        type = landplaceB
+ endarea
+
+ area Bronie
+        type         = obj_capsule
+        range        = 30
+ endarea
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,48 @@
+netcolor1=63,00,00              ;kolorek sieciowy 1
+netcolor2=63,63,00              ;kolorek sieciowy 2
+netcolor3=00,63,00              ;kolorek sieciowy 3
+netcolor4=00,00,63              ;kolorek sieciowy 4
+nettool1=00,00,00,63,00,00      ;sieciowe 1
+nettool2=00,00,00,63,63,00      ;sieciowe 2
+nettool3=00,00,00,00,63,00      ;sieciowe 3
+nettool4=00,00,00,00,00,63      ;sieciowe 4
+shadow=-50                      ;cien
+lshadow=-33                     ;lekki cien
+vlshadow=-16                    ;bardzo lekki cien
+blackwhite=00,00,00,63,63,63    ;zdjecia
+aliensmoke=53,53,53,30          ;dymek z obcych
+light=100                       ;rozjasnienie
+dispinfo=26,26,26,72            ;wskazniczki
+backfilter=15,14,18,25,26,33    ;przyciemnianie tla w czolowkach
+
+area expl                       ;eksplozje
+  expltool=7
+  expldif=7
+endarea
+
+area radar                      ;radar
+  brownalien=  30,30,30,75
+  browntarget= 63,63,63,90
+  netalien=    30,30,30,75
+  nettarget=   63,63,63,90
+  greenalien=  30,30,30,75
+  greentarget= 63,63,63,90
+  whitealien=  40,36,32,75
+  whitetarget= 63,63,63,90
+  grayalien=   30,30,30,75
+  graytarget=  63,63,63,90
+endarea
+
+area blacksmoke                 ;czarny dym
+  rgb=4,0,0
+  begin=8
+  step=10
+endarea
+
+area whitesmoke                 ;bialy dym
+  rgb=40,40,40
+  begin=8
+  step=10
+endarea
+
+

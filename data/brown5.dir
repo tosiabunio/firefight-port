@@ -1,0 +1,63 @@
+;旼컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴커
+;�                              BROWN LEVEL 2                                 �
+;읕컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴켸
+area brown
+  area border5                            ; skaly otaczajace
+    source = -flics\brown\border.flc
+    hires  = brown\sprites\border.sph
+  endarea
+
+  area 5servo                           ; servo i boisko
+    source = -flics\brown\servo.flc
+    hires = brown\sprites\servo.sph
+  endarea
+
+  area 5roads                           ; druty i drogi
+    source = -flics\brown\roads.flc
+    hires = brown\sprites\roads.sph
+  endarea
+
+  area 5elektrownia                     ; podpora do drutow
+    source = -flics\brown\elektr.flc
+    hires = brown\sprites\elektr.sph
+    csource = -flics\brown\elektrk.flc
+    collis = brown\sprites\elektr.spc
+  endarea
+
+  area 5elektrowniad                    ; podpora do drutow zniszczona
+    source = -flics\brown\elektrd.flc
+    hires = brown\sprites\elektrd.sph
+  endarea
+
+  area 5pipes                           ; rury
+    source = -flics\brown\pipes.flc
+    hires = brown\sprites\pipes.sph
+  endarea
+
+  area 5collis                          ; kolizje do rur
+    source = -flics\brown\pipesk.flc
+    hires = brown\sprites\pipesk.sph
+    collis = brown\sprites\pipesk.spc
+  endarea
+
+  area destup5                          ; skaly do wybuchania gora
+    source = -flics\brown\destup.flc
+    hires = brown\sprites\destup.sph
+    csource = -flics\brown\destupk.flc
+    collis = brown\sprites\destup.spc
+  endarea
+
+  area destdwn5                         ; skaly do wybuchania dol
+    source = -flics\brown\destdwn.flc
+    hires = brown\sprites\destdwn.sph
+    csource = -flics\brown\destdwnk.flc
+    collis = brown\sprites\destdwn.spc
+  endarea
+
+  area 5kopulap                         ; kopula dziala na slupie
+    source = -flics\brown\kopulap.flc
+    hires = brown\sprites\kopulap.sph
+    csource = -flics\brown\kopulapk.flc
+    collis = brown\sprites\kopulap.spc
+  endarea
+endarea

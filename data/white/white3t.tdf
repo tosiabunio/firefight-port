@@ -1,0 +1,147 @@
+;=====================================================================
+;
+;                               WHITE TYPY 1
+;
+;=====================================================================
+
+
+;---------------------------------------- STATKI
+
+
+
+;---------------------------------------- DESTROY
+
+
+ area BUMCYK
+        type          = obj_destroy0
+        life          = HIGH_SHIELDS
+        explode       = 1
+        range         = 60
+        ch_sprite     = CPX421C
+        frame_delay   = 0.05
+        morph         = 1
+ endarea
+
+ area belkot_dest
+        type          = obj_destroy1
+        life          = LOW_SHIELDS
+        explode       = 1
+        action        = enable_after
+        range         = 60
+        ch_sprite     = belk_z
+        frame_delay   = 0.05
+        morph         = 1
+ endarea
+
+ area belkot_dest1
+        type          = obj_destroy2
+        action        = enable_after
+        explode       = 1
+        life          = LOW_SHIELDS
+        range         = 60
+        ch_sprite     = belk_z
+        frame_delay   = 0.05
+        morph         = 1
+ endarea
+
+ area kwiatek_dest
+        type         = obj_destroy5
+        life         = LOW_SHIELDS
+        explode       = 1
+        range        = 60
+        ch_sprite    = kwiat_z
+        frame_delay  = 0.06
+        morph         = 1
+ endarea
+
+ area macki_dest
+        type         = obj_destroy6
+        life         = LOW_SHIELDS
+        explode      = 1
+        range        = 60
+        ch_sprite    = macki_z1
+        anim_sprite  = macki_z
+        colis        = 1
+        frame_delay  = 0.07
+ endarea
+
+ area  big_flame
+        type          = obj_destroy10
+        life          = LOW_SHIELDS
+        explode       = 1
+        ch_sprite     = b_flame
+        range         = 60
+        frame_delay   = 0.07
+        visible     = 0
+        morph         = 1
+ endarea
+
+ area  medium_flame
+        type          = obj_destroy11
+        life          = LOW_SHIELDS
+        explode       = 1
+        ch_sprite     = m_flame
+        range         = 60
+        frame_delay   = 0.07
+        visible       = 0
+        morph         = 1
+ endarea
+
+ area  small_flame
+        type          = obj_destroy12
+        life          = LOW_SHIELDS
+        explode       = 1
+        ch_sprite     = s_flame
+        range         = 60
+        frame_delay   = 0.07
+        visible       = 0
+        morph         = 1
+ endarea
+
+ area  baza3a_destroy
+        type          = obj_destroyb3a
+        life          = LOW_SHIELDS
+        ch_sprite     = baza4a
+        range         = 60
+        frame_delay   = 0.07
+        visible       = 1
+        morph         = 1
+ endarea
+
+ area  baza3b_destroy
+        type          = obj_destroyb3b
+        life          = LOW_SHIELDS
+        ch_sprite     = baza4b
+        range         = 60
+        frame_delay   = 0.07
+        visible       = 1
+        morph         = 1
+ endarea
+
+ area  baza3c_destroy
+        type          = obj_destroyb3c
+        life          = LOW_SHIELDS
+        ch_sprite     = baza4c
+        range         = 60
+        frame_delay   = 0.07
+        visible       = 1
+        morph         = 1
+ endarea
+
+
+
+
+;---------------------------------------- BRONIE & LOTNISKA
+
+area landplaceA
+        type          = landplaceA
+endarea
+
+area landplaceB
+        type           = landplaceB
+endarea
+
+area Bronie
+        type           = obj_capsule
+        range          = 30
+endarea

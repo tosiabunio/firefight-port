@@ -1,0 +1,51 @@
+  weather = rain2
+  dx=4096
+  dy=4096
+
+  CheckPoints
+       "OK"
+       "END"
+  Bonus
+       "secret"
+       "againxx"
+
+area OK
+  type          = raft_target
+  count         = 1
+  radar         = 1
+  enable_action = unblock2
+  obj_text "brown_6_1"
+  Displ_text
+  "brown_6_1_1" "brown_6_1_1" "STACY"
+  "brown_6_1_2" "brown_6_1_2" "STACY"
+  "brown_6_1_3" "brown_6_1_3" "STACY"
+endarea
+
+area END
+  type          = unblock2
+  count         = 1
+  radar         = 1
+  quit          = true
+  enable_action "loteryjka"
+  obj_text "brown_6_2"
+  Displ_text
+  "brown_6_2_1" "brown_6_2_1" "JAXON"
+  "brown_6_2_2" "brown_6_2_2" "JAXON"
+  "brown_6_2_3" "brown_6_2_3" "RILEY"
+  "brown_6_2_4" "brown_6_2_4" "RILEY"
+endarea
+
+;---------------bonus----------------------
+area againxx
+  type          = obj_raft
+  count         = 1
+  quit          = 1
+;  timer         = 1
+;  Displ_text "missing_even_text" "mission" "base"
+endarea
+
+area secret
+  type          = unblock
+  count         = 1
+  handle " destroy_obj dest_1"
+endarea

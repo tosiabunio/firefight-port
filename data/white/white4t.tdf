@@ -1,0 +1,614 @@
+;=====================================================================
+;
+;                               WHITE TYPY 4
+;
+;=====================================================================
+
+
+;---------------------------------------- STATKI
+
+
+
+;---------------------------------------- DESTROY
+
+ area BUMCYK
+        type          = obj_destroy0
+        life          = HIGH_SHIELDS
+        explode       = 1
+        range         = 60
+        ch_sprite     = CPX421C
+        frame_delay   = 0.05
+        morph         = 1
+ endarea
+
+ area belkot_dest
+        type          = obj_destroy1
+        life          = LOW_SHIELDS
+        explode       = 1
+        action        = enable_after
+        range         = 60
+        ch_sprite     = belk_z
+        frame_delay   = 0.05
+        morph         = 1
+ endarea
+
+ area belkot_dest1
+        type          = obj_destroy2
+        action        = enable_after
+        explode       = 1
+        life          = LOW_SHIELDS
+        range         = 60
+        ch_sprite     = belk_z
+        frame_delay   = 0.05
+        morph         = 1
+ endarea
+
+ area kwiatek_dest
+        type         = obj_destroy5
+        life         = LOW_SHIELDS
+        explode       = 1
+        range        = 60
+        ch_sprite    = kwiat_z
+        frame_delay  = 0.06
+        morph         = 1
+ endarea
+
+ area macki_dest
+        type         = obj_destroy6
+        life         = LOW_SHIELDS
+        explode      = 1
+        range        = 60
+        ch_sprite    = macki_z1
+        anim_sprite  = macki_z
+        colis        = 1
+        frame_delay  = 0.07
+ endarea
+
+ area  big_flame
+        type          = obj_destroy10
+        life          = LOW_SHIELDS
+        explode       = 1
+        ch_sprite     = b_flame
+        range         = 60
+        frame_delay   = 0.07
+        visible     = 0
+        morph         = 1
+ endarea
+
+ area  medium_flame
+        type          = obj_destroy11
+        life          = LOW_SHIELDS
+        explode       = 1
+        ch_sprite     = m_flame
+        range         = 60
+        frame_delay   = 0.07
+        visible       = 0
+        morph         = 1
+ endarea
+
+ area  small_flame
+        type          = obj_destroy12
+        life          = LOW_SHIELDS
+        explode       = 1
+        ch_sprite     = s_flame
+        range         = 60
+        frame_delay   = 0.07
+        visible       = 0
+        morph         = 1
+ endarea
+
+;---------------------------------------- BUNKRY
+
+ area bunkier1_destroy  ; bunkry do ludkow itp.
+        type          = obj_destroy_bunkier1
+        action        = enable_after
+        explode       = 1
+        life          = MEDIUM_SHIELDS
+        range         = 60
+        ch_sprite     = bunk1z
+        frame_delay   = 0.05
+        morph         = 1
+ endarea
+
+ area bunkier2_destroy ; bunkry do ludkow itp.
+        type          = obj_destroy_bunkier2
+        action        = enable_after
+        explode       = 1
+        life          = MEDIUM_SHIELDS
+        range         = 60
+        ch_sprite     = bunk2z
+        frame_delay   = 0.05
+        morph         = 1
+ endarea
+
+
+ area wieza1_dest ; plonace wieze
+        type          = obj_destroy13
+        explode       = 1
+        life          = medium_shields
+        range         = 60
+        ch_sprite     = wieza1z
+        frame_delay   = 0.04
+        morph         = 1
+ endarea
+
+ area beczka1_dest ;wybuchajace beczki (zbiorniki)
+        type          = obj_destroy14
+        explode       = 1
+        life          = medium_shields
+        range         = 60
+        ch_sprite     = beczka1z
+        frame_delay   = 0.04
+        morph         = 1
+ endarea
+
+ area kopulka  ; -  kopulki
+
+        type          = obj_destroy_kopulka1
+        life          = IMMORTAL
+        action        = enable_after
+        anim_sprite   = kopani
+        ch_sprite     = kopend
+        range         = 60
+        frame_delay   = 0.07
+ endarea
+;============================================= misja
+
+
+;----- niszczenie statkow i zbieranie
+;----- broni
+
+ area kopulka4_bronie  ; -  kopulki
+
+        type          = obj_destroy_kopulka4_bronie
+        life          = IMMORTAL
+        action        = enable_after
+        anim_sprite   = kopani
+        ch_sprite     = kopend
+        range         = 60
+        frame_delay   = 0.07
+ endarea
+
+ area odblok_bronie   ;- obiekt sluzy do pokazywania
+                      ;- na radarze gdzie siedza statki
+
+        type           = obj_unblock_bronie
+        serv_type      = visual
+        unblocked_type = odblok_bronie
+ endarea
+
+;------- pierwsza baza
+;-------
+
+ area kopulka4_baza1  ; -  kopulki
+
+        type          = obj_destroy_kopulka4_b1
+        life          = IMMORTAL
+        action        = enable_after
+        anim_sprite   = kopani
+        ch_sprite     = kopend
+        range         = 60
+        frame_delay   = 0.07
+ endarea
+
+ area wieza4_baza1 ; plonace wieze
+        type          = obj_destroy_w4_b1
+        explode       = 1
+        life          = high_shields
+        range         = 60
+        ch_sprite     = wieza1z
+        frame_delay   = 0.04
+        morph         = 1
+ endarea
+
+ area bunkier4_baza1  ; bunkry do ludkow itp.
+        type          = obj_destroy_bu4_b1
+        action        = enable_after
+        explode       = 1
+        life          = MEDIUM_SHIELDS
+        range         = 60
+        ch_sprite     = bunk1z
+        frame_delay   = 0.05
+        morph         = 1
+ endarea
+
+ area beczka4_baza1 ;wybuchajace beczki (zbiorniki)
+        type          = obj_destroy_be4_b1
+        explode       = 1
+        life          = medium_shields
+        range         = 60
+        ch_sprite     = beczka1z
+        frame_delay   = 0.05
+        morph         = 1
+ endarea
+
+
+;------- druga baza
+;-------
+
+ area kopulka4_baza2  ; -  kopulki
+
+        type          = obj_destroy_kopulka4_b2
+        life          = IMMORTAL
+        action        = enable_after
+        anim_sprite   = kopani
+        ch_sprite     = kopend
+        range         = 60
+        frame_delay   = 0.07
+ endarea
+
+ area wieza4_baza2 ; plonace wieze
+        type          = obj_destroy_w4_b2
+        explode       = 1
+        life          = high_shields
+        range         = 60
+        ch_sprite     = wieza1z
+        frame_delay   = 0.04
+        morph         = 1
+ endarea
+
+ area bunkier4_baza2  ; bunkry do ludkow itp.
+        type          = obj_destroy_bu4_b2
+        action        = enable_after
+        explode       = 1
+        life          = MEDIUM_SHIELDS
+        range         = 60
+        ch_sprite     = bunk1z
+        frame_delay   = 0.05
+        morph         = 1
+ endarea
+
+ area beczka4_baza2 ;wybuchajace beczki (zbiorniki)
+        type          = obj_destroy_be4_b2
+        explode       = 1
+        life          = medium_shields
+        range         = 60
+        ch_sprite     = beczka1z
+        frame_delay   = 0.05
+        morph         = 1
+ endarea
+
+ area bunkier41_baza2 ; bunkry do ludkow itp.
+        type          = obj_destroy_bu41_b2
+        action        = enable_after
+        explode       = 1
+        life          = MEDIUM_SHIELDS
+        range         = 60
+        ch_sprite     = bunk2z
+        frame_delay   = 0.05
+        morph         = 1
+ endarea
+
+;------- trzecia baza
+;-------
+
+ area wieza4_baza3 ; plonace wieze
+        type          = obj_destroy_w4_b3
+        explode       = 1
+        life          = high_shields
+        range         = 60
+        ch_sprite     = wieza1z
+        frame_delay   = 0.05
+        morph         = 1
+ endarea
+
+ area bunkier4_baza3  ; bunkry do ludkow itp.
+        type          = obj_destroy_bu4_b3
+        action        = enable_after
+        explode       = 1
+        life          = MEDIUM_SHIELDS
+        range         = 60
+        ch_sprite     = bunk1z
+        frame_delay   = 0.05
+        morph         = 1
+ endarea
+
+ area beczka4_baza3 ;wybuchajace beczki (zbiorniki)
+        type          = obj_destroy_be4_b3
+        explode       = 1
+        life          = medium_shields
+        range         = 60
+        ch_sprite     = beczka1z
+        frame_delay   = 0.06
+        morph         = 1
+ endarea
+
+;------- bunkier z inzynierem
+;-------
+
+ area bunkier4_inzynier ; bunkry do ludkow itp.
+        type          = obj_destroy_bu4_in
+        action        = enable_after
+        explode       = 1
+        life          = MEDIUM_SHIELDS
+        range         = 60
+        ch_sprite     = bunk1z
+        frame_delay   = 0.05
+ endarea
+
+;------- kwiatek otwierajacy wejscia do baz
+ area kwiatek_bazy
+        type         = obj_destroy_kb1
+        life         = low_shields
+        action       = disable_after
+        explode      = 1
+        range        = 60
+        ch_sprite    = kwiat_z
+        frame_delay  = 0.06
+        morph        = 1
+ endarea
+
+;------- rozwalanie bazy 4
+;-------
+
+ area kwiatek_b4
+        type         = obj_destroy_b4_1
+        life         = medium_shields
+        explode      = 1
+        range        = 60
+        ch_sprite    = kwiat_z
+        frame_delay  = 0.06
+        morph         = 1
+ endarea
+
+ area  big_flame_b4
+        type          = obj_destroy_b4_2
+        life          = medium_shields
+        explode       = 1
+        ch_sprite     = b_flame
+        range         = 60
+        frame_delay   = 0.07
+        visible       = 0
+        morph         = 1
+ endarea
+
+ area  medium_flame_b4
+        type          = obj_destroy_b4_3
+        life          = medium_shields
+        explode       = 1
+        ch_sprite     = m_flame
+        range         = 60
+        frame_delay   = 0.07
+        visible       = 0
+        morph         = 1
+ endarea
+
+ area  small_flame_b4
+        type          = obj_destroy_b4_4
+        life          = medium_shields
+        explode       = 1
+        ch_sprite     = s_flame
+        range         = 60
+        frame_delay   = 0.07
+        visible       = 0
+        morph         = 1
+ endarea
+
+ area bunkier1_b4  ; bunkry do ludkow itp.
+        type          = obj_destroy_b4_5
+        action        = enable_after
+        explode       = 1
+        life          = medium_shields
+        range         = 60
+        ch_sprite     = bunk1z
+        frame_delay   = 0.05
+        morph         = 1
+ endarea
+
+ area bunkier2_b4 ; bunkry do ludkow itp.
+        type          = obj_destroy_b4_6
+        action        = enable_after
+        explode       = 1
+        life          = medium_shields
+        range         = 60
+        ch_sprite     = bunk2z
+        frame_delay   = 0.05
+        morph         = 1
+ endarea
+
+
+ area wieza1_b4 ; plonace wieze
+        type          = obj_destroy_b4_7
+        explode       = 1
+        life          = high_shields
+        range         = 60
+        ch_sprite     = wieza1z
+        frame_delay   = 0.06
+        morph         = 1
+ endarea
+
+ area beczka1_b4 ;wybuchajace beczki (zbiorniki)
+        type          = obj_destroy_b4_8
+        explode       = 1
+        life          = medium_shields
+        range         = 60
+        ch_sprite     = beczka1z
+        frame_delay   = 0.05
+        morph         = 1
+ endarea
+
+ area landplace_baza4
+        type          = landplace_baza4
+ endarea
+
+ area odblok_baza4    ;- obiekt  do pokazywania
+                      ;- na radarze gdzie leciec
+
+        type           = obj_unblock_baza4
+        serv_type      = visual
+        unblocked_type = odblok_bronie
+ endarea
+
+;------- rozwalanie bazy 5
+;-------
+
+ area kwiatek_b5
+        type         = obj_destroy_b5_1
+        life         = medium_shields
+        explode      = 1
+        range        = 60
+        ch_sprite    = kwiat_z
+        frame_delay  = 0.06
+        morph         = 1
+ endarea
+
+ area  big_flame_b5
+        type          = obj_destroy_b5_2
+        life          = medium_shields
+        explode       = 1
+        ch_sprite     = b_flame
+        range         = 60
+        frame_delay   = 0.07
+        visible       = 0
+        morph         = 1
+ endarea
+
+ area  medium_flame_b5
+        type          = obj_destroy_b5_3
+        life          = medium_shields
+        explode       = 1
+        ch_sprite     = m_flame
+        range         = 60
+        frame_delay   = 0.07
+        visible       = 0
+        morph         = 1
+ endarea
+
+ area  small_flame_b5
+        type          = obj_destroy_b5_4
+        life          = medium_shields
+        explode       = 1
+        ch_sprite     = s_flame
+        range         = 60
+        frame_delay   = 0.07
+        visible       = 0
+        morph         = 1
+ endarea
+
+ area bunkier1_b5  ; bunkry do ludkow itp.
+        type          = obj_destroy_b5_5
+        action        = enable_after
+        explode       = 1
+        life          = medium_shields
+        range         = 60
+        ch_sprite     = bunk2z
+        frame_delay   = 0.05
+        morph         = 1
+ endarea
+
+ area bunkier2_b5 ; bunkry do ludkow itp.
+        type          = obj_destroy_b5_6
+        action        = enable_after
+        explode       = 1
+        life          = medium_shields
+        range         = 60
+        ch_sprite     = bunk2z
+        frame_delay   = 0.05
+        morph         = 1
+ endarea
+
+
+ area wieza1_b5 ; plonace wieze
+        type          = obj_destroy_b5_7
+        explode       = 1
+        life          = medium_shields
+        range         = 60
+        ch_sprite     = wieza1z
+        frame_delay   = 0.05
+        morph         = 1
+ endarea
+
+ area beczka1_b5 ;wybuchajace beczki (zbiorniki)
+        type          = obj_destroy_b5_8
+        explode       = 1
+        life          = medium_shields
+        range         = 60
+        ch_sprite     = beczka1z
+        frame_delay   = 0.05
+        morph         = 1
+ endarea
+
+ area landplace_baza5
+        type          = landplace_baza5
+ endarea
+
+
+;-------- sekret 1
+
+ area kwiatek_sekret1
+        type         = obj_destroy_ks1
+        life         = low_shields
+        action       = disable_after
+        explode      = 1
+        range        = 60
+        ch_sprite    = kwiat_z
+        frame_delay  = 0.06
+        morph        = 1
+ endarea
+
+ area kwiatek_sekret2
+        type         = obj_destroy_ks2
+        life         = low_shields
+        action       = enable_after
+        explode      = 1
+        range        = 60
+        ch_sprite    = kwiat_z
+        frame_delay  = 0.06
+        morph        = 1
+ endarea
+
+ area odblok_sekret1
+        type            = obj_unblock_s1
+        serv_type       = visual
+        unblocked_type   = odblok
+ endarea
+
+ area kopulka_sekret1  ; -  kopulki
+
+        type          = obj_destroy_ks1
+        life          = IMMORTAL
+        action        = enable_after
+        anim_sprite   = kopani
+        ch_sprite     = kopend
+        range         = 60
+        frame_delay   = 0.07
+ endarea
+
+ area kopulka_sekret2  ; -  kopulki
+
+        type          = obj_destroy_ks2
+        life          = IMMORTAL
+        action        = enable_after
+        anim_sprite   = kopani
+        ch_sprite     = kopend
+        range         = 60
+        frame_delay   = 0.07
+ endarea
+
+
+;---------------------------------------- BRONIE & LOTNISKA
+
+ area landplaceA
+        type          = landplaceA
+ endarea
+
+ area landplaceB
+        type           = landplaceB
+ endarea
+
+ area Bronie
+        type           = obj_capsule
+        range          = 30
+ endarea
+
+ area Bronie1
+        type           = obj_capsule
+        range          = 30
+ endarea
+
+
+ area odblok
+        type            = obj_unblock
+        serv_type       = visual
+        unblocked_type   = odblok
+ endarea

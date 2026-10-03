@@ -1,0 +1,399 @@
+
+
+;=====================================================================
+;
+;                               GRAY TYPY 2
+;
+;=====================================================================
+
+
+
+
+
+ ;---------------------------------------- DRZWI
+
+
+ area A2_door
+        type         = doorA2
+        delay        = 99999
+        open         = 0
+ endarea
+
+ area destroy2_A
+        type          = obj_destroyA2
+        life          = MEDIUM_SHIELDS
+        explode       = 1
+        ch_sprite     = sb4_z
+        range         = 60
+        frame_delay   = 0.05
+        morph         = 1
+ endarea
+
+;-----
+
+ area B2_door
+        type         = doorB2
+        delay        = 99999
+        open         = 0
+ endarea
+
+
+ area B2_switch
+        type         = switchB2
+        standtime    = 99999
+        door_type    = B2_door
+ endarea
+
+;------
+
+ area C2_door
+        type         = doorC2
+        delay        = 99999
+        open         = 1
+ endarea
+
+ area C2_unlock
+        type            = obj_unblockC2
+        serv_type       = visual
+        unblocked_type  = C2_unlock
+ endarea
+
+ area destroy2_C
+        type          = obj_destroyC2
+        life          = MEDIUM_SHIELDS
+        explode       = 1
+        ch_sprite     = sb4_z
+        range         = 60
+        frame_delay   = 0.05
+        morph         = 1
+ endarea
+
+;------
+
+ area D2_door
+        type         = doorD2
+        delay        = 99999
+        open         = 0
+ endarea
+
+ area D2_switch
+        type         = switchD2
+        standtime    = 999999
+        door_type    = D2_door
+ endarea
+
+;------
+
+ area E2_door
+        type         = doorE2
+        delay        = 99999
+        open         = 0
+ endarea
+
+ area E2_switch
+        type         = switchE2
+        standtime    = 99999
+        door_type    = E2_door
+ endarea
+
+;------
+
+ area F2_door
+        type         = doorF2
+        delay        = 999999
+        open         = 0
+ endarea
+
+ area F2_unlock
+        type            = obj_unblockF2
+        serv_type       = collis
+        unblocked_type  = F2_unlock
+ endarea
+
+;------
+
+ area G2_door
+        type         = doorG2
+        delay        = 999999
+        open         = 0
+ endarea
+
+ area destroy2_G
+        type          = obj_destroyG2
+        life          = MEDIUM_SHIELDS
+        explode       = 1
+        ch_sprite     = sb4_z
+        range         = 60
+        frame_delay   = 0.05
+        morph         = 1
+ endarea
+
+;------
+
+ area H2_door
+        type         = doorH2
+        delay        = 999999
+        open         = 0
+ endarea
+
+ area destroy2_H
+        type          = obj_destroyH2
+        life          = MEDIUM_SHIELDS
+        explode       = 1
+        ch_sprite     = sb4_z
+        range         = 60
+        frame_delay   = 0.05
+        morph         = 1
+ endarea
+
+
+;-------
+
+ area I2_door
+        type         = doorI2
+        delay        = 999999
+        open         = 0
+ endarea
+
+ area I2_unlock
+        type            = obj_unblockI2
+        serv_type       = collis
+        unblocked_type  = I2_unlock
+ endarea
+
+ area I2_unlock1
+        type            = obj_unblockI21
+        serv_type       = visual
+        unblocked_type  = I2_unlock1
+ endarea
+
+ area destroy2_I
+        type          = obj_destroyI2
+        life          = MEDIUM_SHIELDS
+        explode       = 1
+        ch_sprite     = sb4_z
+        range         = 60
+        action        = enable_after
+        frame_delay   = 0.05
+        morph         = 1
+ endarea
+
+;--------
+
+ area J2_door
+        type         = doorJ2
+        delay        = 999999
+        open         = 0
+ endarea
+
+
+;---------
+
+ area K2_door
+        type         = doorK2
+        delay        = 999999
+        open         = 0
+ endarea
+
+ area K2_switch
+        type         = switchK2
+        standtime    = 9999999
+        door_type    = K2_door
+ endarea
+
+;----------
+
+ area L2_door
+        type         = doorL2
+        delay        = 999999
+        open         = 0
+ endarea
+
+ area destroy2_L
+        type          = obj_destroyL2
+        life          = MEDIUM_SHIELDS
+        explode       = 1
+        ch_sprite     = sb4_z
+        range         = 60
+        frame_delay   = 0.05
+        morph         = 1
+ endarea
+
+
+;----------
+
+ area S2_door
+        type         = doorS2
+        delay        = 999999
+        open         = 0
+ endarea
+
+ area destroy2_S
+        type          = obj_destroyS2
+        life          = MEDIUM_SHIELDS
+        explode       = 1
+        ch_sprite     = sb4_z
+        range         = 60
+        frame_delay   = 0.05
+        morph         = 1
+ endarea
+
+
+;---------------------------------------- DESTROY
+
+
+
+ area destroy_5
+        type          = obj_destroy5
+        life          = low_shields
+        explode       = 1
+        ch_sprite     = scianyz
+        action        = enable_after
+        range         = 60
+        colis         = 1
+        frame_delay   = 0.05
+        morph         = 1
+ endarea
+
+ area destroy_6
+        type          = obj_destroy6
+        life          = low_shields
+        action        = enable_after
+        explode       = 1
+        ch_sprite     = sb4_z
+        range         = 60
+        collis        = 1
+        frame_delay   = 0.05
+        morph         = 1
+ endarea
+
+ area destroy_8
+        type          = obj_destroy8
+        life          = low_shields
+        action        = enable_after
+        explode       = 1
+        ch_sprite     = sb2_z
+        range         = 60
+        frame_delay   = 0.05
+        morph         = 1
+ endarea
+
+ area destroy_9
+        type          = obj_destroy9
+        life          = low_shields
+        action        = enable_after
+        explode       = 1
+        ch_sprite     = rad2_z
+        range         = 60
+        frame_delay   = 0.05
+        morph         = 1
+ endarea
+
+ area  big_flame
+        type          = obj_destroy10
+        life          = low_shields
+        explode       = 1
+        visible       = 0
+        morph         = 1
+        ch_sprite     = b_flame
+        range         = 60
+        frame_delay   = 0.05
+ endarea
+
+ area  medium_flame
+        type          = obj_destroy11
+        life          = low_shields
+        explode       = 1
+        visible       = 0
+        morph         = 1
+        ch_sprite     = m_flame
+        range         = 60
+        frame_delay   = 0.05
+ endarea
+
+ area  small_flame
+        type          = obj_destroy12
+        life          = low_shields
+        ;explode       = 0
+        visible       = 0
+        morph         = 1
+        ch_sprite     = s_flame
+        range         = 60
+        frame_delay   = 0.05
+ endarea
+
+ area kopulka2
+        type          = obj_destroy_k1s
+        life          = low_shields
+        action        = enable_after
+        anim_sprite   = kop1ani
+        ch_sprite     = kop1en
+        range         = 60
+        collis        = 1
+        frame_delay   = 0.05
+ endarea
+
+ area  destroy_baza1
+        type          = obj_destroy_ba1
+        life          = LOW_SHIELDS
+        explode       = 1
+        ch_sprite     = 2gen3z
+        range         = 60
+        frame_delay   = 0.05
+        morph         = 1
+ endarea
+
+ area  destroy_baza2
+        type          = obj_destroy_ba2
+        life          = MEDIUM_SHIELDS
+        action        = disable_after
+        explode       = 1
+        ch_sprite     = 2gen4z
+        range         = 60
+        frame_delay   = 0.05
+        morph         = 1
+ endarea
+
+ ;------------------------------------------- LOTNISKA & BRONIE
+
+
+ area landplaceA
+        type = landplaceA
+ endarea
+
+ area landplaceB
+        type = landplaceB
+ endarea
+
+ area Bronie
+        type         = obj_capsule
+        range        = 30
+ endarea
+
+ area Bronie1
+        type         = obj_capsule
+        range        = 30
+ endarea
+
+ area odblok
+        type            = obj_unblock
+        serv_type       = visual
+        unblocked_type   = odblok
+ endarea
+
+ area marker5
+        type            = obj_unblock5
+        serv_type       = visual
+        unblocked_type   = marker5
+ endarea
+
+
+
+
+
+
+
+
+
+
+

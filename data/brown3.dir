@@ -1,0 +1,46 @@
+;旼컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴커
+;�                              BROWN LEVEL                                   �
+;읕컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴켸
+area brown
+  area 3pipes                           ; grube rury
+    source = -flics\brown\pipes.flc
+    hires = brown\sprites\pipes.sph
+  endarea
+
+  area 3collis                          ; kolizje do grubych rur
+    source = -flics\brown\pipesk.flc
+    hires = brown\sprites\pipesk.sph
+    collis = brown\sprites\pipesk.spc
+  endarea
+
+  area 3elektrownia                    ; podpora do drutow
+    source = -flics\brown\elektr.flc
+    hires = brown\sprites\elektr.sph
+    csource = -flics\brown\elektrk.flc
+    collis = brown\sprites\elektr.spc
+  endarea
+
+  area 3elektrowniad                   ; podpora do drutow zniszczona
+    source = -flics\brown\elektrd.flc
+    hires = brown\sprites\elektrd.sph
+  endarea
+
+  area base                            ; baza sieciowa.
+    source = -flics\net\base.flc
+    hires = brown\sprites\base.sph
+    csource = -flics\net\base_k.flc
+    collis = brown\sprites\base.spc
+  endarea
+
+  area energy                            ; energia
+    source = -flics\net\energy.flc
+    hires = brown\sprites\energy.sph
+    csource = -flics\net\energy.flc
+    collis = brown\sprites\energy.spc
+  endarea
+
+  area border3                            ; skaly otaczajace
+    source = -flics\brown\border.flc
+    hires  = brown\sprites\border.sph
+  endarea
+endarea

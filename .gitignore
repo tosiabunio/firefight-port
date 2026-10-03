@@ -1,0 +1,10 @@
+# Sprite build caches the engine regenerates from the FLC masters in data/flics
+# (hires .sph, collision .spc, palette tables .spp; .spl is lores, which the port does not use)
+*.sph
+*.spc
+*.spp
+*.spl
+
+# Runtime logs written by the engine and game
+lastexec.log
+firefght.log

@@ -1,0 +1,223 @@
+;=====================================================================
+;
+;                               WHITE TYPY 1
+;
+;=====================================================================
+
+
+
+;---------------------------------------- DESTROY
+
+area BUMCYK
+        type          = obj_destroy0
+        life          = HIGH_SHIELDS
+        explode       = 1
+        range         = 60
+        ch_sprite     = CPX421C
+        frame_delay   = 0.05
+        morph         = 1
+ endarea
+
+ area belkot_dest
+        type          = obj_destroy1
+        life          = LOW_SHIELDS
+        explode       = 1
+        action        = enable_after
+        range         = 60
+        ch_sprite     = belk_z
+        frame_delay   = 0.05
+        morph         = 1
+ endarea
+
+ area belkot_dest1
+        type          = obj_destroy2
+        action        = enable_after
+        explode       = 1
+        life          = LOW_SHIELDS
+        range         = 60
+        ch_sprite     = belk_z
+        frame_delay   = 0.05
+        morph         = 1
+ endarea
+
+ area kwiatek_dest
+        type         = obj_destroy5
+        life         = LOW_SHIELDS
+        explode      = 1
+        range        = 60
+        ch_sprite    = kwiat_z
+        frame_delay  = 0.06
+        morph         = 1
+ endarea
+
+ area macki_dest
+        type         = obj_destroy6
+        life         = LOW_SHIELDS
+        explode      = 1
+        range        = 60
+        ch_sprite    = macki_z1
+        anim_sprite  = macki_z
+        colis        = 1
+        frame_delay  = 0.07
+ endarea
+
+ area  big_flame
+        type          = obj_destroy10
+        life          = LOW_SHIELDS
+        explode       = 1
+        ch_sprite     = b_flame
+        range         = 60
+        frame_delay   = 0.07
+        visible     = 0
+        morph         = 1
+ endarea
+
+ area  medium_flame
+        type          = obj_destroy11
+        life          = LOW_SHIELDS
+        explode       = 1
+        ch_sprite     = m_flame
+        range         = 60
+        frame_delay   = 0.07
+        visible       = 0
+        morph         = 1
+ endarea
+
+ area  small_flame
+        type          = obj_destroy12
+        life          = LOW_SHIELDS
+        explode       = 1
+        ch_sprite     = s_flame
+        range         = 60
+        frame_delay   = 0.07
+        visible       = 0
+        morph         = 1
+ endarea
+
+;---------------------------------------- BUNKRY
+
+ area bunkier1_destroy  ; bunkry do ludkow itp.
+        type          = obj_destroy_bunkier1
+        action        = enable_after
+        explode       = 1
+        life          = MEDIUM_SHIELDS
+        range         = 60
+        ch_sprite     = bunk1z
+        frame_delay   = 0.05
+        morph         = 1
+ endarea
+
+ area bunkier2_destroy ; bunkry do ludkow itp.
+        type          = obj_destroy_bunkier2
+        action        = enable_after
+        explode       = 1
+        life          = MEDIUM_SHIELDS
+        range         = 60
+        ch_sprite     = bunk2z
+        frame_delay   = 0.05
+        morph         = 1
+ endarea
+
+
+ area wieza1_dest ; plonace wieze
+        type          = obj_destroy13
+        explode       = 1
+        life          = medium_shields
+        range         = 60
+        ch_sprite     = wieza1z
+        frame_delay   = 0.05
+        morph         = 1
+ endarea
+
+ area beczka1_dest ;wybuchajace beczki (zbiorniki)
+        type          = obj_destroy14
+        explode       = 1
+        life          = medium_shields
+        range         = 60
+        ch_sprite     = beczka1z
+        frame_delay   = 0.05
+        morph         = 1
+ endarea
+
+ area kopulka  ; -  kopulki
+
+        type          = obj_destroy_kopulka1
+        life          = IMMORTAL
+        action        = enable_after
+        anim_sprite   = kopani
+        ch_sprite     = kopend
+        range         = 60
+        frame_delay   = 0.07
+;        morph         = 1
+ endarea
+
+
+;---------------------------------------- BRONIE & LOTNISKA
+
+
+area landplaceA
+        type          = landplaceA
+endarea
+
+
+area Bronie
+        type           = obj_capsule
+        range          = 30
+endarea
+
+area bronie1
+        type           = obj_capsule
+        range          = 30
+endarea
+
+area odblok
+        type            = obj_unblock
+        serv_type       = visual
+        unblocked_type   = odblok
+endarea
+
+
+;----------------------------------------- MISJA
+
+ area marker1
+        type            = obj_unblock_m1
+        serv_type       = visual
+        unblocked_type  = marker1
+ endarea
+
+
+ area marker2
+        type            = obj_unblock_m2
+        serv_type       = visual
+        unblocked_type  = marker2
+ endarea
+
+
+ area marker3
+        type            = obj_unblock_m3
+        serv_type       = visual
+        unblocked_type  = marker3
+ endarea
+
+ area marker4
+        type            = obj_unblock_m4
+        serv_type       = visual
+        unblocked_type  = marker4
+ endarea
+
+ area marker5
+        type            = obj_unblock_m5
+        serv_type       = visual
+        unblocked_type  = marker5
+ endarea
+
+ area kwaitek_dest_sekret
+        type         = obj_destroy_1sek
+        life         = LOW_SHIELDS
+        action       = enable_after
+        explode      = 1
+        range        = 80
+        ch_sprite    = kwiat_z
+        frame_delay  = 0.06
+        morph         = 1
+ endarea

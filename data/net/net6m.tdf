@@ -1,0 +1,11 @@
+  dx=4096
+  dy=4096
+  weather = smoke_below
+
+  CheckPoints
+     "landplace"
+
+area landplace
+  type  =  landplace
+  count = all
+endarea

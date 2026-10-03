@@ -1,0 +1,229 @@
+;旼컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴커
+;�                              BROWN LEVEL                                   �
+;읕컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴켸
+
+area brown
+
+  source = brown\brown.def
+
+        area palette
+          source = -flics\brown\palette.flc
+          target = brown\sprites\palette.spp
+        endarea
+
+;--------------------------LEVEL SPRITES-----------------------------------
+
+        area back                               ;background
+          source = -flics\brown\back.flc
+          hires  =  brown\sprites\back.sph
+        endarea
+
+        area 2pluton                            ; skrzynie z plutonem
+          source = -flics\brown\pluton.flc
+          hires = brown\sprites\pluton.sph
+         csource = -flics\brown\pluton.flc
+          collis = brown\sprites\pluton.spc
+        endarea
+
+        area trees                              ;zielone choinki
+          source = -flics\brown\trees.flc
+          hires  =  brown\sprites\trees.sph
+          csource = -flics\brown\treesk.flc
+          collis =  brown\sprites\trees.spc
+        endarea
+
+        area mur                                ;wysoki mur
+          source = -flics\brown\mur.flc
+          hires  =  brown\sprites\mur.sph
+          csource = -flics\brown\mur_k.flc
+          collis =  brown\sprites\mur.spc
+        endarea
+
+        area litery                             ;litery na murze (sektory)
+          source = -flics\brown\litery.flc
+          hires  =  brown\sprites\litery.sph
+        endarea
+
+        area cyfry                              ;cyfry do liter na murze
+          source = -flics\brown\cyfry.flc
+          hires  =  brown\sprites\cyfry.sph
+        endarea
+
+        area alienlanding                       ;kamienne ladowisko obcych
+          source = -flics\brown\secgrnd.flc
+          hires  =  brown\sprites\secgrnd.sph
+        endarea
+
+        area telepdst                           ;teleport podstawka
+          source = -flics\!global\teleport.flc
+          hires  =  !global\sprites\teleport.sph
+          csource = -flics\!global\teleport.flc
+          collis =  !global\sprites\teleport.spc
+        endarea
+
+        area rura                               ;rura do wiatraka
+          source = -flics\brown\rura.flc
+          hires = brown\sprites\rura.sph
+        endarea
+
+        area wiatrak                            ;wiatrak normalny
+          source = -flics\brown\wiatrak.flc
+          hires  =  brown\sprites\wiatrak.sph
+          csource = -flics\brown\wiatrak.flc
+          collis =  brown\sprites\wiatrak.spc
+        endarea
+
+        area wiatrakd                           ;wiatrak zniszczony
+          source = -flics\brown\wiatrakd.flc
+          hires  =  brown\sprites\wiatrakd.sph
+          csource = -flics\brown\wiatrakd.flc
+          collis =  brown\sprites\wiatrakd.spc
+        endarea
+
+        area wiatraka                           ;wiatrak animacja
+          source = -flics\brown\wiatraka.flc
+          hires  =  brown\sprites\wiatraka.sph
+          csource = -flics\brown\wiatraka.flc
+          collis =  brown\sprites\wiatraka.spc
+        endarea
+
+        area blow1                              ;kompresor
+          source = -flics\brown\blow1.flc
+          hires  =  brown\sprites\blow1.sph
+          csource = -flics\brown\blow1k.flc
+          collis =  brown\sprites\blow.spc
+        endarea
+
+        area blow1d                             ;kompresor po zniszczeniu
+          source = -flics\brown\blow1d.flc
+          hires  =  brown\sprites\blow1d.sph
+        endarea
+
+        area fence                              ;sklay otaczajace
+          source = -flics\brown\fence.flc
+          hires  = brown\sprites\fence.sph
+          csource = -flics\brown\fence_k.flc
+          collis = brown\sprites\fence.spc
+        endarea
+
+        area skaly                              ;glazy na ziemi
+          source = -flics\brown\skaly.flc
+          hires  =  brown\sprites\skaly.sph
+        endarea
+
+        area podest                             ;bunkier pod dzialo
+          source = -flics\brown\podest.flc
+          hires  =  brown\sprites\podest.sph
+        endarea
+
+        area cannong                            ;dzialo
+          source = -flics\brown\cannong.flc
+          hires  =  brown\sprites\cannong.sph
+          csource= -flics\brown\cannong.flc
+          collis =  brown\sprites\cannong.spc
+        endarea
+
+        area cannong2                            ;dzialo
+          source = -flics\brown\cannong2.flc
+          hires  =  brown\sprites\cannong2.sph
+          csource= -flics\brown\cannong2.flc
+          collis =  brown\sprites\cannong2.spc
+        endarea
+
+        area poziom3                            ;polki
+          source = -flics\brown\poziom3.flc
+          hires  =  brown\sprites\poziom3.sph
+        endarea
+
+        area ludek                              ;ludek do zbierania
+          source = -flics\brown\ludek.flc
+          hires  =  brown\sprites\ludek.sph
+          csource = -flics\brown\ludek.flc
+          collis =  brown\sprites\ludek.spc
+        endarea
+
+        area landplac                           ;ladowisko gracza (dummy)
+          source = -flics\brown\landplac.flc
+          hires  =  brown\sprites\landplac.sph
+        csource  = -flics\brown\landplak.flc
+         collis  =  brown\sprites\landplac.spc
+        endarea
+
+        area landani                            ;ladowisko gracza (anim)
+          source = -flics\brown\landani.flc
+          hires  =  brown\sprites\landani.sph
+        endarea
+
+  area bar                               ; beczka wybuchowa
+    source = -flics\brown\bar.flc
+    hires = brown\sprites\bar.sph
+    collis = brown\sprites\bar.spc
+  endarea
+
+  area barani                            ; beczka wybuchowa (anim)
+    source = -flics\brown\barani2.flc
+    hires = brown\sprites\barani2.sph
+  endarea
+
+  area bardest                           ; beczka wybuchowa (destroyed)
+    source = -flics\brown\bardest.flc
+    hires = brown\sprites\bardest.sph
+    collis = brown\sprites\bardest.spc
+  endarea
+
+  area ZBIORNIK                          ; KOMPLEKS DO BECZEK
+    source = -flics\brown\zbiornik.flc
+    hires = brown\sprites\zbiornik.sph
+  endarea
+;-------------------OBIEKTY VIRTUALNE Z LEDA----------------------
+
+        area unblock                            ;plaszczyzna wyzwalajaca
+          source = -flics\brown\unblock.flc
+          hires  =  brown\sprites\unblock.sph
+          collis =  brown\sprites\unblock.spc
+        endarea
+
+        area secret
+          source = -flics\brown\secret.flc
+          hires  =  brown\sprites\secret.sph
+          collis =  brown\sprites\secret.spc
+        endarea
+
+        area minna                               ;mina
+          source = -flics\!global\defmine.flc
+          hires  =  !global\sprites\defmine.sph
+          collis =  !global\sprites\defmine.spc
+        endarea
+
+        area _wrog                              ;statki przeciwnikow
+          source = -flics\!global\_wrog.flc
+          hires  =  !global\sprites\_wrog.sph
+          collis =  !global\sprites\_wrog.spc
+        endarea
+
+        area link                               ;obiekt do linkow
+          source = -flics\!global\link.flc
+          hires  = !global\sprites\link.sph
+        endarea
+
+        area bronie                             ;upgrady do statku
+          source = -flics\!global\bronie.flc
+          hires  =  !global\sprites\bronie.sph
+          collis =  !global\sprites\bronie.spc
+        endarea
+
+  area shad2                              ; sien skal otaczajacych
+    source = -flics\brown\shadow2.flc
+    hires  = brown\sprites\shadow2.sph
+  endarea
+
+  area col
+    source = -flics\brown\col.flc
+    hires  = brown\sprites\col.sph
+    collis = brown\sprites\col.spc
+  endarea
+
+endarea
+bar = brown\sounds\bar2.wav 7
+
+

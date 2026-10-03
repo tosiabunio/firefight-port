@@ -1,0 +1,166 @@
+  dx=4096
+  dy=4096
+  weather = smoke_below
+
+  CheckPoints
+
+     "dest_alien5_1"
+     "do_cel2"
+     "dest_alien5_2"
+     "do_cel3"
+     "dest_alien5_3"
+     "do_cel4"
+     "dest_alien5_4"
+     "do_cel5"
+     "dest_alien5_5"
+     "do_cel6"
+     "dest_alien5_boss"
+
+     "landing"
+
+;-----------
+
+  area dest_alien5_1
+    type        = obj_alien5_1
+    count       = all
+    OBJ_TEXT "net_5_1"
+    DISPL_TEXT
+    "net_5_1_1" "net_5_1_1" "STACY"
+    "net_5_1_2" "net_5_1_2" "JAXON"
+    "net_5_1_3" "net_5_1_3" "STACY"
+    "net_5_1_4" "net_5_1_4" "STACY"
+    "net_5_1_5" "net_5_1_5" "JAXON"
+    disable_action "5sciany1"
+    ;HANDLE      "DESTROY_OBJ 5flame1"
+  endarea
+
+;-----------
+
+  area do_cel2
+    type        = 5cel2
+    count       = 1
+    radar       = 1
+    OBJ_TEXT "net_5_2"
+    DISPL_TEXT
+    "net_5_2_1" "net_5_2_1" "STACY"
+  endarea
+
+  area dest_alien5_2
+    type        = obj_alien5_2
+    count       = all
+    OBJ_TEXT "net_5_3"
+    DISPL_TEXT
+    "net_5_3_1" "net_5_3_1" "STACY"
+    disable_action "5sciany2"
+    ;HANDLE      "DESTROY_OBJ 5flame2"
+  endarea
+
+;-----------
+
+  area do_cel3
+    type        = 5cel3
+    count       = 1
+    radar       = 1
+    OBJ_TEXT "net_5_4"
+    DISPL_TEXT
+    "net_5_4_1" "net_5_4_1" "JAXON"
+    "net_5_4_2" "net_5_4_2" "JAXON"
+  endarea
+
+  area dest_alien5_3
+    type        = obj_alien5_3
+    count       = all
+    OBJ_TEXT "net_5_5"
+    DISPL_TEXT
+    "net_5_5_1" "net_5_5_1" "STACY"
+    "net_5_5_2" "net_5_5_2" "STACY"
+    disable_action "5sciany3"
+    ;HANDLE      "DESTROY_OBJ 5flame3"
+  endarea
+
+;-----------
+
+  area do_cel4
+    type        = 5cel4
+    count       = 1
+    radar       = 1
+    OBJ_TEXT "net_5_6"
+    DISPL_TEXT
+    "net_5_6_1" "net_5_6_1" "STACY"
+    enable_action "obj_teleport"
+
+  endarea
+
+  area dest_alien5_4
+    type        = obj_alien5_4
+    count       = all
+    OBJ_TEXT "net_5_7"
+    DISPL_TEXT
+    "net_5_7_1" "net_5_7_1" "JAXON"
+    "net_5_7_2" "net_5_7_2" "JAXON"
+    disable_action "5sciany4"
+    ;HANDLE      "DESTROY_OBJ 5flame4"
+  endarea
+
+;-----------
+
+  area do_cel5
+    type        = 5cel5
+    count       = 1
+    radar       = 1
+    OBJ_TEXT "net_5_8"
+    DISPL_TEXT
+    "net_5_8_1" "net_5_8_1" "STACY"
+    "net_5_8_2" "net_5_8_2" "STACY"
+  endarea
+
+  area dest_alien5_5
+    type        = obj_alien5_5
+    count       = all
+    OBJ_TEXT "net_5_9"
+    DISPL_TEXT
+    "net_5_9_1" "net_5_9_1" "STACY"
+    disable_action "5scianyboss"
+    ;HANDLE      "DESTROY_OBJ 5flame5"
+  endarea
+
+;----------- BOSS
+
+  area do_cel6
+    type        = 5cel6
+    count       = 1
+    radar       = 1
+    OBJ_TEXT "net_5_10"
+    DISPL_TEXT
+    "net_5_10_1" "net_5_10_1" "STACY"
+   ;HANDLE      "DESTROY_OBJ 5flameboss"
+  endarea
+
+  area dest_alien5_boss
+    type        = obj_alien5_boss
+    count       = all
+    radar       = 1
+    OBJ_TEXT "net_5_11"
+    DISPL_TEXT
+    "net_5_11_1" "net_5_11_1" "STACY"
+    "net_5_11_2" "net_5_11_2" "STACY"
+    "net_5_11_3" "net_5_11_3" "STACY"
+    disable_action "5sciany6"
+    ;HANDLE      "DESTROY_OBJ 5flame6"
+  endarea
+
+
+;-----------
+
+  area landing
+    quit        = true
+    type        = landplaceA
+    count       = 1
+    enable_action "bronie1"
+    radar       = 1
+    OBJ_TEXT "net_5_12"
+    DISPL_TEXT
+    "net_5_12_1" "net_5_12_1" "JAXON"
+    "net_5_12_2" "net_5_12_2" "STACY"
+  endarea
+

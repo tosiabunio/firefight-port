@@ -1,0 +1,198 @@
+;=====================================================================
+;
+;                              NET TYPY 1
+;
+;=====================================================================
+
+
+;---------------------------------------- STATKI
+
+
+
+;---------------------------------------- DESTROY
+
+
+area  big_flame
+        type          = obj_destroy10
+        action        = enable_after
+        life          = LOW_SHIELDS
+        explode       = 1
+        ch_sprite     = b_flame
+        range         = 60
+        frame_delay   = 0.07
+        visible       = 0
+endarea
+
+ area  medium_flame
+        type          = obj_destroy11
+        action        = disable_after
+        life          = LOW_SHIELDS
+        explode       = 1
+        ch_sprite     = m_flame
+        range         = 60
+        frame_delay   = 0.07
+        visible       = 0
+ endarea
+
+ area  small_flame
+        type          = obj_destroy12
+        action        = enable_after
+        life          = LOW_SHIELDS
+        explode       = 1
+        ch_sprite     = s_flame
+        range         = 60
+        frame_delay   = 0.07
+        visible       = 0
+ endarea
+
+ area  doorblowd
+        type          = obj_destroyxx
+        life          = immortal
+        anim_sprite   = 0d
+        ch_sprite      = 0dd
+        range         = 60
+        frame_delay   = 0.07
+ endarea
+
+ area  doorblowg
+        type          = obj_destroyxx
+        life          = immortal
+        anim_sprite   = 0g
+        ch_sprite     = 0gd
+        range         = 60
+        frame_delay   = 0.07
+ endarea
+
+;---------------------------------------- LEVEL 3
+
+
+ area 3kopulka_1   ; -  kopulki
+
+        type          = obj_destroy_kopulka_n1
+        life          = IMMORTAL
+        action        = enable_after
+        anim_sprite   = kop1ani
+        ch_sprite     = kop1en
+        range         = 60
+        collis        = 1
+        frame_delay   = 0.07
+ endarea
+
+ area 3kopulka_2   ; -  kopulki
+
+        type          = obj_destroy_kopulka_n2
+        life          = IMMORTAL
+        action        = enable_after
+        anim_sprite   = kop1ani
+        ch_sprite     = kop1en
+        range         = 60
+        collis        = 1
+        frame_delay   = 0.07
+ endarea
+
+ area 3kopulka_3   ; -  kopulki
+
+        type          = obj_destroy_kopulka_n3
+        life          = IMMORTAL
+        action        = enable_after
+        anim_sprite   = kop1ani
+        ch_sprite     = kop1en
+        range         = 60
+        collis        = 1
+        frame_delay   = 0.07
+ endarea
+
+ area 3kopulka_4   ; -  kopulki
+
+        type          = obj_destroy_kopulka_n4
+        life          = IMMORTAL
+        action        = enable_after
+        anim_sprite   = kop1ani
+        ch_sprite     = kop1en
+        range         = 60
+        collis        = 1
+        frame_delay   = 0.07
+ endarea
+
+ area 3kopulka_5   ; -  kopulki
+
+        type          = obj_destroy_kopulka_n5
+        life          = IMMORTAL
+        action        = enable_after
+        anim_sprite   = kop1ani
+        ch_sprite     = kop1en
+        range         = 60
+        collis        = 1
+        frame_delay   = 0.07
+ endarea
+
+ area  3medium_flame1
+        type          = obj_destroy_mf1
+        life          = LOW_SHIELDS
+        explode       = 1
+        ch_sprite     = m_flame
+        range         = 60
+        frame_delay   = 0.07
+        visible       = 0
+ endarea
+
+ area  3medium_flame2
+        type          = obj_destroy_mf2
+        life          = LOW_SHIELDS
+        explode       = 1
+        ch_sprite     = m_flame
+        range         = 60
+        frame_delay   = 0.07
+        visible       = 0
+ endarea
+
+ area  3medium_flame3
+        type          = obj_destroy_mf3
+        life          = LOW_SHIELDS
+        explode       = 1
+        ch_sprite     = m_flame
+        range         = 60
+        frame_delay   = 0.07
+        visible       = 0
+ endarea
+
+ area  3medium_flame4
+        type          = obj_destroy_mf4
+        life          = LOW_SHIELDS
+        explode       = 1
+        ch_sprite     = m_flame
+        range         = 60
+        frame_delay   = 0.07
+        visible       = 0
+ endarea
+
+ area  3medium_flame5
+        type          = obj_destroy_mf5
+        life          = LOW_SHIELDS
+        explode       = 1
+        ch_sprite     = m_flame
+        range         = 60
+        frame_delay   = 0.07
+        visible       = 0
+ endarea
+
+;---------------------------------------- BRONIE & LOTNISKA
+
+area landplaceA
+        type          = landplaceA
+endarea
+
+area landplaceB
+        type           = landplaceB
+endarea
+
+area Bronie
+        type           = obj_capsule
+        range          = 30
+endarea
+
+area odblok
+        type            = obj_unblock
+        serv_type       = visual
+        unblocked_type   = odblok
+endarea

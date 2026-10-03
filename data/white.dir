@@ -1,0 +1,439 @@
+;旼컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴커
+;�                              WHITE LEVEL                                   �
+;읕컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴켸
+
+area white
+
+  source = white\white.def
+
+  ;PALETTE
+  area palette
+    source = -flics\white\palette.flc
+    target = white\sprites\palette.spp
+  endarea
+
+  ; LEVEL SPRITES -------------------------------------------------------------
+
+  area sciany1
+    source = -flics\white\sciany1.flc
+    csource = -flics\white\sciany2k.flc
+    hires  =  white\sprites\sciany1.sph
+    collis  =  white\sprites\sciany1.spc
+  endarea
+
+  area kolumna
+    source = -flics\white\kolumna.flc
+    csource= -flics\white\kolumn_k.flc
+    hires  =  white\sprites\kolumna.sph
+    collis =  white\sprites\kolumna.spc
+  endarea
+
+  area cpx421
+    source = -flics\white\cpx421.flc
+    hires  =  white\sprites\cpx421.sph
+ endarea
+
+  area cpx421a
+    source = -flics\white\cpx421a.flc
+    csource= -flics\white\cpx421b.flc
+    hires  =  white\sprites\cpx421a.sph
+    collis =  white\sprites\cpx421a.spc
+ endarea
+
+ area CPX421C
+    source = -flics\white\cpx421c.flc
+    csource= -flics\white\cpx421b.flc
+    hires  =  white\sprites\cpx421c.sph
+    collis =  white\sprites\cpx421c.spc
+ endarea
+
+  area polka1
+    source = -flics\white\polka1.flc
+    hires  =  white\sprites\polka1.sph
+  endarea
+
+  area polka3
+    source = -flics\white\polka3.flc
+    hires  =  white\sprites\polka3.sph
+  endarea
+
+  area sciany2
+    source = -flics\white\sciany2.flc
+    hires  =  white\sprites\sciany2.sph
+  endarea
+
+  area skaly
+    source = -flics\white\skaly.flc
+    hires  =  white\sprites\skaly.sph
+  ; collis =  white\sprites\skaly.spc
+  endarea
+
+  area skaly_sn
+    source = -flics\white\skaly_sn.flc
+    hires  =  white\sprites\skaly_sn.sph
+    ;collis =  white\sprites\skaly_sn.spc
+  endarea
+
+  area sople_d
+    source = -flics\white\sople_.flc
+    hires  =  white\sprites\sople_.sph
+  endarea
+
+  area sople
+    source = -flics\white\sople.flc
+    csource= -flics\white\sople_k.flc
+    hires  =  white\sprites\sople.sph
+    collis =  white\sprites\sople.spc
+  endarea
+
+  area sople_d1
+    source = -flics\white\sople1_.flc
+    hires  =  white\sprites\sople1_.sph
+  endarea
+
+  area kwiatek
+    source = -flics\white\kwiatek.flc
+    hires  =  white\sprites\kwiatek.sph
+    collis =  white\sprites\kwiatek.spc
+  endarea
+
+  area kwiatek1
+    source = -flics\white\kwiatek1.flc
+    hires  =  white\sprites\kwiatek1.sph
+    collis =  white\sprites\kwiatek1.spc
+  endarea
+
+  area kwiatek2
+    source = -flics\white\kwiatek2.flc
+    hires  =  white\sprites\kwiatek2.sph
+    collis =  white\sprites\kwiatek2.spc
+  endarea
+
+  area waza1
+    source = -flics\white\waza1.flc
+    hires  =  white\sprites\waza1.sph
+  endarea
+
+  area cien
+    source = -flics\white\cien.flc
+    hires  =  white\sprites\cien.sph
+  endarea
+
+  area klada
+    source = -flics\white\klada.flc
+    hires  =  white\sprites\klada.sph
+  endarea
+
+  area back
+    source = -flics\white\backg.flc
+    hires  =  white\sprites\backg.sph
+  endarea
+
+  area dzialo_u
+    source = -flics\white\dzialo_u.flc
+    hires  =  white\sprites\dzialo_u.sph
+    collis =  white\sprites\dzialo_u.spc
+  endarea
+
+  area rocker
+    source = -flics\white\rocker.flc
+    hires  =  white\sprites\rocker.sph
+    collis =  white\sprites\rocker.spc
+  endarea
+
+  area flamer
+    source = -flics\white\flamer.flc
+    hires  =  white\sprites\flamer.sph
+    collis =  white\sprites\flamer.spc
+  endarea
+
+  ;area dzialo_d
+  ;  source = -flics\white\dzialo_d.flc
+  ;  hires  =  white\sprites\dzialo_d.sph
+  ;  lores  =  white\sprites\dzialo_d.spl
+  ;endarea
+
+  area dzialo2_
+    source = -flics\white\dzialo2_.flc
+    hires  =  white\sprites\dzialo2_.sph
+  endarea
+
+  area belkot
+    source = -flics\white\belkot.flc
+    csource= -flics\white\belkotk.flc
+    hires  =  white\sprites\belkot.sph
+    collis =  white\sprites\belkot.spc
+  endarea
+
+  area belkot2
+    source = -flics\white\belkot2.flc
+    csource= -flics\white\belkot2k.flc
+    hires  =  white\sprites\belkot2.sph
+    collis =  white\sprites\belkot2.spc
+  endarea
+
+  area belk_z
+    source = -flics\white\bel_z.flc
+    hires  =  white\sprites\bel_z.sph
+    collis =  white\sprites\bel_z.spc
+  endarea
+
+  ;area rura1
+  ;  source = -flics\white\rura1.flc
+  ;  hires  =  white\sprites\rura1.sph
+  ;  lores  =  white\sprites\rura1.spl
+  ;  collis =  white\sprites\rura1.spc
+  ;endarea
+
+  ;area rura1_z
+  ;  source = -flics\white\rura1_z.flc
+  ;  hires  =  white\sprites\rura1_z.sph
+  ;  lores  =  white\sprites\rura1_z.spl
+  ;  collis =  white\sprites\rura1_z.spc
+  ;endarea
+
+  ;area rura2_z
+  ;  source = -flics\white\rura2_z.flc
+  ;  hires  =  white\sprites\rura2_z.sph
+  ;  lores  =  white\sprites\rura2_z.spl
+  ;  collis =  white\sprites\rura2_z.spc
+  ;endarea
+
+  ;area rura2
+  ;  source = -flics\white\rura2.flc
+  ;  hires  =  white\sprites\rura2.sph
+  ;  lores  =  white\sprites\rura2.spl
+  ;  collis =  white\sprites\rura2.spc
+  ;endarea
+
+  area kwiat_z
+    source = -flics\white\kwiat_z.flc
+    hires  =  white\sprites\kwiat_z.sph
+    collis =  white\sprites\kwiat_z.spc
+  endarea
+
+  area macki
+    source = -flics\white\macki.flc
+    hires  =  white\sprites\macki.sph
+    csource= -flics\white\macki_k.flc
+    collis =  white\sprites\macki.spc
+  endarea
+
+  area macki_z
+    source = -flics\white\macki_z.flc
+    hires  =  white\sprites\macki_z.sph
+    csource= -flics\white\macki_zk.flc
+    collis =  white\sprites\macki_z.spc
+  endarea
+
+  area macki_z1
+    source = -flics\white\macki_z1.flc
+    hires  =  white\sprites\macki_z1.sph
+  endarea
+
+  area 3rdplane
+    source = -flics\white\3rdplane.flc
+    hires  =  white\sprites\3rdplane.sph
+  endarea
+
+  area fl_b
+    source = -flics\net\fl_b.flc
+    hires  =  net\sprites\fl_b.sph
+    collis =  net\sprites\fl_b.spc
+  endarea
+
+  area fl_s
+    source = -flics\net\fl_s.flc
+    hires  =  net\sprites\fl_s.sph
+    collis =  net\sprites\fl_s.spc
+  endarea
+
+  area fl_m
+    source = -flics\net\fl_m.flc
+    hires  =  net\sprites\fl_m.sph
+    collis =  net\sprites\fl_m.spc
+  endarea
+
+
+  area b_flame
+    source = -flics\net\b_flame.flc
+    hires  =  net\sprites\b_flame.sph
+    collis =  net\sprites\b_flame.spc
+  endarea
+
+
+  area s_flame
+    source = -flics\net\s_flame.flc
+    hires  =  net\sprites\s_flame.sph
+    collis =  net\sprites\s_flame.spc
+  endarea
+
+
+  area m_flame
+    source = -flics\net\m_flame.flc
+    hires  =  net\sprites\m_flame.sph
+    collis =  net\sprites\m_flame.spc
+  endarea
+
+  area ludek
+    source = -flics\white\ludek.flc
+    hires  =  white\sprites\ludek.sph
+    collis =  white\sprites\ludek.spc
+  endarea
+
+   area unlock
+    source = -flics\white\unlock.flc
+    hires  =  white\sprites\unlock.sph
+    collis =  white\sprites\unlock.spc
+  endarea
+
+   area telep
+    source = -flics\white\telep.flc
+    hires  =  white\sprites\telep.sph
+    collis =  white\sprites\telep.spc
+  endarea
+
+   area bunk1
+    source = -flics\white\bunk1.flc
+    hires  =  white\sprites\bunk1.sph
+    csource= -flics\white\bunk1k.flc
+    collis =  white\sprites\bunk1.spc
+  endarea
+
+   area bunk1z
+    source = -flics\white\bunk1z.flc
+    hires  =  white\sprites\bunk1z.sph
+;    collis =  white\sprites\bunk1z.spc
+  endarea
+
+   area bunk2
+    source = -flics\white\bunk2.flc
+    hires  =  white\sprites\bunk2.sph
+    csource= -flics\white\bunk2k.flc
+    collis =  white\sprites\bunk2.spc
+  endarea
+
+   area bunk2z
+    source = -flics\white\bunk2z.flc
+    hires  =  white\sprites\bunk2z.sph
+ ;   collis =  white\sprites\bunk2z.spc
+  endarea
+
+  area wieza1u
+    source = -flics\white\wiez1_u1.flc
+    hires  =  white\sprites\wiez1_u1.sph
+    csource= -flics\white\wiez1c.flc
+    collis =  white\sprites\wiez1_u1.spc
+  endarea
+
+  area wieza1z
+    source = -flics\white\wiez1_zu.flc
+    hires  =  white\sprites\wiez1_zu.sph
+    csource= -flics\white\wiez1_zc.flc
+    collis =  white\sprites\wiez1_zu.spc
+  endarea
+
+  area wieza1d
+    source = -flics\white\wiez1_u.flc
+    hires  =  white\sprites\wiez1_u.sph
+  endarea
+
+
+  area beczka1
+    source = -flics\white\beczka.flc
+    hires  =  white\sprites\beczka.sph
+    csource= -flics\white\beczkac.flc
+    collis =  white\sprites\beczka.spc
+  endarea
+
+  area beczka1z
+    source = -flics\white\beczkaz.flc
+    hires  =  white\sprites\beczkaz.sph
+  endarea
+
+  area droga
+    source = -flics\white\droga.flc
+    hires  =  white\sprites\droga.sph
+  endarea
+
+  area kopst
+    source = -flics\white\kopst.flc
+    hires  =  white\sprites\kopst.sph
+    csource = -flics\white\kopstc.flc
+    collis =  white\sprites\kopst.spc
+  endarea
+
+  area kopend
+    source = -flics\white\kopend.flc
+    hires  =  white\sprites\kopend.sph
+    csource = -flics\white\kopstc.flc
+    collis  =  white\sprites\kopend.spc
+  endarea
+
+  area kopani
+    source = -flics\white\kopani.flc
+    hires  =  white\sprites\kopani.sph
+    csource = -flics\white\kopanic.flc
+    collis  =  white\sprites\kopani.spc
+  endarea
+
+
+  area landplac
+    source = -flics\white\landpl.flc
+    hires  =  white\sprites\landpl.sph
+  endarea
+
+  area load1
+    source = -flics\white\load1.flc
+    hires  =  white\sprites\load1.sph
+    collis =  white\sprites\load1.spc
+  endarea
+
+  area load2
+    source = -flics\white\load2.flc
+    hires  =  white\sprites\load2.sph
+    collis =  white\sprites\load2.spc
+  endarea
+
+  area obca_mina
+   source = -flics\!global\defmine.flc
+   hires  =  !global\sprites\defmine.sph
+   ;csource = -flics\!global\defmine_k.flc
+   collis =  !global\sprites\defminek.spc
+  endarea
+
+  area marker
+    source = -flics\white\marker.flc
+    hires  =  white\sprites\marker.sph
+    collis =  white\sprites\marker.spc
+  endarea
+
+  area sekret
+    source = -flics\gray\sekret.flc
+    hires  =  gray\sprites\sekret.sph
+    collis =  gray\sprites\sekret.spc
+  endarea
+
+  ; GLOBAL SPRITES ------------------------------------------------------------
+
+
+
+  area bronie
+    source = -flics\!global\bronie.flc
+    hires  =  !global\sprites\bronie.sph
+    collis =  !global\sprites\bronie.spc
+  endarea
+
+  area _wrog
+    source = -flics\!global\_wrog.flc
+    hires  =  !global\sprites\_wrog.sph
+    collis =  !global\sprites\_wrog.spc
+  endarea
+
+  area light
+    source = -flics\!global\light.flc
+    hires  =  !global\sprites\light.sph
+  endarea
+
+endarea
+

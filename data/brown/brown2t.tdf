@@ -1,0 +1,100 @@
+;------------------------------------------------------
+area upgrade
+  type = obj_capsule
+   range = 30
+endarea
+
+area loteryjka
+  type = obj_capsule
+  range = 30
+endarea
+
+area nagroda
+  type = obj_capsule
+  range = 30
+endarea
+
+area lotniskoA
+  type = landplaceA
+endarea
+
+area lotniskoB
+  type = landplaceB
+endarea
+
+area lotniskoC
+  type = landplaceC
+endarea
+
+area lotniskoD
+  type = landplaceD
+endarea
+
+area unblock
+  type = obj_unblock
+  serv_type = visual
+  unblocked_type = unblock
+endarea
+
+area unblock2
+  type = obj_unblockcel2
+  serv_type = visual
+  unblocked_type = unblock
+endarea
+
+area zapora
+  type = door_02
+  delay = 999999999
+  open = 1
+endarea
+
+area wiatrak
+  type = obj_destroy
+  life = medium_shields
+  range = 60
+  smoke = 1
+  explode =1
+  ch_sprite = wiatrakd
+  frame_delay = 0.05
+  action = enable_after
+  morph =1
+endarea
+
+area kompresor
+  type = obj_destroy
+  life = medium_shields
+  range = 60
+  explode =1
+  ch_sprite = blow1d
+  action = enable_after
+  frame_delay = 0.05
+  morph =1
+endarea
+
+area elektrownia
+  type = obj_destroy
+  life = medium_shields
+  range = 60
+  explode=1
+  ch_sprite = 2elektrowniad
+  action = enable_after
+  frame_delay = 0.05
+  morph =1
+endarea
+
+area kopula
+  type = obj_destroy
+  life = low_shields
+  range = 60
+  ch_sprite = 2kopulad
+  anim_sprite = 2kopula
+  explode_sample= dome_open
+  frame_delay = 0.05
+  action = enable_after
+endarea
+
+area walldoor
+  type = door_01
+  delay = 0
+  open = 0
+endarea

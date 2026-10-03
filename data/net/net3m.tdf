@@ -1,0 +1,59 @@
+dx=4096
+dy=4096
+  weather = smoke_above
+
+  CheckPoints
+  "zniszcz_zlodzieja"
+
+  Bonus
+
+  "sekret1"
+  "zlodziej_start"
+  "zlodziej_end"
+  "blow"
+
+;------------------------------------
+
+  area zniszcz_zlodzieja
+
+    type        = obj_thief
+    quit        = true
+    count       = 1
+    radar       = 1
+    obj_text "net_3_1"
+    DISPL_TEXT
+    "net_3_1_1" "net_3_1_1" "STACY"
+
+  endarea
+
+
+  area zlodziej_start
+    type        = link
+    quit        = false
+    count       = 1
+    radar       = 1
+  endarea
+
+ area blow
+    type        = link_blow
+    count       = 1
+    handle "destroy_obj doorblowg"
+           "destroy_obj doorblowd"
+    sample "blddemol"
+  endarea
+
+ area zlodziej_end
+    type        = link_end
+    count       = 1
+    quit        = true
+    radar       = 1
+  endarea
+
+ area sekret1
+    quit        = false
+    type        = obj_alien_special1
+    count       = ALL
+    radar       = 1
+ endarea
+
+

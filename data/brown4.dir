@@ -1,0 +1,89 @@
+;旼컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴커
+;�                              BROWN LEVEL 4                                 �
+;읕컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴켸
+area brown
+  area 4pipes                           ; grube rury
+    source = -flics\brown\pipes.flc
+    hires = brown\sprites\pipes.sph
+  endarea
+
+  area 4collis                          ; kolizje do grubych rur
+    source = -flics\brown\pipesk.flc
+    hires = brown\sprites\pipesk.sph
+    collis = brown\sprites\pipesk.spc
+  endarea
+
+  area destup                          ; skaly do wybuchania gora
+    source = -flics\brown\destup.flc
+    hires = brown\sprites\destup.sph
+    csource = -flics\brown\destupk.flc
+    collis = brown\sprites\destup.spc
+  endarea
+
+  area destdwn                         ; skaly do wybuchania dol
+    source = -flics\brown\destdwn.flc
+    hires = brown\sprites\destdwn.sph
+    csource = -flics\brown\destdwnk.flc
+    collis = brown\sprites\destdwn.spc
+  endarea
+
+  area 4elektrownia                    ; podpora do drutow
+    source = -flics\brown\elektr.flc
+    hires = brown\sprites\elektr.sph
+    csource = -flics\brown\elektrk.flc
+    collis = brown\sprites\elektr.spc
+  endarea
+
+  area 4elektrowniad                   ; podpora do drutow zniszczona
+    source = -flics\brown\elektrd.flc
+    hires = brown\sprites\elektrd.sph
+  endarea
+
+  area 4servo                           ; servo i boisko
+    source = -flics\brown\servo.flc
+    hires = brown\sprites\servo.sph
+  endarea
+
+  area 4walldoor                        ; sciana drzwi
+    source = -flics\brown\walldoor.flc
+    hires = brown\sprites\walldoor.sph
+    csource = -flics\brown\walldook.flc
+    collis = brown\sprites\walldoor.spc
+  endarea
+
+  area destup4                          ; skaly do wybuchania gora
+    source = -flics\brown\destup.flc
+    hires = brown\sprites\destup.sph
+    csource = -flics\brown\destupk.flc
+    collis = brown\sprites\destup.spc
+  endarea
+
+  area destdwn4                         ; skaly do wybuchania dol
+    source = -flics\brown\destdwn.flc
+    hires = brown\sprites\destdwn.sph
+    csource = -flics\brown\destdwnk.flc
+    collis = brown\sprites\destdwn.spc
+  endarea
+
+  area 01                               ; cool glass
+    source = -flics\brown\01.flc
+    hires = brown\sprites\01.sph
+    csource = -flics\brown\01_k.flc
+    collis = brown\sprites\01.spc
+  endarea
+
+  area 02                               ; cool glass anim
+    source = -flics\brown\02.flc
+    hires = brown\sprites\02.sph
+  endarea
+
+  area 03                               ; cool glass dest
+    source = -flics\brown\03.flc
+    hires = brown\sprites\03.sph
+  endarea
+
+endarea
+
+wallexplode = !global\sounds\explode1.wav        6   ;poziom brown4
+
+

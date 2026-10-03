@@ -1,0 +1,147 @@
+;=====================================================================
+;
+;                              NET TYPY 1
+;
+;=====================================================================
+
+
+;---------------------------------------- STATKI
+
+
+
+;---------------------------------------- DESTROY
+
+
+area  big_flame
+        type          = obj_destroy10
+        life          = LOW_SHIELDS
+        explode       = 1
+        ch_sprite     = b_flame
+        range         = 60
+        frame_delay   = 0.07
+        visible       = 0
+endarea
+
+ area  medium_flame
+        type          = obj_destroy11
+        life          = LOW_SHIELDS
+        explode       = 1
+        ch_sprite     = m_flame
+        range         = 60
+        frame_delay   = 0.07
+        visible       = 0
+ endarea
+
+ area  small_flame
+        type          = obj_destroy12
+        life          = LOW_SHIELDS
+        explode       = 1
+        ch_sprite     = s_flame
+        range         = 60
+        frame_delay   = 0.07
+        visible       = 0
+ endarea
+
+
+
+
+
+;---------------------------------------- DZIALA
+
+area obj_rakieta_2
+  type=obj_mycannon
+  appear_level= 1
+  cannon_type = 1
+  angle = 360
+endarea
+
+
+area obj_rakieta_3
+  type=obj_mycannon
+  appear_level= 2
+  cannon_type = 1
+  angle = 360
+endarea
+
+area obj_rakieta_4
+  type=obj_mycannon
+  appear_level= 3
+  cannon_type = 1
+  angle = 360
+endarea
+
+;area obj_rakieta_4
+;  type=obj_mycannon
+;  appear_level= 4
+;  cannon_type = 1
+;  angle = 360
+;endarea
+
+area obj_rakieta_5
+  type=obj_mycannon
+  appear_level= 4
+  cannon_type = 1
+  angle = 360
+endarea
+
+area obj_laser_2
+  type=obj_mycannon
+  appear_level= 1
+  cannon_type = 2
+  angle = 360
+endarea
+
+
+area obj_laser_3
+  type=obj_mycannon
+  appear_level= 2
+  cannon_type = 2
+  angle = 360
+endarea
+
+area obj_laser_4
+  type=obj_mycannon
+  appear_level= 3
+  cannon_type = 2
+  angle = 360
+endarea
+
+;area obj_laser_4
+;  type=obj_mycannon
+;  appear_level= 4
+;  cannon_type = 2
+;  angle = 360
+;endarea
+
+area obj_laser_5
+  type=obj_mycannon
+  appear_level= 5
+  cannon_type = 2
+  angle = 360
+endarea
+
+
+;---------------------------------------- BRONIE & LOTNISKA
+
+area landplace
+        type          = landplaceA
+endarea
+
+area landplaceA
+        type          = landplaceA
+endarea
+
+area landplaceB
+        type           = landplaceB
+endarea
+
+area Bronie
+        type           = obj_capsule
+        range          = 30
+endarea
+
+area odblok
+        type            = obj_unblock
+        serv_type       = visual
+        unblocked_type   = odblok
+endarea

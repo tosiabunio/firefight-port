@@ -1,0 +1,327 @@
+;旼컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴커
+;�                              NET LEVEL                                     �
+;읕컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴켸
+
+area net
+
+  source = net\net.def
+
+area palette
+  source = -flics\net\palette.flc
+  target = net\sprites\palette.spp
+endarea
+
+  ; LEVEL SPRITES -----------------------------------------------------------
+
+  area back
+    source = -flics\net\back.flc
+    hires  =  net\sprites\back.sph
+    collis =  net\sprites\back.spc
+  endarea
+
+  area brick
+    source = -flics\net\energy.flc
+    hires  =  net\sprites\energy.sph
+    collis =  net\sprites\energy.spc
+  endarea
+
+  area base                             ; baza do sieci
+    source = -flics\net\base.flc
+    hires  =  net\sprites\base.sph
+   csource = -flics\net\base_k.flc
+    collis =  net\sprites\base.spc
+  endarea
+
+  area gunbase                             ; podstawka dziala do sieci
+    source = -flics\net\gunbase.flc
+    hires  =  net\sprites\gunbase.sph
+  endarea
+
+  area lplace                             ; lotnisko na siec
+    source = -flics\gray\lplace.flc
+    hires  =  gray\sprites\lplace.sph
+    collis =  gray\sprites\lplace.spc
+  endarea
+
+  area polka
+    source = -flics\net\polka.flc
+    hires  =  net\sprites\polka.sph
+   ;collis =  net\sprites\polka.spc
+  endarea
+
+ area tb303
+    source = -flics\net\tb303.flc
+    hires  =  net\sprites\tb303.sph
+    ;collis = net\sprites\tb303.spc
+  endarea
+
+  area boki
+    source = -flics\net\boki.flc
+    hires  =  net\sprites\boki.sph
+  ; collis =  net\sprites\boki.spc
+  endarea
+
+
+area 3rdplane
+    source = -flics\net\3rdplane.flc
+    hires  =  net\sprites\3rdplane.sph
+  ; collis =  net\sprites\3rdplane.spc
+  endarea
+
+area sciany1
+    source = -flics\net\sciany1.flc
+    csource= -flics\net\sciany1k.flc
+    hires  =  net\sprites\sciany1.sph
+    collis =  net\sprites\sciany1.spc
+  endarea
+
+area scianal
+    source = -flics\net\scianal.flc
+    csource= -flics\net\scianalk.flc
+    hires  =  net\sprites\scianal.sph
+    collis =  net\sprites\scianal.spc
+  endarea
+
+area rury
+    source = -flics\net\rury.flc
+    csource= -flics\net\ruryk.flc
+    hires  =  net\sprites\rury.sph
+    collis =  net\sprites\rury.spc
+  endarea
+
+area ruryc
+    source = -flics\net\ruryc.flc
+    hires  =  net\sprites\ruryc.sph
+  endarea
+
+area tb304
+    source = -flics\net\tb304.flc
+    hires  =  net\sprites\tb304.sph
+  endarea
+
+area mosty
+    source = -flics\net\mosty.flc
+    hires  =  net\sprites\mosty.sph
+  endarea
+
+area mostyc
+    source = -flics\net\mostyc.flc
+    hires  =  net\sprites\mostyc.sph
+  endarea
+
+area mosts
+    source = -flics\net\mosts.flc
+    csource= -flics\net\mostsk.flc
+    hires  =  net\sprites\mosts.sph
+    collis =  net\sprites\mosts.spc
+  endarea
+
+area mostsc
+    source = -flics\net\mostsc.flc
+    hires  =  net\sprites\mostsc.sph
+  endarea
+
+area smieci1
+    source = -flics\net\smieci1.flc
+    hires  =  net\sprites\smieci1.sph
+  endarea
+
+area smieci1c
+    source = -flics\net\smieci1c.flc
+    hires  =  net\sprites\smieci1c.sph
+  endarea
+
+
+ area l1
+    source = -flics\net\l1.flc
+    hires  =  net\sprites\l1.sph
+  endarea
+
+ area lampa
+    source = -flics\net\lampa.flc
+    hires  =  net\sprites\lampa.sph
+  endarea
+
+  area lampac
+    source = -flics\net\lampac.flc
+    hires  =  net\sprites\lampac.sph
+  endarea
+
+  area paski
+    source = -flics\net\paski.flc
+    csource = -flics\net\paskik.flc
+    hires  =  net\sprites\paski.sph
+    collis  =  net\sprites\paski.spc
+  endarea
+
+  area kogut1                             ; koguty na mury
+    source = -flics\net\kogut1.flc
+    hires  =  net\sprites\kogut1.sph
+  endarea
+
+  area kogut2
+    source = -flics\net\kogut2.flc
+    hires  =  net\sprites\kogut2.sph
+  endarea
+
+  area kogut3
+    source = -flics\net\kogut3.flc
+    hires  =  net\sprites\kogut3.sph
+  endarea
+
+  area stplace
+    source = -flics\net\stplace.flc
+    hires  =  net\sprites\stplace.sph
+    collis =  net\sprites\stplace.spc
+  endarea
+
+ area obca_mina
+   source = -flics\!global\defmine.flc
+   hires  =  !global\sprites\defmine.sph
+   ;csource = -flics\!global\defmine_k.flc
+   collis =  !global\sprites\defminek.spc
+ endarea
+
+
+;---------------------------------------------------- OGNIE
+
+  area fl_b
+    source = -flics\net\fl_b.flc
+    hires  =  net\sprites\fl_b.sph
+    collis =  net\sprites\fl_b.spc
+  endarea
+
+  area fl_s
+    source = -flics\net\fl_s.flc
+    hires  =  net\sprites\fl_s.sph
+    collis =  net\sprites\fl_s.spc
+  endarea
+
+  area fl_m
+    source = -flics\net\fl_m.flc
+    hires  =  net\sprites\fl_m.sph
+    collis =  net\sprites\fl_m.spc
+  endarea
+
+
+  area b_flame
+    source = -flics\net\b_flame.flc
+    hires  =  net\sprites\b_flame.sph
+    collis =  net\sprites\b_flame.spc
+  endarea
+
+
+  area s_flame
+    source = -flics\net\s_flame.flc
+    hires  =  net\sprites\s_flame.sph
+    collis =  net\sprites\s_flame.spc
+  endarea
+
+
+  area m_flame
+    source = -flics\net\m_flame.flc
+    hires  =  net\sprites\m_flame.sph
+    collis =  net\sprites\m_flame.spc
+  endarea
+
+;================== LEVEL 3
+
+area kop1st
+    source = -flics\net\kop1st.flc
+    hires  =  net\sprites\kop1st.sph
+    csource= -flics\net\kop1c.flc
+    collis =  net\sprites\kop1st.spc
+  endarea
+
+  area kop1ani
+    source = -flics\net\kop1ani.flc
+    hires  =  net\sprites\kop1ani.sph
+    csource= -flics\net\kop1ac.flc
+    collis =  net\sprites\kop1ac.spc
+  endarea
+
+  area kop1en
+    source = -flics\net\kop1en.flc
+    hires  =  net\sprites\kop1en.sph
+    csource= -flics\net\kop1c.flc
+    collis =  net\sprites\kop1en.spc
+  endarea
+
+  area dzialo_podstawa
+    source = -flics\net\dzialk1p.flc
+    hires  =  net\sprites\dzialk1p.sph
+    collis =  net\sprites\dzialk1p.spc
+  endarea
+
+;-----------------------------------------------------
+  area dzialo
+    source = -flics\net\lasergn.flc
+    hires  =  net\sprites\lasergn.sph
+    collis =  net\sprites\lasergn.spc
+  endarea
+
+  area dzialo2
+    source = -flics\net\rocketgn.flc
+    hires  =  net\sprites\rocketgn.sph
+    collis =  net\sprites\rocketgn.spc
+  endarea
+;-----------------------------------------------------
+
+  area light1
+    source = -flics\!global\light.flc
+    hires  =  !global\sprites\light.sph
+  endarea
+
+  area bronie
+    source = -flics\!global\bronie.flc
+    hires  =  !global\sprites\bronie.sph
+    collis =  !global\sprites\bronie.spc
+  endarea
+
+  area _wrog
+    source = -flics\!global\_wrog.flc
+    hires  =  !global\sprites\_wrog.sph
+    collis =  !global\sprites\_wrog.spc
+  endarea
+
+  area unlock
+    source = -flics\net\unlock.flc
+    hires  =  net\sprites\unlock.sph
+    collis =  net\sprites\unlock.spc
+  endarea
+
+  area unlock1
+    source = -flics\net\unlock2.flc
+    hires  =  net\sprites\unlock2.sph
+    collis =  net\sprites\unlock2.spc
+  endarea
+
+  area znacznik
+    source = -flics\net\unlock1.flc
+    hires  =  net\sprites\unlock1.sph
+    collis =  net\sprites\unlock1.spc
+  endarea
+
+  area link
+    source = -flics\net\link.flc
+    hires  =  net\sprites\link.sph
+    collis =  net\sprites\link.spc
+  endarea
+
+  area zlodziej
+    source = -flics\net\zlodziej.flc
+    hires  =  net\sprites\zlodziej.sph
+    collis =  net\sprites\zlodziej.spc
+  endarea
+
+  area sekret
+    source = -flics\net\sekret.flc
+    hires  =  net\sprites\sekret.sph
+    collis =  net\sprites\sekret.spc
+  endarea
+
+endarea
+
+;------------------------------------------- PROBKI
+
+

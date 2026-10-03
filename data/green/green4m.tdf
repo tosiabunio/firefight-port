@@ -1,0 +1,125 @@
+dx=4096
+dy=4096
+
+  weather = rain1
+
+  CheckPoints
+  "dest_alien1"
+  "do_cel1"
+  "dest_alien2"
+  "do_cel2"
+  "dest_alien3"
+  "do_cel3"
+  "dest_alien4"
+  "do_cel4"
+  "dest_alien5"
+  "land"
+
+;==================================
+
+ area dest_alien1
+    type        = obj_alien4_sektor1
+    count       = all
+    obj_text "green_4_1"
+    DISPL_TEXT
+    "green_4_1_1" "green_4_1_1" "RILEY"
+    "green_4_1_2" "green_4_1_2" "RILEY"
+    "green_4_1_3" "green_4_1_3" "STACY"
+    "green_4_1_4" "green_4_1_4" "JAXON"
+    disable_action "sciany4_sektor1"
+ endarea
+
+ area do_cel1
+    type        = marker1
+    count       = all
+    radar       = 1
+    obj_text "green_4_2"
+    DISPL_TEXT
+    "green_4_2_1" "green_4_2_1" "RILEY"
+ endarea
+
+ area dest_alien2
+    type        = obj_alien4_sektor2
+    count       = all
+    obj_text "green_4_3"
+    DISPL_TEXT
+    "green_4_3_1" "green_4_3_1" "STACY"
+    "green_4_3_2" "green_4_3_2" "RILEY"
+    "green_4_3_3" "green_4_3_3" "JAXON"
+    "green_4_3_4" "green_4_3_4" "RILEY"
+    "green_4_3_5" "green_4_3_5" "RILEY"
+    "green_4_3_6" "green_4_3_6" "RILEY"
+    disable_action "sciany4_sektor2"
+ endarea
+
+ area do_cel2
+    type        = marker2
+    count       = all
+    radar       = 1
+    obj_text "green_4_4"
+    DISPL_TEXT
+    "green_4_4_1" "green_4_4_1" "STACY"
+ endarea
+
+ area dest_alien3
+    type        = obj_alien4_sektor3
+    count       = all
+    obj_text "green_4_5"
+    DISPL_TEXT
+    "green_4_5_1" "green_4_5_1" "STACY"
+    "green_4_5_2" "green_4_5_2" "STACY"
+    disable_action "sciany4_sektor3"
+ endarea
+
+ area do_cel3
+    type        = marker3
+    count       = all
+    radar       = 1
+    obj_text "green_4_6"
+    DISPL_TEXT
+    "green_4_6_1" "green_4_6_1" "STACY"
+ endarea
+
+ area dest_alien4
+    type        = obj_alien4_sektor4
+    count       = all
+    obj_text "green_4_7"
+    DISPL_TEXT
+    "green_4_7_1" "green_4_7_1" "STACY"
+    disable_action "sciany4_sektor4"
+ endarea
+
+ area do_cel4
+    type        = marker4
+    count       = all
+    radar       = 1
+    obj_text "green_4_8"
+    DISPL_TEXT
+    "green_4_8_1" "green_4_8_1" "JAXON"
+    "green_4_8_2" "green_4_8_2" "JAXON"
+ endarea
+
+ area dest_alien5
+    type        = obj_alien4_sektor5
+    count       = all
+    obj_text "green_4_9"
+    DISPL_TEXT
+    "green_4_9_1" "green_4_9_1" "STACY"
+ endarea
+
+ area land
+    type     = landplaceA
+    count    = 1
+    radar    = 1
+    enable_action "bronie1"
+    quit     = TRUE
+    obj_text "green_4_10"
+    DISPL_TEXT
+    "green_4_10_1" "green_4_10_1" "JAXON"
+    "green_4_10_2" "green_4_10_2" "JAXON"
+    "green_4_10_3" "green_4_10_3" "STACY"
+    "green_4_10_4" "green_4_10_4" "STACY"
+endarea
+
+
+

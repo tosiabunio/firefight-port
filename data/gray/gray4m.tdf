@@ -1,0 +1,13 @@
+  dx=4096
+  dy=4096
+  weather = none
+
+  CheckPoints
+     "landing"
+
+  area landing
+    quit        = true
+    type        = landplace
+    count       = 1
+    radar       = 1
+  endarea

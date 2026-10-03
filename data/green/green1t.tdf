@@ -1,0 +1,179 @@
+;=====================================================================
+;
+;                               GREEN TYPY 1
+;
+;=====================================================================
+
+;---------------------------------------- STATKI
+
+
+
+;---------------------------------------- DRZWI
+
+ area green_door
+        type           = doorgreen
+        delay          = 60
+        open           = 0
+endarea
+
+area green_switch
+        type           = switchgreen
+        standtime      = 60
+        door_type      = green_door
+endarea
+
+area yellow_door
+        type           = dooryellow
+        delay          = 60
+        open           = 0
+endarea
+
+area yellow_switch
+        type           = switchyellow
+        standtime      = 60
+        door_type      = yellow_door
+endarea
+
+area red_door
+        type           = doorred
+        delay          = 60
+        open           = 0
+endarea
+
+area red_switch
+        type           = switchred
+        standtime      = 37
+        door_type      = red_door
+endarea
+
+area neutral_door
+        type          = doorneutral
+        delay         = 45
+        open          = 0
+endarea
+
+area neutral_switch
+        type          = switchneutral
+        standtime     = 45
+        door_type     = neutral_door
+endarea
+
+
+;----------------------------------------  DESTROY
+
+area destroy_1 ;- plonaca palma
+        type          = obj_destroy1
+        life          = low_shields
+        morph         = 1
+        ch_sprite     = palma_z
+        range         = 100
+        frame_delay   = 0.04                 ;---- 0,05
+        explode_sample= tree_burning_1
+endarea
+
+area destroy_2 ; - sam ogien - wybucha krzaczek
+        type         = obj_destroy2
+        life         = low_shields
+        morph         = 1
+        ch_sprite    = firez
+        range        = 60
+        frame_delay  = 0.04                   ;---- 0,05
+        explode_sample= tree_burning_2
+endarea
+
+area destroy_3 ; - srodek zmieniajacy sie w krater
+        type         = obj_destroy3
+        action       = enable_after
+        life         = low_shields
+        morph         = 1
+        explode      = 1
+        ch_sprite    = ruiny1z
+        range        = 60
+        frame_delay  = 0.04
+endarea
+
+area destroy_4 ; - do wysokiego domku, rozdupczona gora
+        type         = obj_destroy4
+        life         = medium_shields
+        explode      = 1
+        ch_sprite    = ruiny2gz
+        range        = 60
+        frame_delay  = 0.04
+endarea
+
+area destroy_5 ; - plonace beczki
+        type         = obj_destroy5
+        action       = enable_after
+        life         = low_shields
+        explode      = 1
+        ch_sprite    = beczki_z
+        range        = 60
+        frame_delay  = 0.04                  ;----- 0,03
+endarea
+
+;-------------------------------------------------- WIEZE MISJI
+
+area destroy_tower1 ; - wieza1
+        type         = obj_destroy6
+        life         = medium_shields
+        explode      = 1
+        ch_sprite    = ruiny2gz
+        range        = 60
+        frame_delay  = 0.05
+endarea
+
+area destroy_tower2 ; - wieza3
+        type         = obj_destroy7
+        life         = medium_shields
+        explode      = 1
+        ch_sprite    = ruiny2gz
+        range        = 60
+        frame_delay  = 0.05
+endarea
+
+area destroy_tower3 ; - wieza3
+        type         = obj_destroy8
+        life         = medium_shields
+        explode      = 1
+        ch_sprite    = ruiny2gz
+        range        = 60
+        frame_delay  = 0.05
+endarea
+
+area destroy_sekret_1 ; - plonace beczki
+        type         = obj_destroy_s1l
+        action       = disable_after
+        life         = low_shields
+        explode      = 1
+        ch_sprite    = beczki_z
+        range        = 60
+        frame_delay  = 0.04                  ;----- 0,03
+endarea
+
+
+;------------------------------------------- LOTNISKA & BRONIE
+
+area landplaceA
+        type         = landplaceA
+endarea
+
+area landplaceB
+        type         = landplaceB
+endarea
+
+area Bronie
+        type         = obj_capsule
+        range        = 30
+endarea
+
+area Bronie1
+        type         = obj_capsule
+        range        = 30
+endarea
+
+
+area odblok
+        type            = obj_unblock
+        serv_type       = visual
+        obj_unblocked_type   = odblok
+endarea

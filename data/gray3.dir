@@ -1,0 +1,30 @@
+;旼컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴커
+;�                              GRAY 3 LEVEL                                  �
+;읕컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴켸
+
+area gray
+
+
+
+;area kop2st
+;    source = -flics\gray\kop2st.flc
+;    hires  =  gray\sprites\kop2st.sph
+;    lores  =  gray\sprites\kop2st.spl
+;    collis =  gray\sprites\kop2st.spc
+;  endarea
+
+;  area kop2ani
+;    source = -flics\gray\kop2ani.flc
+;    hires  =  gray\sprites\kop2ani.sph
+;    lores  =  gray\sprites\kop2ani.spl
+;    collis =  gray\sprites\kop2ani.spc
+;  endarea
+
+  area kop2en
+    source = -flics\gray\kop2en.flc
+    hires  =  gray\sprites\kop2en.sph
+    ;collis =  gray\sprites\kop2en.spc
+  endarea
+
+endarea
+

@@ -1,0 +1,125 @@
+;旼컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴커
+;�                              GREEN3 LEVEL                                  �
+;읕컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴켸
+
+area green
+
+;-------------------------------------------- LADUNKI WYSADZAJACE BAZE
+
+area 3load1
+    source = -flics\green\load1.flc
+    hires  =  green\sprites\load1.sph
+    collis =  green\sprites\load1.spc
+endarea
+
+area 3load2
+    source = -flics\green\load2.flc
+    hires  =  green\sprites\load2.sph
+    collis =  green\sprites\load2.spc
+endarea
+
+area 3load3
+    source = -flics\green\load3.flc
+    hires  =  green\sprites\load3.sph
+    collis =  green\sprites\load3.spc
+endarea
+
+area 3loadz
+    source = -flics\green\loadz.flc
+    hires  =  green\sprites\loadz.sph
+    collis =  green\sprites\loadz.spc
+endarea
+
+;-------------------------------------------- RADARY
+
+area 3antena1
+    source = -flics\green\ant1.flc
+    hires  =  green\sprites\ant1.sph
+    collis =  green\sprites\ant1.spc
+endarea
+
+area 3antena2
+    source = -flics\green\ant2.flc
+    hires  =  green\sprites\ant2.sph
+    collis =  green\sprites\ant2.spc
+endarea
+
+area 3antena_off
+    source = -flics\green\ant1s.flc
+    csource = -flics\green\ant1sk.flc
+    hires  =  green\sprites\ant1s.sph
+    collis =  green\sprites\ant1s.spc
+endarea
+
+area 3antena_on
+    source = -flics\green\ant1e.flc
+    csource = -flics\green\ant1ek.flc
+    hires  =  green\sprites\ant1e.sph
+    collis =  green\sprites\ant1e.spc
+endarea
+
+
+
+area 3sw_on
+    source = -flics\green\sw_on.flc
+    hires  =  green\sprites\sw_on.sph
+    collis =  green\sprites\sw_on.spc
+endarea
+
+area 3sw_off
+    source = -flics\green\sw_off.flc
+    hires  =  green\sprites\sw_off.sph
+    ;collis =  green\sprites\sw_off.spc
+endarea
+
+
+
+;--------------------------------------------- MURY DO BAZY
+area 3mur1
+    source = -flics\green\mur1.flc
+    csource = -flics\green\mur1k.flc
+    hires  =  green\sprites\mur1.sph
+    collis =  green\sprites\mur1.spc
+endarea
+
+area 3mur2
+    source = -flics\green\mur2.flc
+    csource = -flics\green\mur2k.flc
+    hires  =  green\sprites\mur2.sph
+    collis =  green\sprites\mur2.spc
+endarea
+
+area 3mur3
+    source = -flics\green\mur3.flc
+    csource = -flics\green\mur3k.flc
+    hires  =  green\sprites\mur3.sph
+    collis =  green\sprites\mur3.spc
+endarea
+
+area 3mur4
+    source = -flics\green\mur4.flc
+    csource = -flics\green\mur4k.flc
+    hires  =  green\sprites\mur4.sph
+    collis =  green\sprites\mur4.spc
+endarea
+
+area 3mur5
+    source = -flics\green\mur5.flc
+    csource = -flics\green\mur5k.flc
+    hires  =  green\sprites\mur5.sph
+    collis =  green\sprites\mur5.spc
+endarea
+
+area 3mur6
+    source = -flics\green\mur6.flc
+    csource = -flics\green\mur6k.flc
+    hires  =  green\sprites\mur6.sph
+    collis =  green\sprites\mur6.spc
+endarea
+
+area skala1
+    source = -flics\green\skala1.flc
+    hires  =  green\sprites\skala1.sph
+  endarea
+
+endarea

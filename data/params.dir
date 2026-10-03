@@ -1,0 +1,89 @@
+mainparams     = !global\main.tdf
+objectparams   = !global\object.tdf
+weather        = !global\weather.tdf
+title_descript = !global\title.tdf
+print_descript = !global\print.tdf
+syssetdefaults = !global\sysset.tdf
+level_descript = !global\missions.tdf
+set_parameters = !global\Params.tdf
+layout         = !global\Layout.tdf
+game_text      = !global\text.txt
+tools          = !global\tools.tdf
+demo           = !global\demo.tdf
+
+; OTHER FILES ----------------------------------------------------------------
+
+brown1_mission = brown\brown1m.tdf
+brown2_mission = brown\brown2m.tdf
+brown3_mission = brown\brown3m.tdf
+brown4_mission = brown\brown4m.tdf
+brown5_mission = brown\brown5m.tdf
+brown6_mission = brown\brown6m.tdf
+brown1_types   = brown\brown1t.tdf
+brown2_types   = brown\brown2t.tdf
+brown3_types   = brown\brown3t.tdf
+brown4_types   = brown\brown4t.tdf
+brown5_types   = brown\brown5t.tdf
+brown6_types   = brown\brown6t.tdf
+
+;test1_mission = test\test1m.tdf
+;test1_types   = test\test1t.tdf
+
+gray1_mission = gray\gray1m.tdf
+gray2_mission = gray\gray2m.tdf
+gray3_mission = gray\gray3m.tdf
+gray4_mission = gray\gray4m.tdf
+gray5_mission = gray\gray5m.tdf
+gray1_types   = gray\gray1t.tdf
+gray2_types   = gray\gray2t.tdf
+gray3_types   = gray\gray3t.tdf
+gray4_types   = gray\gray4t.tdf
+gray5_types   = gray\gray5t.tdf
+
+green1_mission = green\green1m.tdf
+green2_mission = green\green2m.tdf
+green3_mission = green\green3m.tdf
+green4_mission = green\green4m.tdf
+green5_mission = green\green5m.tdf
+green6_mission = green\green6m.tdf
+green1_types   = green\green1t.tdf
+green2_types   = green\green2t.tdf
+green3_types   = green\green3t.tdf
+green4_types   = green\green4t.tdf
+green5_types   = green\green5t.tdf
+green6_types   = green\green6t.tdf
+
+;violet1_mission = violet\violet1m.tdf
+;violet2_mission = violet\violet2m.tdf
+;violet3_mission = violet\violet3m.tdf
+;violet4_mission = violet\violet4m.tdf
+;violet5_mission = violet\violet5m.tdf
+;violet1_types   = violet\violet1t.tdf
+;violet2_types   = violet\violet2t.tdf
+;violet3_types   = violet\violet3t.tdf
+;violet4_types   = violet\violet4t.tdf
+;violet5_types   = violet\violet5t.tdf
+
+white1_mission = white\white1m.tdf
+white2_mission = white\white2m.tdf
+white3_mission = white\white3m.tdf
+white4_mission = white\white4m.tdf
+white5_mission = white\white5m.tdf
+white1_types   = white\white1t.tdf
+white2_types   = white\white2t.tdf
+white3_types   = white\white3t.tdf
+white4_types   = white\white4t.tdf
+white5_types   = white\white5t.tdf
+
+net1_mission = net\net1m.tdf
+net2_mission = net\net2m.tdf
+net3_mission = net\net3m.tdf
+net4_mission = net\net4m.tdf
+net5_mission = net\net5m.tdf
+net6_mission = net\net6m.tdf
+net1_types   = net\net1t.tdf
+net2_types   = net\net2t.tdf
+net3_types   = net\net3t.tdf
+net4_types   = net\net4t.tdf
+net5_types   = net\net5t.tdf
+net6_types   = net\net6t.tdf

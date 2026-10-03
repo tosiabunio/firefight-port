@@ -1,0 +1,175 @@
+;GLOBALS:
+area globals
+        x=42
+        y=14
+        glass_x=15
+        glass_y=0
+        glass_sx=50
+        glass_sy=148
+        sprite_x=10
+        sprite_y=150
+        box_tool=32,27,34,65             ;rgb,(power|rgb) narzedzie prostokata w menu
+        letter_in_tool=32,27,34,74       ;rgb,(power|rgb) narzedzie wnetrza literek w menu
+        letter_out_tool=0,0,0,50,42,53   ;rgb,(power|rgb) narzedzie zewnetrza literek w menu
+        between_y=4                      ;liczba piksli pomiedzy kolejnymi pozycjami menu w y
+        radio_button_between_y=4         ;liczba piksli pomiedzy kolejnymi pozycjami radiobuttona w y
+        zipper_length=4                  ;dlugowc suwaka
+        zipper_states=60                 ;liczba stanow suwaka
+        zipper_item_width=200            ;calkowita dlugosc itemu z suwakiem
+endarea
+
+;OPTIONS:
+area options
+        default=d
+        title_phase=1
+        definition
+          "s,d,d,0,-1" "DISPLAY"
+          "s,s,s,0,-1" "SOUND"
+          "s,c,c,0,-1" "CONTROLS"
+          "s,g,g,0,-1" "MISSION"
+          "s,q,q,0,-1" "^- GO BACK -"
+endarea
+;OPTIONS_SHORT:
+area options_short
+        default=d
+        title_phase=1
+        definition
+          "s,d,d,0,-1" "DISPLAY"
+          "s,s,s,0,-1" "SOUND"
+          "s,c,c,0,-1" "CONTROLS"
+          "s,e,e,0,-1" "EXIT TO LOADER"
+          "s,q,q,0,-1" "^- GO BACK -"
+endarea
+;GAME:
+area game
+        default=e
+        title_phase=1
+        definition
+          "s,e,e,0,-1" "EXIT TO LOADER"
+          "s,q,q,0,-1" "^- GO BACK -"
+endarea
+;IN_GAME_GAME:
+area in_game_game
+        default=e
+        title_phase=1
+        definition
+          "s,e,e,0,-1" "EXIT TO LOADER"
+          "s,a,a,0,-1" "ABORT MISSION"
+          "s,r,r,0,-1" "RESTART MISSION"
+          "s,q,q,0,-1" "^- GO BACK -"
+endarea
+;DISPLAY:
+area display
+        default=b
+        title_phase=2
+        definition
+          "z,b,b,0,-1" "-32,31,BRIGHTNESS"
+          "b,r,r,0,-1" "HIGH RESOLUTION"
+          "b,d,d,0,-1" "HIGH DETAILS"
+          "s,q,q,0,-1" "^- GO BACK -"
+endarea
+;SOUNDS:
+area sounds
+        default=s
+        title_phase=4
+        definition
+          "z,s,s,0,-1" "0,65535,SOUND VOLUME"
+          "z,m,m,0,-1" "0,65535,MUSIC VOLUME"
+          "s,q,q,0,-1" "^- GO BACK -"
+endarea
+;CONTROLS:
+area controls
+        default=t
+        title_phase=3
+        definition
+          "r,t,t,0,-1" "types"
+          "s,q,q,0,-1" "^- GO BACK -"
+       types
+          "keyboard"
+          "mouse"
+          "joystick"
+endarea
+;LAYOUT:
+area layout
+        default=l
+        title_phase=5
+        definition
+          "b,l,l,0,-1" "AUTOHIDE LIFE"
+          "b,a,a,0,-1" "AUTOHIDE AMMO"
+          "b,w,w,0,-1" "AUTOHIDE INVENTORY"
+          "b,r,r,0,-1" "HIDE RADAR"
+          "s,q,q,0,-1" "^- GO BACK -"
+endarea
+;DEBUG_MODE:
+area debug_mode
+        default=d
+        title_phase=7
+        definition
+          "s,d,d,0,-1" "__DUMMY__"
+endarea
+;IN_GAME_SECRET
+area in_game_secret
+        default=l
+        title_phase=7
+        definition
+          "s,l,l,0,-1" "RESTORE SHIELDS"
+          "s,e,e,0,-1" "FULL WEAPONRY"
+          "b,i,i,0,-1" "INVULNERABILITY"
+          "s,q,q,0,-1" "^- GO BACK -"
+endarea
+;GAME_QUIT:
+area game_quit
+        default=y
+        title_phase=8
+        definition
+          "s,y,y,0,-1" "EXIT TO LOADER"
+          "s,n,n,0,-1" "^- GO BACK -"
+endarea
+;IN_GAME_ABORT:
+area in_game_abort
+        default=y
+        title_phase=8
+        definition
+          "s,y,y,0,-1" "ABORT CURRENT MISSION"
+          "s,n,n,0,-1" "^- GO BACK -"
+endarea
+;IN_GAME_RESTART:
+area in_game_restart
+        default=y
+        title_phase=8
+        definition
+          "s,y,y,0,-1" "RESTART MISSION"
+          "s,n,n,0,-1" "^- GO BACK -"
+endarea
+;IN_GAME_PAUSE:
+area in_game_pause
+        default=d
+        title_phase=10
+        definition
+          "s,d,d,0,-1" "__DUMMY__"
+endarea
+;IN_GAME_HELP:
+area in_game_help
+        default=d
+        title_phase=11
+        definition
+          "s,d,d,0,-1" "__DUMMY__"
+endarea
+
+;HELP:
+area help
+  labels
+          "PAUSE" "PAUSE"
+          "HELP" "F1"
+          "CURRENT OBJECTIVE" "F2"
+          "NETWORK CHAT" "F3"
+          "NETWORK MESSAGE" "F4"
+          "SCREEN RESOLUTION" "F5"
+          "DETAIL LEVEL" "F6"
+          "DECREASE BRIGHTNESS" "F7"
+          "INCREASE BRIGHTNESS" "F8"
+          "RESTART MISSION" "F9"
+          "ABORT MISSION" "F10"
+          "CONTROL DEVICE" "F11"
+          "EXIT TO LOADER" "ALT+X"
+endarea

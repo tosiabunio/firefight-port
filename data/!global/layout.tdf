@@ -1,0 +1,98 @@
+
+
+area NetStatisctics
+   titleX      =    10     ;opis u gory x
+   titleY      =    10     ;opis u gory y
+
+   playerNAMEX =    10   ;napisy z playerami x imienia
+   playerLASTX =    100  ;napisy z playerami x imienia
+   playerSUMX  =    150  ;napisy z playerami x imienia
+   playerX     =    10
+   playerY     =    40   ;napisy z playerami y
+   playerH     =    18   ;szerokosc jednej linii
+
+   spriteX     =    66     ;sprajty z poziomami x
+   spriteY     =    175    ;sprajty z poziomami y
+   spriteW     =    2      ;szczelina miedzy sprajtami z poziomami
+
+   pointerW    =    12     ;szczelina miedzy sprajtami wsazowek
+   pointerX    =    20
+   pointery    =    145
+
+endarea
+
+area SingleStatisctics
+
+   levelx        = 5
+   levely        = 5
+   brickx        = 10
+   bricky        = 10
+   brickw        = 88
+
+   pointerx      = 90
+   pointery      = 30 ; zmienilem z 30 na 40
+
+   panelx        = 110
+   panely        = 10
+
+   statusX       = 110
+   statusY       = 30
+
+   textx         = 110
+   texty         = 80         ; zmienilem z 80 na 75
+
+   anim_speed    = 10
+   light1        = 100
+   light2        = 50
+   dark          = -40
+
+   ready          "*status: available"
+   completed      "*status: completed"
+   notcompleted   "*status: unavailable"
+
+   enemyx        = 110
+   enemyy        = 50
+   secretx       = 130
+   secrety       = 60
+   capsulex      = 120
+   capsuley      = 70
+
+   lineX          = 110
+   lineY          = 50
+
+
+;                  x      y    szer   wys
+   area single_panels
+     panel1 =      115,  11,   191,   20                     ;nazwa misji
+     panel2 =      115,  39,   191,   83                     ;opis misji (90)
+     panel3 =      115,  131,  191,   58,   50,    130,  61  ;statystyka
+     panel4 =      108,  7,    208,   189,                   ;najwieksz okno
+
+                ;najwiekszy (30) panele      dol paneli     paski pionowe do stat
+     tools  =      20,            -45,         -35,           40
+
+     title   = 16
+     margin  = 6
+     stripeX = 3
+     stripeY = 3
+     active_time=0.1
+   endarea
+
+;                  x      y    szer   wys
+
+   area net_panels
+     panel1 =      120,  7,    190,   20                     ;nazwa misji
+     panel2 =      120,  35,   190,  125,   90,    145,  45  ;statystyka
+     panel3 =       10,   7,   100,  180,   65,    140,   5  ;panel z obrazkiem
+     panel4 =      120,  169,  190,   18,  85,              ;panel z wersja gry
+
+                   ;panele  dol paneli  paski pionowe
+     tools  =      -45,-45,50,-45,80,55,100
+   endarea
+
+endarea
+
+
+area help            ;x         y      w      h         tool
+    panel  =        65,         0,    245,   148,       -45
+endarea

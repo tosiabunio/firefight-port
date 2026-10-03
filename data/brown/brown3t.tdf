@@ -1,0 +1,152 @@
+;=====================================================================
+;
+;                              NET TYPY 1
+;
+;=====================================================================
+
+
+;---------------------------------------- STATKI
+
+
+
+;---------------------------------------- DESTROY
+area upgrade
+        type = obj_capsule
+        range = 30
+endarea
+
+area wiatrak
+  type = obj_destroy
+  life = medium_shields
+  range = 60
+  smoke = 1
+  explode =1
+  ch_sprite = wiatrakd
+  frame_delay = 0.05
+  action = enable_after
+  morph =1
+endarea
+
+area kompresor
+  type = obj_destroy
+  life = medium_shields
+  range = 60
+  explode =1
+  ch_sprite = blow1d
+  action = enable_after
+  frame_delay = 0.05
+  morph =1
+endarea
+
+area elektrownia
+  type = obj_destroy
+  life = medium_shields
+  range = 60
+  explode=1
+  ch_sprite = 3elektrowniad
+  action = enable_after
+  frame_delay = 0.05
+  morph =1
+endarea
+
+area obj_rakieta_2
+  type=obj_mycannon
+  appear_level= 1
+  cannon_type = 1
+  angle = 360
+endarea
+
+
+area obj_rakieta_3
+  type=obj_mycannon
+  appear_level= 2
+  cannon_type = 1
+  angle = 360
+endarea
+
+area obj_rakieta_4
+  type=obj_mycannon
+  appear_level= 3
+  cannon_type = 1
+  angle = 360
+endarea
+
+area obj_rakieta_5
+  type=obj_mycannon
+  appear_level= 4
+  cannon_type = 1
+  angle = 360
+endarea
+
+area obj_laser_2
+  type=obj_mycannon
+  appear_level= 1
+  cannon_type = 2
+  angle = 360
+endarea
+
+
+area obj_laser_3
+  type=obj_mycannon
+  appear_level= 2
+  cannon_type = 2
+  angle = 360
+endarea
+
+area obj_laser_4
+  type=obj_mycannon
+  appear_level= 3
+  cannon_type = 2
+  angle = 360
+endarea
+
+area obj_laser_5
+  type=obj_mycannon
+  appear_level= 5
+  cannon_type = 2
+  angle = 360
+endarea
+
+area bar
+  type = obj_destroy
+  life = low_shields
+  range = 60
+  ch_sprite = bardest
+  anim_sprite = barani
+  frame_delay = 0.05
+  action = enable_after
+  explode_sample= bar
+endarea
+
+;---------------------------------------- BRONIE & LOTNISKA
+
+area landplace
+        type          = landplaceA
+endarea
+
+area lotniskoA
+        type          = landplaceA
+endarea
+
+area lotniskoB
+        type           = landplaceB
+endarea
+
+area lotniskoC
+        type           = landplaceB
+endarea
+
+area lotniskoD
+        type           = landplaceB
+endarea
+
+area Bronie
+        type           = obj_capsule
+        range          = 30
+endarea
+
+area odblok
+        type            = obj_unblock
+        serv_type       = visual
+        unblocked_type   = odblok
+endarea

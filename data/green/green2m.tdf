@@ -1,0 +1,210 @@
+dx=4096
+dy=4096
+  weather = smoke_above
+
+  CheckPoints
+
+  "Enable_Antena1"
+  "Enable_Antena2"
+  "Enable_Antena3"
+  "Enable_Antena4"
+  "Enable_Antena5"
+  "Antena_Enabled"
+  "Teleport"
+  "Destroy_Base1"
+  "Destroy_Base2"
+  "Destroy_Base3"
+  "Destroy_Base4"
+  "Landing"
+
+
+;============================================================================
+
+
+
+area Enable_Antena1
+        type         "obj_collect1"
+                     "destroy_bunkier1"
+
+        count       = 2
+        radar       = 1
+        OBJ_TEXT "green_2_1"
+        DISPL_TEXT
+        "green_2_1_1" "green_2_1_1" "RILEY"
+        HANDLE "DESTROY_OBJ antena_active1"
+endarea
+
+area Enable_Antena2
+        type         "obj_collect2"
+                     "destroy_bunkier2"
+
+        count       = 2
+        radar       = 1
+        OBJ_TEXT "green_2_2"
+        DISPL_TEXT
+        "green_2_2_1" "green_2_2_1" "JAXON"
+        "green_2_2_2" "green_2_2_2" "RILEY"
+        HANDLE "DESTROY_OBJ antena_active2"
+endarea
+
+area Enable_Antena3
+        type         "obj_collect3"
+                     "destroy_bunkier3"
+
+        count       = 2
+        radar       = 1
+        OBJ_TEXT "green_2_3"
+        DISPL_TEXT
+        "green_2_3_1" "green_2_3_1" "JAXON"
+        "green_2_3_2" "green_2_3_2" "RILEY"
+        HANDLE "DESTROY_OBJ antena_active3"
+endarea
+
+area Enable_Antena4
+        type          "obj_collect4"
+                      "destroy_bunkier4"
+
+        count       = 2
+        radar       = 1
+        OBJ_TEXT "green_2_4"
+        DISPL_TEXT
+        "green_2_4_1" "green_2_4_1" "JAXON"
+        "green_2_4_2" "green_2_4_2" "JAXON"
+        "green_2_4_3" "green_2_4_3" "JAXON"
+        "green_2_4_4" "green_2_4_4" "STACY"
+        "green_2_4_5" "green_2_4_5" "RILEY"
+        "green_2_4_6" "green_2_4_6" "RILEY"
+        HANDLE "DESTROY_OBJ antena_active4"
+endarea
+
+area Enable_Antena5
+        type          "obj_collect5"
+                      "destroy_bunkier5"
+        count       = 2
+        radar       = 1
+        HANDLE "DESTROY_OBJ antena_active5"
+        OBJ_TEXT "green_2_5"
+        DISPL_TEXT
+        "green_2_5_1" "green_2_5_1" "JAXON"
+        "green_2_5_2" "green_2_5_2" "JAXON"
+        "green_2_5_3" "green_2_5_3" "RILEY"
+        "green_2_5_4" "green_2_5_4" "RILEY"
+        "green_2_5_5" "green_2_5_5" "RILEY"
+        "green_2_5_6" "green_2_5_6" "JAXON"
+endarea
+
+;-------------------------------------------- uaktywnienie wszystkich anten
+;-------------------------------------------- powoduje zniszczenie murow
+;-------------------------------------------- na srodku levelu
+
+area Antena_Enabled
+
+        TYPE   "antena_active1"
+               "antena_active2"
+               "antena_active3"
+               "antena_active4"
+               "antena_active5"
+
+        count       = ALL
+        radar       = 0
+        shake_screen = 1
+
+        OBJ_TEXT "green_2_6"
+
+        HANDLE "DOOR mur1"
+               "DOOR mur2"
+               "DOOR mur3"
+               "DOOR mur4"
+               "DOOR mur5"
+               "DOOR mur6"
+               "DESTROY_OBJ load1"
+endarea
+
+area Teleport
+
+    type            = marker1
+    count           = 1
+    radar           = 1
+    quit            = FALSE
+    OBJ_TEXT "green_2_6"
+    DISPL_TEXT
+        "green_2_6_1" "green_2_6_1" "STACY"
+        "green_2_6_2" "green_2_6_2" "STACY"
+endarea
+
+
+;--------------------------------------- PIERWSZA WIEZA
+;--------------------------------------- od gory  - po lewej
+
+area Destroy_Base1
+        type        = destroy_wieza1
+        count       = ALL
+        radar       = 1
+        OBJ_TEXT "green_2_7"
+        DISPL_TEXT
+        "green_2_7_1" "green_2_7_1" "RILEY"
+        "green_2_7_2" "green_2_7_2" "JAXON"
+        "green_2_7_3" "green_2_7_3" "RILEY"
+endarea
+
+;--------------------------------------- DRUGA WIEZA
+;--------------------------------------- od gory  - po prawej
+
+area Destroy_Base2
+        type        = destroy_wieza2
+        count       = ALL
+        radar       = 1
+        OBJ_TEXT "green_2_8"
+        DISPL_TEXT
+        "green_2_8_1" "green_2_8_1" "STACY"
+        "green_2_8_2" "green_2_8_2" "JAXON"
+endarea
+
+
+;--------------------------------------- PLASKI ZE SRODKIEM
+;--------------------------------------- ten miedzy murami
+
+
+area Destroy_Base3
+        type        = destroy_srodek1
+        count       = ALL
+        radar       = 1
+        OBJ_TEXT "green_2_9"
+        DISPL_TEXT
+        "green_2_9_1" "green_2_9_1" "RILEY"
+        "green_2_9_2" "green_2_9_2" "STACY"
+        "green_2_9_3" "green_2_9_3" "STACY"
+        "green_2_9_4" "green_2_9_4" "RILEY"
+endarea
+
+
+;--------------------------------------- PLASKI ZE SRODKIEM
+;--------------------------------------- ten na dole
+
+
+area Destroy_Base4
+        type        = destroy_srodek2
+        count       = ALL
+        radar       = 1
+        OBJ_TEXT "green_2_10"
+        DISPL_TEXT
+        "green_2_10_1" "green_2_10_1" "JAXON"
+        "green_2_10_2" "green_2_10_2" "JAXON"
+        "green_2_10_3" "green_2_10_3" "RILEY"
+        "green_2_10_4" "green_2_10_4" "RILEY"
+endarea
+
+area Landing
+
+    type            = landplaceA
+    count           = 1
+    radar           = 1
+    enable_action "bronie1"
+    quit            = TRUE
+    OBJ_TEXT "green_2_11"
+    DISPL_TEXT
+        "green_2_11_1" "green_2_11_1" "STACY"
+        "green_2_11_2" "green_2_11_2" "JAXON"
+        "green_2_11_3" "green_2_11_3" "RILEY"
+        "green_2_11_4" "green_2_11_4" "RILEY"
+endarea

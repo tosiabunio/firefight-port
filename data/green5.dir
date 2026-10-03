@@ -1,0 +1,30 @@
+;旼컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴커
+;�                              GREEN5 LEVEL                                  �
+;읕컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴켸
+area green
+
+  area brick                                ; paczki do sieci
+    source = -flics\green\energy.flc
+    hires  =  green\sprites\energy.sph
+    collis =  green\sprites\energy.spc
+  endarea
+
+  area base                               ; baza do sieci
+    source = -flics\green\base.flc
+    hires  =  green\sprites\base.sph
+   csource = -flics\green\base_k.flc
+    collis =  green\sprites\base.spc
+  endarea
+
+  area gunbase                             ; podstawka dziala sieciowego
+    source = -flics\green\gunbase.flc
+    hires  =  green\sprites\gunbase.sph
+  endarea
+
+  area dzialo_podstawa
+    source = -flics\green\dzialk1p.flc
+    hires  =  green\sprites\dzialk1p.sph
+    ;collis =  green\sprites\dzialk1p.spc
+  endarea
+
+endarea

@@ -1,0 +1,71 @@
+Missions_order:
+
+  green6                     ;2
+  brown2                     ;4
+  green1                     ;3
+  white1                     ;7
+  brown4                     ;6
+  gray1                      ;4
+  white2                     ;5
+  green4                     ;6
+  net3                       ;8
+  white4                     ;7
+  green2                     ;3
+  brown1                     ;2
+  green3                     ;6
+  gray3                      ;5
+  net5                       ;8
+  brown6                     ;4
+  gray2                      ;7
+  brown5                     ;2
+
+Net_order:
+  net1
+  net2
+  brown3
+  green5
+  net4
+  gray4
+
+
+Net_ident:
+  0x01
+  0x02
+  0x04
+  0x08
+  0x10
+  0x20
+
+
+
+headersong   =  1
+footersong   =  6
+
+songs
+      "2"   ;1
+      "4"   ;2
+      "3"   ;3
+      "7"   ;4
+      "6"   ;5
+      "4"   ;6
+      "5"   ;7
+      "6"   ;8
+      "8"   ;9
+      "7"   ;10
+      "3"   ;11
+      "2"   ;12
+      "6"   ;13
+      "5"   ;14
+      "8"   ;15
+      "4"   ;16
+      "7"   ;17
+      "5"   ;18
+
+netsongs
+      "4"   ;1
+      "6"   ;2
+      "8"   ;3
+      "2"   ;4
+      "5"   ;5
+      "7"   ;6
+

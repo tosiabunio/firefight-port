@@ -1,0 +1,12 @@
+# Source and docs: normalise line endings (LF in the repo, native on checkout).
+* text=auto
+
+# Original game data must stay byte-identical: CP852 text with CRLF, plus binaries.
+# The in-game fonts index glyphs by byte value, so never convert these.
+data/** -text
+
+*.flac binary
+*.flc  binary
+*.wav  binary
+*.rec  binary
+*.ico  binary

@@ -1,0 +1,95 @@
+;------------------------------------------------------
+area upgrade
+        type = obj_capsule
+        range = 30
+endarea
+
+area loteryjka
+  type = obj_capsule
+  range = 30
+endarea
+
+area lotniskoA
+        type = landplaceA
+        range = 300
+endarea
+
+area door2city5
+        type = door_01
+        delay = 0
+        open = 0
+endarea
+
+area zapora
+        type = door_02
+        delay = 9999999999
+        open = 1
+endarea
+
+area wiatrak
+  type = obj_destroy
+  life = medium_shields
+  range = 60
+  smoke = 1
+  explode =1
+  ch_sprite = wiatrakd
+  frame_delay = 0.05
+  action = enable_after
+  morph =1
+endarea
+
+area unblock
+  type = obj_unblock
+  serv_type = visual
+  unblocked_type = unblock
+endarea
+
+area unblock2
+  type = obj_unblock
+  serv_type = visual
+  unblocked_type = unblock
+endarea
+
+area unblock3
+  type = obj_unblock
+  serv_type = visual
+  unblocked_type = unblock
+endarea
+
+area kompresor
+  type = obj_destroy
+  life = medium_shields
+  range = 60
+  explode =1
+  ch_sprite = blow1d
+  action = enable_after
+  frame_delay = 0.05
+  morph =1
+endarea
+
+area bar
+  type = obj_destroy
+  life = low_shields
+  range = 60
+  ch_sprite = bardest
+  anim_sprite = barani
+  frame_delay = 0.05
+  action = enable_after
+  explode_sample= bar
+endarea
+
+area dest_1
+  type = obj_destroy
+  life = immortal
+  range = 60
+  frame_delay = 0.05
+  action = disable_after
+endarea
+
+area dest_2
+  type = obj_destroy
+  life = immortal
+  range = 60
+  frame_delay = 0.05
+  action = disable_after
+endarea

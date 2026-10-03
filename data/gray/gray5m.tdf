@@ -1,0 +1,50 @@
+  dx=4096
+  dy=4096
+  weather = smoke_above
+
+  CheckPoints
+     "DestroyAircraft"
+     "landingA"
+
+  Bonus
+     "drzwi1"
+     "drzwi2"
+     "drzwi3"
+ ;==================================================================================================
+
+  area landingA
+    event       =landing
+    type        =landplaceA
+    count       =1
+    quit        =TRUE
+  endarea
+
+  area DestroyAircraft
+    event       =destroy
+    type        =destroy_7
+    count       =14
+;    DISPL_TEXT  "AIRCRAFTS DESTROYED"
+  endarea
+
+  area drzwi1
+        event       = ON
+        type        = red_switch
+        count       = 1
+        nodelete    = true
+;        DISPL_TEXT  "DOOR OPEN"
+ endarea
+ area drzwi2
+        event       = ON
+        type        = neutral_switch
+        count       = 1
+        nodelete    = true
+;        DISPL_TEXT  "DOOR OPEN"
+ endarea
+ area drzwi3
+        event       =ON
+        type        = green_switch
+        count       = 1
+        nodelete    = true
+ ;       DISPL_TEXT  "DOOR OPEN"
+ endarea
+

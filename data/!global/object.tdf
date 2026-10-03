@@ -1,0 +1,535 @@
+;Defaultowe parametry rozpoznawane przez konstruktory obiektow:
+
+;area myobject
+;       speed = <int literal>                  ;piksle/sek
+;       max_speed = <int literal>              ;piksle/sek
+;       strafe_speed = <int literal>           ;piksle/sek
+;       accel_pwr = <floating literal>         ;mnoznik(zwielokrotnienie)/sek
+;       brake_pwr= <float literal>             ;mnoznik/sek
+;       auto_pwr = <float literal>             ;mnoznik/sek
+;       destroy = <int literal>                ;Losie
+;       life = <int literal>                   ;Losie
+;       turn_speed = <float literal>           ;obroty/sek
+;       dirs = <int literal>                   ;liczba kierunkowm (liczba faz sprita)
+;       climb_speed = <int literal>            ;piksle/sek
+;endarea
+
+;UWAGA1: wszystkie etykiety nie sa konieczne. W przypadku braku
+;tychze zostana przyjete wartosci domyslne (przewaznie 0).
+;UWAGA2: (zasada ogolna) wszelki czas jest podawany w sekundach, wszelkie predkosci
+;liniowe sa podawane w pikslach na sekunde; predkosci obrotowe sa podwwane w obrotach/sek
+;zycie, wytrzymalosc itp. sa podawane w Grzeniach lub Losiach (1 Grzen == 1 Los)
+;tak, ze wzajemne relacje pomiedzy nimi sa zachowane (rakieta o sile 100 zjada
+;100 z dowolnego zycia) i to bez znaczenia czy sa to obiekty nasze czy obce.
+
+area myship
+        turbomaxspeed=400           ;predkosc maksymalna w trybie turbo
+        turbostrafespeed=200        ;predkosc maksymalna strafe'a w trybie turbo
+        turboturnspeed=0.8          ;predkosc maksymalna obrotu w trybie turbo
+        accel_pwr=500
+        brake_pwr=3
+        auto_pwr=1.5
+        climb_speed=50
+        destroy=0
+        life=20000
+        flashtime=0.4               ;czas podswietlania po kolizji ze strzalem
+        cloaktime=30                ;czas zakloakowania
+        shieldtime=45               ;czas trwania oslony
+        colsndspeed=100             ;predkosc powyzej ktorej grana jest probka kolizji ze sciana
+        destroycolspeed=325         ;predkosc, po ktorej uzera energii
+        destroycolamount=2          ;ilosc uzeranej energii po zderzeniu ze sciana
+endarea
+
+area dispinfo
+        begcolor=233               ;kolor poczatkowy
+        colors=12                  ;liczba kolorkow
+        orgx=0                     ;origin wskaznikow
+        orgy=0                     ;origin wskaznikow
+        weapx=8                    ;pozycja wsk. weaponary
+        weapy=4                    ;pozycja wsk. weaponary
+        weapsx=15                  ;rozmiary prostok. weaponary
+        weapsy=8                   ;rozmiary prostok. weaponary
+        weapinrectx=8              ;pozycja liczby w prostok. weaponary
+        weapinrecty=1              ;pozycja liczby w prostok. weaponary
+        weapspacex=2               ;odstep w x pomiedzy prostok. weaponary
+        lifex=124                  ;poczatek wskaznika zycia
+        lifey=4                    ;poczatek wskaznika zycia
+        marginx=1                  ;marginesy we wskazniku zycia
+        marginy=1                  ;marginesy we wskazniku zycia
+        liferectsx=2               ;rozmiary pojedynczego paseczka
+        liferectsy=6               ;rozmiary pojedynczego paseczka
+        liferectspacex=1           ;odstepy pomiedzy wskazniczkami
+        invx=213                   ;pozycja inventory
+        invy=4                     ;pozycja inventory
+        invsx=100                  ;rozmiar paska inventory
+        invsy=8                    ;rozmiar paska inventory
+        invinrectx=50              ;pozycja tekstu w inventory
+        invinrecty=2               ;pozycja tekstu w inventory
+endarea
+
+area rebeliant
+        time=5                     ;odstepy miedzy niszczeniem (statku od srodka)
+        power=11                   ;sila niszczaca
+endarea
+
+area fade
+        fadetime=0.6               ;czas znikania ekranu
+        texty=20                   ;pozycja y tekstu na fadzie
+endarea
+
+area user
+        lifeupgramount=10        ;liczba jednostek dodanych do energii po czasie lifeupgrtime
+        lifeupgrtime=15          ;czas samoistnego zwiekszenia energii
+endarea
+
+area inventory
+        maxmine=30               ;pojemnosc inventory na miny
+        maxgoldeneye=5           ;pojemnosc inventory na goldeneye
+        descript                 ;opis inventory
+          "INVENTORY EMPTY"
+          "SHIELD RESTORE"
+          "CLOAKING DEVICE"
+          "DOUBLED SHIELD"
+          "MINE (%d)"
+          "EM-SHOCK (%d)"
+endarea
+
+area scrcatch
+        max_speed=50
+        radius=76                ;promien okregu, po ktorym jezdzi statek wzgledem ekranu
+endarea
+
+area capsule
+       wpn1_min=112,8            ;faza poczatkowa, liczba faz
+       wpn2_min=120,8
+       wpn3_min=128,8
+       wpn4_min=136,8
+       wpn5_min=144,8
+       wpn6_min=152,8
+       wpn1_med=56,8
+       wpn2_med=64,8
+       wpn3_med=72,8
+       wpn4_med=80,8
+       wpn5_med=88,8
+       wpn6_med=96,8
+       wpn1_max=0,8
+       wpn2_max=8,8
+       wpn3_max=16,8
+       wpn4_max=24,8
+       wpn5_max=32,8
+       wpn6_max=40,8
+       life_min=160,8
+       life_med=104,8
+       life_max=48,8
+       medikit=168,8
+       immortal=184,8
+       cloak=176,8
+       camera=192,8
+       satview=200,8
+       netmine=208,8
+       goldeneye=216,8
+       chaos=224,16
+endarea
+
+area mybomb
+        lifetime=1.5             ;czas zycia iskierek
+        size=50                  ;liczba iskierek (nie wiecej niz 69)
+        radius=350               ;promien obrazowania bomby
+        power=800                ;sila zabijania
+        shaketime=1              ;czas trzesienia ekranem po wybuchu
+endarea
+
+area weapon
+       alienangle=30             ;kat naprowadzania wiezyczki na statki (w stopniach, max. 360)
+       alienrange=200            ;zasieg naprowadzania wiezyczki na statki
+       destroyangle=30           ;kat naprowadzania wiezyczki na obiekty destroy (w stopniach, max. 360)
+       destroyrange=200          ;zasieg naprowadzania wiezyczki na obiekty destroy
+       morphphases=6             ;liczba faz morfowania wiezyczki
+       weap1_auto=2,3,4,5,1   ;3,1,2,1        ;bronie na jakie ma sie zmieniac automatycznie
+       weap2_auto=1,3,4,5,2   ;3,1,2
+       weap3_auto=2,1,4,5,3   ;1,2,3
+       weap4_auto=3,2,1,5,4   ;3,1,2,4
+       weap5_auto=4,3,2,1,5   ;3,1,2,5
+       weap6_auto=5,4,3,2,1,6 ;3,1,2,6
+endarea
+
+area mysplash
+       max_speed=500
+       speed=500
+       lifetime=2                ;czas zycia
+endarea
+
+area myswarmer
+        max_speed=350
+        speed=180
+        accel_pwr=500
+        lifetime=2.5             ;czas zycia swarmera
+        inittime=0.5             ;czas swobodnego lotu po starcie
+        startdangle=80           ;kat rozrzutu przy startcie
+        transangle=100           ;maksymalny kat o jaki swarmer moze sie obrocic pzry namierzeniu celu
+endarea
+
+area mylaser
+        speed=300
+        max_speed=320
+        accel_pwr=2000
+        framedelay=0.01          ;do wydupczenia
+        lifetime=2               ;czas zycia
+endarea
+
+area myrocket
+        max_speed=350
+        speed=250
+        accel_pwr=200
+        turn_speed=0.5
+        idletime=0.20            ;czas lecenia prosto
+        lifetime=1.5             ;calkowity czas zycia
+        alienangle=140           ;kat naprowadzania rakiety na statki (w stopniach, max. 360)
+        alienrange=320           ;zasieg naprowadzania rakiety na statki
+        destroyangle=140         ;kat naprowadzania rakiety na obiekty destroy (w stopniach, max. 360)
+        destroyrange=320         ;zasieg naprowadzania rakiety na obiekty destroy
+endarea
+
+area mybomb
+endarea
+
+area coca
+  area shoot
+       max_speed = 150
+       speed     = 100
+       accel_pwr = 600
+       destroy   = 10           ;nie wazne
+       turn_speed = 0.3
+    endarea
+
+endarea
+
+area taran
+        max_speed=280           ;maxsymalna predkosc
+        accel_pwr=650
+        brake_pwr=3
+        destroy=20
+        life=200
+        flytime=0.3             ;czas swobodnego lotu pomiedzy atakami
+        attacktime=1            ;czas ataku
+        lifetime=6              ;czas zycia po wypuszczeniu przez mbossa4
+        climb_speed=100         ;szybkosc strtu po aktywacji
+endarea
+
+area simple1
+        max_speed=100           ;[60]
+        accel_pwr=650
+        brake_pwr=3
+        destroy=10
+        life=200                ;[350]
+        climb_speed=100         ;szybkosc strtu po aktywacji
+        shoottime=1             ;czas srzelania
+
+     area shoot
+         destroy=30
+     endarea
+
+     ;nie zmieniac
+        approx=180
+        targettime=0.7
+endarea
+
+area simple2
+        max_speed=100           ;[60]
+        accel_pwr=650
+        turn_speed=0.8
+        destroy=10              ;[350]
+        life=250
+        climb_speed=100         ;szybkosc strtu po aktywacji
+        shoottime=1.5           ;czas srzelania
+
+     area shoot
+        destroy = 50
+        speed =200
+     endarea
+endarea
+
+area mboss1
+        max_speed=200
+        accel_pwr=650
+        brake_pwr=3
+        climb_speed=200
+        destroy=0
+        life=1500
+        dirs=16
+
+        SHOOTTIME=3      ;czas ataku mboss'a
+        FLYTIME=3        ;czas latania mboss'a
+        SHOOTFRQ=0.5     ;co ile klatek strzal
+
+     area shoot
+        destroy=50
+        speed=200
+     endarea
+
+        ;nie zmieniac
+        APROXPOINT=200     ;parametry zwiazane z lataniem
+        TARGETTIME=2     ;           ''
+endarea
+
+
+area mboss2
+        max_speed=150
+        accel_pwr=180
+        brake_pwr=3
+        climb_speed=200
+        destroy=0
+        life=1500
+        dirs=16
+
+        FLYTIME=2          ;czas latania
+        SHOOTCOUNT=4       ;ilosc strzalow
+        SHOOTFRQ=1         ;czestosc strzalow
+        area rocket
+          max_speed=230
+          accel_pwr=500
+          brake_pwr=3
+          destroy=150
+          speed=200
+        endarea
+
+        ;nie zmieniac
+        APROXPOINT=200;
+        TTIME=2
+        WALLCOLIS=0.7
+endarea
+
+area mboss3
+        max_speed=200
+        accel_pwr=650
+        brake_pwr=3
+        climb_speed=200
+        destroy=10
+        life=1500
+        dirs=16
+
+        FLYTIME=3      ;czas latania
+        SHOOTTIME=2    ;czas ataku
+        SHOOTFRQ=0.5
+    area shoot
+       destroy=150
+       speed=300
+    endarea
+
+        ;nie zmieniac
+        WALLCOLIS=0.7
+        TTIME=2
+        APROXPOINT=200
+endarea
+
+area mboss4
+        max_speed=80
+        accel_pwr=650
+        brake_pwr=3
+        climb_speed=50
+        destroy=0
+        life=15000
+
+        FLYTIME=2        ;czas latania
+        SHOOTTIME=2      ;czas strzelania
+        SHOOTFRQ=2
+        dirs=16
+
+     area shoot
+       timelife=4
+     endarea
+
+        ;nie zmieniac
+        TTIME=2;
+        APROXPOINT=200;
+endarea
+
+area landplace
+        landdistance=40         ;odleglosc w jakiej chwytane sa statki
+        landspeed=50            ;minimalna predkosc statku, przy ktorej moze ladowac
+        landtime=0              ;czas pozostawania na lotnisku statku
+        radardistance=2000      ;zasieg widocznosci lotniska na radarze
+endarea
+
+area teleport
+        startdistance=25        ;odleglosc od srodka teleportu przy ktorej wciaga
+        inusedistance=35        ;odleglosc przy ktorej teleport jest zajety przez wyteleportowany statek
+endarea
+
+area RocketCannon
+     SHOOTFRQ=0.8               ;czestosc strzelania (t+rand(t))
+     TURNSPEED=1.0              ;predkosc obrotu dziala
+     area Cannon_rocket
+        max_speed=120
+        speed=120
+        accel_pwr=400
+        destroy=400             ;sila niszczenia
+     endarea
+endarea
+
+area CannonRocket
+    max_speed=180
+    speed=100
+    accel_pwr=400
+endarea
+
+
+area brick
+  max_speed=350
+  brake_pwr=1
+  auto_pwr =1
+endarea
+
+
+area CannonSplash
+  max_speed=300
+  speed=300
+  frq=0.2
+endarea
+
+area NetCannon1
+  power   = 10
+  passive = 2
+  active  = 0.5
+endarea
+
+area NetCannon2
+  power   = 50
+  passive = 1
+  active  = 0.5
+endarea
+
+area Objective
+  time     =20
+  downjust =196
+endarea
+
+area MINE
+  max_speed=50
+  speed =0
+  accel_pwr=100
+  auto_pwr = 1.8
+  destroy=100
+  life=50
+  turn_speed=0.5
+  non_active = 3
+endarea
+
+area MYMINE
+ range = 100
+endarea
+
+MAGNESZEROPWR=300             ;sila przyciagania przy magnesie
+MAGNESEDGEPWR=30              ;sila przyciagania na brzegu
+MAGNESLIFE=100                ;zywotnosc magnesu
+
+BOMBSPEED=350                 ;poczatkowa predkosc bomby
+BOMBBRAKE=2                   ;hamulec bomby
+BOMBPOWER=600                 ;sila niszczenia
+BOMBTIME=2000                 ;czas po jakim sie uaktywnia
+SHOTGUNCHPOWER= 1
+
+MINE_LIFE=200                  ;zycie miny(pozniej wybucha)
+
+EXPLTIME=60
+
+
+area destroy_smoke
+ frq  = 0.1
+ aap  = 10
+ disp_phases = 12
+ time_change = 140
+endarea
+
+area destroy
+ morph_time=0.01
+endarea
+
+area base
+  baselife = 50
+  MAXBASELEVELBRICK=  10
+  MAXSHIPBRICK=     8
+  MAXLEVELBRICK=    70
+  MAXBASELEVEL =    5
+endarea
+
+area raft
+     speed      = 70
+     life       = 30
+     buoy_power = 30
+     buoy_life  = 30
+endarea
+
+area thief
+     speed       = 250
+     accel_pwr   = 1650
+     life        = 2000
+     destroy     = 12
+endarea
+
+area collect
+     time        = 2
+     speed       = 50
+     radius      = 25
+endarea
+
+area sounds
+     R1          = 250
+     R2          = 340
+     MIN_VOL     = 40
+     NETR1       = 300
+     NETR2       = 420
+     NETMIN_VOL  = 10
+endarea
+
+area header
+     frametime=2                ;czas trwania pojedynczej klatki
+     textspeed=15               ;predkosc przesuwu tekstu
+endarea
+
+area splinter
+     time        = 4
+     fall_time   = 2
+     pixels      = 2
+     speed1      = 4800
+     speed2      = 1500
+     speed3      = 700
+     max_speed=1000
+     strafe_speed=0
+     accel_pwr=1.2
+     brake_pwr=0.85
+     auto_pwr=0.98
+     speed=0
+endarea
+
+
+area bullet
+     max_speed=500
+     turn_speed=0.05
+endarea
+
+area morph
+     max_speed=280
+     strafe_speed=0
+     accel_pwr=1.2
+     brake_pwr=3
+     auto_pwr=0.98
+     speed=280
+endarea
+
+area smoke
+     max_speed=50
+     speed=30
+endarea
+
+area countdown
+     x      = 5
+     y      = 15
+     time1  = 1
+     time2  = 0.5
+     time3  = 0.25
+endarea
+
+area statistics
+        bonus = 10
+endarea

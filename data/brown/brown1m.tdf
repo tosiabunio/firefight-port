@@ -1,0 +1,145 @@
+  weather = rain4
+  dx=4096
+  dy=4096
+  radar =1
+
+  CheckPoints
+       "pomp1"
+       "dummy"
+       "wall01"
+       "destroy"
+       "collect"
+       "return"
+  Bonus
+       "teleport"
+       "ludek"
+       "hisship"
+       "drop"
+       "trader"
+       "radar_on"
+
+
+  area pomp1
+    type        = pomp1
+    count       = 2
+    radar       = 1
+    OBJ_TEXT "brown_1_1"
+    displ_text
+    "brown_1_1_1" "brown_1_1_1" "RILEY"
+    "brown_1_1_2" "brown_1_1_2" "JAXON"
+    handle       "destroy_obj dest_1"
+  endarea
+
+  area dummy
+    type        = unblock2
+    count       = 1
+    OBJ_TEXT    "brown_1_2"
+    radar       = 1
+  endarea
+
+  area wall01
+    type        = obj_aliend1
+    count       = 2
+    radar       = 1
+    OBJ_TEXT "brown_1_2"
+    displ_text
+    "brown_1_2_1" "brown_1_2_1" "RILEY"
+    enable_action "obj_alienm1"
+    handle       "destroy_obj dest_2"
+                 "destroy_obj dest_3"
+  endarea
+
+  area destroy
+    type        = pomp
+    count       = all
+    radar       = 1
+    OBJ_TEXT "brown_1_3"
+    displ_text
+    "brown_1_3_1" "brown_1_3_1" "RILEY"
+    "brown_1_3_2" "brown_1_3_2" "JAXON"
+    enable_action "obj_alienx1"
+                  "obj_collectpluton"
+                  "obj_teleport"
+                  "dest_4"
+    disable_action "river"
+  endarea
+
+  area collect
+    type        = obj_collectpluton
+    count       = all
+    radar       = 1
+    OBJ_TEXT "brown_1_4"
+    displ_text
+    "brown_1_4_1" "brown_1_4_1" "RILEY"
+    "brown_1_4_2" "brown_1_4_2" "STACY"
+  endarea
+
+  area return
+    type        = lotniskoA
+    count       = 1
+    radar       = 1
+    quit        = 1
+    enable_action "loteryjka"
+    OBJ_TEXT "brown_1_5"
+    displ_text
+    "brown_1_5_1" "brown_1_5_1" "JAXON"
+    "brown_1_5_2" "brown_1_5_2" "RILEY"
+    "brown_1_5_3" "brown_1_5_3" "RILEY"
+    "brown_1_5_4" "brown_1_5_4" "RILEY"
+  endarea
+;-------------------bonus--------------------------
+  area teleport
+    type        = door2city3
+    count       = 1
+    disable_action "obj_teleport"
+    set_radar   = 0
+  endarea
+
+  area ludek
+    type        = obj_collect
+    count       = 1
+    disable_action "door2city2"
+                   "door2city"
+;    obj_text "brown_1_A"
+    displ_text
+        "brown_1_A_1" "brown_1_A_1" "SHADOW"
+        "brown_1_A_2" "brown_1_A_2" "SHADOW"
+        "brown_1_A_3" "brown_1_A_3" "JAXON"
+  endarea
+
+  area hisship
+    type        = door2city5
+    count       = 1
+;    obj_text "brown_1_B"
+    displ_text
+        "brown_1_B_1" "brown_1_B_1" "SHADOW"
+  endarea
+
+  area drop
+    type        = obj_collectx1
+    radar       = 1
+    count       = 1
+    enable_action "unblock3"
+                  "door2city4"
+;    obj_text "brown_1_C"
+    displ_text
+        "brown_1_C_1" "brown_1_C_1" "SHADOW"
+        "brown_1_C_2" "brown_1_C_2" "SHADOW"
+  endarea
+
+  area trader
+    type        = obj_alien_ludek_1
+    count       = 1
+    enable_action "obj_teleport2"
+                  "upgradeSPEC"
+    displ_text
+        "brown_1_D_1" "brown_1_D_1" "JAXON"
+        "brown_1_D_2" "brown_1_D_2" "SHADOW"
+        "brown_1_D_3" "brown_1_D_3" "SHADOW"
+  endarea
+
+  area radar_on
+    type        = door2city4
+    count       = 1
+    set_radar   = 1
+  endarea

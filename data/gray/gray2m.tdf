@@ -1,0 +1,139 @@
+  dx=4096
+  dy=4096
+  weather = smoke_above
+
+  CheckPoints
+  "marker"
+  "land"
+
+  Bonus
+
+  "open_door_A"
+  "close_door_C"
+  "open_door_C"
+  "open_door_F"
+  "open_door_G"
+  "open_door_I"
+  "close_door_I"
+  "destroy_boss_I"
+  "open_door_H"
+  "open_door_L"
+  "open_door_S"
+
+ ;=========================================================================================
+
+ area open_door_A
+    type        = destroy2_A
+    count       = all
+;    DISPL_TEXT  "gray2_open_door_A" "short_silence" "BASE"
+    obj_text    "grey_2_1"
+    HANDLE      "DOOR A2_door"
+ endarea
+
+ area close_door_C
+    type        = C2_unlock
+    obj_text    "grey_2_1"
+    count       = 1
+;    DISPL_TEXT  "gray2_close_door_C" "short_silence" "BASE"
+    HANDLE      "DOOR C2_door"
+ endarea
+
+ area open_door_C
+    type        = destroy2_C
+    count       = all
+    obj_text    "grey_2_1"
+;    DISPL_TEXT  "gray2_open_door_C" "short_silence" "BASE"
+    HANDLE      "DOOR C2_door"
+ endarea
+
+ area open_door_F
+    type        = F2_unlock
+    count       = 1
+    obj_text    "grey_2_1"
+;    DISPL_TEXT  "gray2_open_door_F" "short_silence" "BASE"
+    HANDLE      "DOOR F2_door"
+ endarea
+
+ area open_door_G
+    type        = destroy2_G
+    count       = all
+    obj_text    "grey_2_1"
+;    DISPL_TEXT  "gray2_open_door_G" "short_silence" "BASE"
+    HANDLE      "DOOR G2_door"
+ endarea
+
+;--------------------------------------------------
+
+ area open_door_I
+    type        = I2_unlock
+    count       = 1
+    obj_text    "grey_2_1"
+;    DISPL_TEXT  "gray2_open_door_I" "short_silence" "BASE"
+    HANDLE      "DOOR I2_door"
+ endarea
+
+ area close_door_I
+    type        = I2_unlock1
+    count       = 1
+    obj_text    "grey_2_1"
+;    DISPL_TEXT  "gray2_close_door_I" "short_silence" "BASE"
+    HANDLE      "DOOR I2_door"
+
+ endarea
+
+ area destroy_boss_I
+    type        = obj_alien_IJ
+    count       = 1
+    obj_text    "grey_2_1"
+;    DISPL_TEXT  "gray2_destroy_boss_I" "short_silence" "BASE"
+    HANDLE      "DOOR I2_door"
+                "DOOR J2_door"
+                "DESTROY_OBJ destroy2_I"
+ endarea
+
+;----------------------------------------------------
+
+ area open_door_H
+    type        = destroy2_H
+    count       = all
+    obj_text    "grey_2_1"
+;    DISPL_TEXT "gray2_open_door_H" "short_silence" "BASE"
+    HANDLE      "DOOR H2_door"
+ endarea
+
+ area open_door_L
+    type        = destroy2_L
+    count       = all
+    obj_text    "grey_2_1"
+;    DISPL_TEXT "gray2_open_door_L" "short_silence" "BASE"
+    HANDLE      "DOOR L2_door"
+ endarea
+
+;-----------------------------------------------------
+
+ area open_door_S
+    type        = destroy2_S
+    count       = all
+    HANDLE      "DOOR S2_door"
+    obj_text    "grey_2_1"
+ endarea
+
+ area marker
+    type        = marker5
+    count       = 1
+    enable_action "bronie1"
+    obj_text    "grey_2_1"
+    DISPL_TEXT
+    "grey_2_1_1" "grey_2_1_1" "STACY"
+ endarea
+
+ area land
+    type        = landplaceA
+    count       = 1
+    radar       = 1
+    quit        = TRUE
+    obj_text    "grey_2_1"
+   ;obj_text "grey_2_1"
+    ;DISPL_TEXT
+    ;"grey_2_1_1" "short_silence" "STACY"
+ endarea

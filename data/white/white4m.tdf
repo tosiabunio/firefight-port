@@ -1,0 +1,193 @@
+dx=4096
+dy=4096
+  weather = snow1
+
+  CheckPoints
+     "statki_i_bronie1"
+     "statki_i_bronie2"
+     "pierwsza_baza"
+     "druga_baza"
+     "trzecia_baza"
+     "inzynier"
+     "do_bazy4"
+     "rozwal_baza4"
+     "rozwal_baza5"
+     "landing"
+
+   Bonus
+     "sekret1"
+     "sekret1a"
+     "sekret2"
+
+;======================================================
+
+  area statki_i_bronie1
+    radar       = 1
+    type        "odblok_bronie"
+    count       = 1
+    OBJ_TEXT "white_4_1"
+    DISPL_TEXT
+    "white_4_1_1" "white_4_1_1" "RILEY"
+    "white_4_1_2" "white_4_1_2" "JAXON"
+  endarea
+
+  area statki_i_bronie2
+    radar       = 1
+    type        "obj_alien4_bronie"
+    count       = ALL
+    HANDLE "DESTROY_OBJ kopulka4_bronie"
+    OBJ_TEXT "white_4_2"
+    DISPL_TEXT
+    "white_4_2_1" "white_4_2_1" "JAXON"
+    "white_4_2_2" "white_4_2_2" "RILEY"
+  endarea
+
+  area pierwsza_baza
+    radar       = 1
+    type        "wieza4_baza1"
+                "bunkier4_baza1"
+                "beczka4_baza1"
+                "obj_collect_load1"
+    count       = ALL
+    HANDLE "DESTROY_OBJ kopulka4_baza1"
+    OBJ_TEXT "white_4_3"
+    DISPL_TEXT
+    "white_4_3_1" "white_4_3_1" "RILEY"
+    "white_4_3_2" "white_4_3_2" "RILEY"
+  endarea
+
+  area druga_baza
+    radar       = 1
+    type        "wieza4_baza2"
+                "bunkier4_baza2"
+                "bunkier41_baza2"
+                "beczka4_baza2"
+                "obj_collect_load2"
+    count       = ALL
+    HANDLE "DESTROY_OBJ kopulka4_baza2"
+    OBJ_TEXT "white_4_4"
+    DISPL_TEXT
+    "white_4_4_1" "white_4_4_1" "RILEY"
+    "white_4_4_2" "white_4_4_2" "RILEY"
+  endarea
+
+  area trzecia_baza
+    radar       = 1
+    type        "wieza4_baza3"
+                "bunkier4_baza3"
+                "beczka4_baza3"
+                "obj_collect_load3"
+    count       = ALL
+    OBJ_TEXT "white_4_5"
+    DISPL_TEXT
+    "white_4_5_1" "white_4_5_1" "RILEY"
+    "white_4_5_2" "white_4_5_2" "RILEY"
+  endarea
+
+  area inzynier
+    radar       = 1
+
+    type        "bunkier4_inzynier"
+                "obj_collect_inzynier"
+    timer       = 45
+    count       = ALL
+    OBJ_TEXT "white_4_6"
+    DISPL_TEXT
+    "white_4_6_1" "white_4_6_1" "SHADOW"
+    "white_4_6_2" "white_4_6_2" "SHADOW"
+  endarea
+
+  area do_bazy4
+    radar       = 1
+
+    type        "odblok_baza4"
+    count       = 1
+    OBJ_TEXT "white_4_7"
+    DISPL_TEXT
+    "white_4_7_1" "white_4_7_1" "SHADOW"
+    "white_4_7_2" "white_4_7_2" "JAXON"
+    "white_4_7_3" "white_4_7_3" "SHADOW"
+    "white_4_7_4" "white_4_7_4" "SHADOW"
+    "white_4_7_5" "white_4_7_5" "JAXON"
+  endarea
+
+  area rozwal_baza4
+    radar        = 1
+    type         "landplace_baza4"
+    count        = ALL
+    shake_screen = 1
+    OBJ_TEXT "white_4_7"
+    HANDLE      "DESTROY_OBJ kwiatek_b4"
+                "DESTROY_OBJ big_flame_b4"
+                "DESTROY_OBJ medium_flame_b4"
+                "DESTROY_OBJ small_flame_b4"
+                "DESTROY_OBJ bunkier1_b4"
+                "DESTROY_OBJ bunkier2_b4"
+                "DESTROY_OBJ wieza1_b4"
+                "DESTROY_OBJ beczka1_b4"
+  endarea
+
+  area rozwal_baza5
+    radar        = 1
+    type         "landplace_baza5"
+    count        = ALL
+    quit_timer   = 1
+    shake_screen = 1
+    HANDLE      "DESTROY_OBJ kwiatek_b5"
+                "DESTROY_OBJ big_flame_b5"
+                "DESTROY_OBJ medium_flame_b5"
+                "DESTROY_OBJ small_flame_b5"
+                "DESTROY_OBJ bunkier1_b5"
+                "DESTROY_OBJ bunkier2_b4"
+                "DESTROY_OBJ wieza1_b5"
+                "DESTROY_OBJ beczka1_b5"
+    OBJ_TEXT "white_4_8"
+    DISPL_TEXT
+    "white_4_8_1" "white_4_8_1" "JAXON"
+    "white_4_8_2" "white_4_8_2" "SHADOW"
+  endarea
+
+;--------- sekret1
+
+  area sekret1
+    type        "obj_collect_sekret1"
+    count       = ALL
+    HANDLE "DESTROY_OBJ kwiatek_sekret1"
+    DISPL_TEXT
+    "white_4_A_1" "white_4_A_1" "STACY"
+    "white_4_A_2" "white_4_A_2" "STACY"
+  endarea
+
+  area sekret1a
+    type        "odblok_sekret1"
+    count       = 1
+    HANDLE "DESTROY_OBJ kopulka_sekret1"
+;    DISPL_TEXT "missing_event_text" "mission" "JAXON"
+  endarea
+
+;--------- sekret2
+
+  area sekret2
+    type        "obj_alien4_sekret2"
+    count       = ALL
+    HANDLE "DESTROY_OBJ kopulka_sekret2"
+;    DISPL_TEXT "missing_event_text" "mission" "JAXON"
+  endarea
+
+
+;--------- koniec
+
+  area landing
+    quit        = true
+    radar       = 1
+    type        = landplaceA
+    enable_action "bronie1"
+    count       = 1
+    OBJ_TEXT "white_4_9"
+    DISPL_TEXT
+    "white_4_9_1" "white_4_9_1" "SHADOW"
+    "white_4_9_2" "white_4_9_2" "SHADOW"
+    "white_4_9_3" "white_4_9_3" "JAXON"
+    "white_4_9_4" "white_4_9_4" "RILEY"
+    "white_4_9_5" "white_4_9_5" "RILEY"
+  endarea

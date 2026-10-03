@@ -1,0 +1,288 @@
+;旼컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴커
+;�                              GREEN LEVEL                                   �
+;읕컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴켸
+
+area green
+
+  source = green\green.def
+
+area palette
+  source = -flics\green\palette.flc
+  target = green\sprites\palette.spp
+endarea
+
+  ; LEVEL SPRITES --------------------------------------------------------------
+
+  area plk_5
+    source = -flics\green\plk_5.flc
+    hires  =  green\sprites\plk_5.sph
+  endarea
+
+  area plk_51
+    source = -flics\green\plk_51.flc
+    hires  =  green\sprites\plk_51.sph
+  endarea
+
+  area liscie
+    source = -flics\green\liscie.flc
+    hires  =  green\sprites\liscie.sph
+    collis =  green\sprites\liscie.spc
+  endarea
+
+  area liscie1
+    source = -flics\green\liscie1.flc
+    hires  =  green\sprites\liscie1.sph
+    collis =  green\sprites\liscie1.spc
+  endarea
+
+  area liscie2
+    source = -flics\green\liscie2.flc
+    hires  =  green\sprites\liscie2.sph
+  endarea
+
+  area liscie3
+    source = -flics\green\liscie3.flc
+    hires  =  green\sprites\liscie3.sph
+  endarea
+
+  area liscie4
+    source = -flics\green\liscie4.flc
+    hires  =  green\sprites\liscie4.sph
+  endarea
+
+  area liscie4c
+    source = -flics\green\liscie4c.flc
+    hires  =  green\sprites\liscie4c.sph
+    collis =  green\sprites\liscie4c.spc
+  endarea
+
+  area palma
+    source = -flics\green\palma.flc
+    hires  =  green\sprites\palma.sph
+    collis =  green\sprites\palma.spc
+  endarea
+
+  area palma_z
+    source = -flics\green\palma_z.flc
+    hires  =  green\sprites\palma_z.sph
+    collis =  green\sprites\palma_z.spc
+  endarea
+
+  area z
+    source = -flics\green\z.flc
+    hires  =  green\sprites\z.sph
+    collis =  green\sprites\z.spc
+  endarea
+
+  area firez
+    source = -flics\green\firez.flc
+    hires  =  green\sprites\firez.sph
+    collis =  green\sprites\firez.spc
+  endarea
+
+  area cqx421
+    source = -flics\green\cqx421.flc
+    hires  =  green\sprites\cqx421.sph
+  endarea
+
+  area back
+    source = -flics\green\back.flc
+    hires  =  green\sprites\back.sph
+  endarea
+
+  area ruiny1
+    source = -flics\green\ruiny1.flc
+    hires  =  green\sprites\ruiny1.sph
+  endarea
+
+  area ruiny1a
+    source = -flics\green\ruiny1a.flc
+    hires  =  green\sprites\ruiny1a.sph
+    collis =  green\sprites\ruiny1a.spc
+  endarea
+
+  area ruiny1z
+    source = -flics\green\ruiny1z.flc
+    hires  =  green\sprites\ruiny1z.sph
+    collis =  green\sprites\ruiny1z.spc
+  endarea
+
+  area ruiny2d
+    source = -flics\green\ruiny2d.flc
+    hires  =  green\sprites\ruiny2d.sph
+  endarea
+
+  area ruiny2g
+    source = -flics\green\ruiny2g.flc
+    csource= -flics\green\ruiny2k1.flc
+    hires  =  green\sprites\ruiny2g.sph
+    collis =  green\sprites\ruiny2g.spc
+  endarea
+
+  area ruiny2gz
+    source = -flics\green\ruiny2gz.flc
+    csource= -flics\green\ruiny2k.flc
+    hires  =  green\sprites\ruiny2gz.sph
+    collis =  green\sprites\ruiny2gz.spc
+  endarea
+
+  area beczka
+    source = -flics\green\beczka.flc
+    csource= -flics\green\beczka_k.flc
+    hires  =  green\sprites\beczka.sph
+    collis =  green\sprites\beczka.spc
+  endarea
+
+  area beczki_z
+    source = -flics\green\beczki_z.flc
+    hires  =  green\sprites\beczki_z.sph
+    collis =  green\sprites\beczki_z.spc
+  endarea
+;--------------------------------------------------- DZIALA
+  area dzialk1p
+    source = -flics\net\dzialk1p.flc
+    hires  =  net\sprites\dzialk1p.sph
+    collis =  net\sprites\dzialk1p.spc
+  endarea
+
+  area dzialko1
+    source = -flics\green\dzialko1.flc
+    hires  =  green\sprites\dzialko1.sph
+    collis =  green\sprites\dzialko1.spc
+  endarea
+
+;-----------------------------------------------------------
+
+
+  area 3rdplane
+    source = -flics\green\3rdplane.flc
+    hires  =  green\sprites\3rdplane.sph
+    collis =  green\sprites\3rdplane.spc
+  endarea
+
+  ;area blok
+  ;  source = -flics\green\blok.flc
+  ;  hires  =  green\sprites\blok.sph
+  ;  lores  =  green\sprites\blok.spl 1x1
+    ;collis =  green\sprites\blok.spc
+  ;endarea
+
+  area unlock
+    source = -flics\green\unlock.flc
+    hires  =  green\sprites\unlock.sph
+    collis =  green\sprites\unlock.spc
+  endarea
+
+ area ludek
+    source = -flics\gray\ludek.flc
+    hires  =  gray\sprites\ludek.sph
+    collis =  gray\sprites\ludek.spc
+ endarea
+
+  area rocker
+    source = -flics\green\rocker.flc
+    hires  =  green\sprites\rocker.sph
+    collis =  green\sprites\rocker.spc
+  endarea
+
+  area telep
+    source = -flics\green\telep.flc
+    hires  =  green\sprites\telep.sph
+    collis =  green\sprites\telep.spc
+  endarea
+
+ area obca_mina
+   source = -flics\!global\defmine.flc
+   hires  =  !global\sprites\defmine.sph
+   ;csource = -flics\!global\defmine_k.flc
+   collis =  !global\sprites\defminek.spc
+ endarea
+
+  area skala
+    source = -flics\green\skala.flc
+    csource= -flics\green\skala_k.flc
+    hires  =  green\sprites\skala.sph
+    collis =  green\sprites\skala.spc
+  endarea
+
+  area kamien
+    source = -flics\green\kamien.flc
+    hires  =  green\sprites\kamien.sph
+  endarea
+
+  area landani
+    source = -flics\green\landani.flc
+    hires  =  green\sprites\landani.sph
+    collis  =  green\sprites\landani.spc
+  endarea
+
+   area kop1st
+    source = -flics\net\kop1st.flc
+    hires  =  net\sprites\kop1st.sph
+    csource= -flics\net\kop1c.flc
+    collis =  net\sprites\kop1st.spc
+  endarea
+
+  area kop1ani
+    source = -flics\net\kop1ani.flc
+    hires  =  net\sprites\kop1ani.sph
+    csource= -flics\net\kop1ac.flc
+    collis =  net\sprites\kop1ac.spc
+  endarea
+
+  area kop1en
+    source = -flics\net\kop1en.flc
+    hires  =  net\sprites\kop1en.sph
+    csource= -flics\net\kop1c.flc
+    collis =  net\sprites\kop1en.spc
+  endarea
+
+  area lad
+    source = -flics\green\lad.flc
+    hires  =  green\sprites\lad.sph
+    collis =  green\sprites\lad.spc
+  endarea
+
+  area marker
+    source = -flics\green\marker.flc
+    hires  =  green\sprites\marker.sph
+    collis =  green\sprites\marker.spc
+  endarea
+
+  area sekret
+    source = -flics\green\sekret.flc
+    hires  =  green\sprites\sekret.sph
+    collis =  green\sprites\sekret.spc
+  endarea
+
+  area smoke
+    source = -flics\green\smoke.flc
+    hires  =  green\sprites\smoke.sph
+    collis =  green\sprites\smoke.spc
+  endarea
+
+; GLOBAL SPRITES -------------------------------------------------------------
+
+  area bronie
+    source = -flics\!global\bronie.flc
+    hires  =  !global\sprites\bronie.sph
+    collis =  !global\sprites\bronie.spc
+  endarea
+
+  area _wrog
+    source = -flics\!global\_wrog.flc
+    hires  =  !global\sprites\_wrog.sph
+    collis =  !global\sprites\_wrog.spc
+  endarea
+
+  area light
+    source = -flics\!global\light.flc
+    hires  =  !global\sprites\light.sph
+  endarea
+
+endarea
+
+;-------------------------------------------- PROBKI
+tree_burning_1=green\sounds\fire1.wav 4
+tree_burning_2=green\sounds\fire2.wav 4
+

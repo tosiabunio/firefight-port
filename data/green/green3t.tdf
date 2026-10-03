@@ -1,0 +1,408 @@
+;=====================================================================
+;
+;                               GREEN TYPY 3
+;
+;=====================================================================
+
+
+;----------------------------------------  DESTROY
+
+area destroy_1 ;- plonaca palma
+        type          = obj_destroy1
+        life          = LOW_SHIELDS
+        ch_sprite     = palma_z
+        morph         = 1
+        range         = 100
+        frame_delay   = 0.05
+        explode_sample= tree_burning_1
+endarea
+
+area destroy_2 ; - sam ogien - wybucha krzaczek
+        type         = obj_destroy2
+        life         = LOW_SHIELDS
+        morph        = 1
+        ch_sprite    = firez
+        range        = 60
+        frame_delay  = 0.05
+        explode_sample= tree_burning_1
+endarea
+
+area destroy_3 ; - srodek zmieniajacy sie w krater
+        type         = obj_destroy3
+        life         = MEDIUM_SHIELDS
+        explode      = 1
+        morph        = 1
+        ch_sprite    = ruiny1z
+        range        = 60
+        frame_delay  = 0.05
+endarea
+
+area destroy_4 ; - do wysokiego domku, rozdupczona gora
+        type         = obj_destroy4
+        life         = MEDIUM_SHIELDS
+        explode      = 1
+        morph        = 1
+        ch_sprite    = ruiny2gz
+        range        = 60
+        frame_delay  = 0.05
+endarea
+
+area destroy_5 ; - plonace beczki
+        type         = obj_destroy5
+        life         = LOW_SHIELDS
+        explode      = 1
+        morph        = 1
+        ch_sprite    = beczki_z
+        range        = 60
+        frame_delay  = 0.05
+endarea
+
+;------------------------------------------- LOTNISKA & BRONIE
+
+area landplaceA
+        type         = landplaceA
+endarea
+
+area landplaceB
+        type         = landplaceB
+endarea
+
+area landplaceC
+        type         = landplaceC
+endarea
+
+area Bronie
+        type         = obj_capsule
+        range        = 30
+endarea
+
+area Bronie1
+        type         = obj_capsule
+        range        = 30
+endarea
+
+area odblok
+        type            = obj_unblock
+        serv_type       = visual
+        unblocked_type   = odblok
+endarea
+
+;------------------------------------------- OBIEKTY MISJI
+
+area destroy3_pulapka ; pulapka zamykajaca wejscie
+        type         = obj_destroy_pulapka
+        action       = enable_after
+        life         = LOW_SHIELDS
+        morph        = 1
+        ch_sprite    = firez
+        range        = 60
+        frame_delay  = 0.05
+endarea
+
+area destroy3_ludek3 ; obiekt do rozwalenia w ktorym siedzi ludek
+                     ; - potem trzeba zebrac nastepnego ludka na czas
+        type         = obj_destroy_ludek3
+        action       = enable_after
+        life         = MEDIUM_SHIELDS
+        explode      = 1
+        ch_sprite    = ruiny1z
+        range        = 60
+        frame_delay  = 0.05
+endarea
+
+area destroy3_skaly  ; obiekt do rozwalenia stoi obok ludka
+                     ; po rozwaleniu znika skaly
+        type         = obj_destroy_skaly
+        action       = disable_after
+        life         = LOW_SHIELDS
+        explode      = 1
+        morph        = 1
+        ch_sprite    = beczki_z
+        range        = 60
+        frame_delay  = 0.05
+endarea
+
+area destroy3_ludek4 ; obiekt do rozwalenia w ktorym siedzi ludek
+        type         = obj_destroy_ludek4
+        action       = enable_after
+        life         = MEDIUM_SHIELDS
+        explode      = 1
+        morph        = 1
+        ch_sprite    = ruiny1z
+        range        = 60
+        frame_delay  = 0.05
+endarea
+
+area destroy3_beczki ; - plonace beczki - stoja przy ludku nr cztery i znikaja skaly
+        type         = obj_destroy_be
+        life         = LOW_SHIELDS
+        action       = disable_after
+        explode      = 1
+        morph        = 1
+        ch_sprite    = beczki_z
+        range        = 60
+        frame_delay  = 0.05
+endarea
+
+;-------------------------------- pierwsza baza
+
+area destroy3_ludek5 ; obiekt do rozwalenia w ktorym siedzi ludek
+        type         = obj_destroy_ludek5
+        action       = enable_after
+        life         = MEDIUM_SHIELDS
+        explode      = 1
+        ch_sprite    = ruiny1z
+        range        = 60
+        frame_delay  = 0.05
+endarea
+
+area destroy3_baza1 ; - do wysokiego domku, rozdupczona gora
+        type         = obj_destroy_3baza1
+        life         = MEDIUM_SHIELDS
+        action       = enable_after
+        explode      = 1
+        morph        = 1
+        ch_sprite    = ruiny2gz
+        range        = 60
+        frame_delay  = 0.05
+endarea
+
+area destroy3_baza11 ; - plonace beczki
+        type         = obj_destroy_3baza11
+        life         = LOW_SHIELDS
+        action       = enable_after
+        explode      = 1
+        morph        = 1
+        ch_sprite    = beczki_z
+        range        = 60
+        frame_delay  = 0.05
+endarea
+
+area kopulka_baza1
+
+        type          = obj_destroy_kopulka_b1
+        life          = IMMORTAL
+        action        = enable_after
+;       explode       = 0
+        anim_sprite   = kop1ani
+        ch_sprite     = kop1en
+        range         = 60
+        collis        = 1
+        frame_delay   = 0.07
+ endarea
+
+
+;------------------- sekret - rozwalenie beczek pokazuje teleport
+
+area destroy3_teleport1 ; - plonace beczki
+        type         = obj_destroy3_teleport
+        life         = LOW_SHIELDS
+        action       = enable_after
+        explode      = 1
+        morph        = 1
+        ch_sprite    = beczki_z
+        range        = 60
+        frame_delay  = 0.05
+endarea
+;--------------------
+
+
+;-------------------- baza z radarami
+
+area antena_active1  ; antena co sie otwiera - wypuszcza nadajnik
+        type           = obj_destroy_antena1
+        life           = IMMORTAL
+        action         = enable_after
+        ch_sprite      = 3antena_on
+        anim_sprite    = 3antena1
+        range          = 100
+        frame_delay    = 0.05
+endarea
+
+area destroy3_baza2 ; baza radarow
+        type         = obj_destroy_br2
+        life         = MEDIUM_SHIELDS
+        explode      = 1
+        morph        = 1
+        ch_sprite    = ruiny2gz
+        range        = 60
+        frame_delay  = 0.05
+endarea
+
+area kopulka_baza2
+
+        type          = obj_destroy_kopulka_b2
+        life          = IMMORTAL
+        action        = enable_after
+;       explode       = 0
+        anim_sprite   = kop1ani
+        ch_sprite     = kop1en
+        range         = 60
+        collis        = 1
+        frame_delay   = 0.07
+ endarea
+
+;-------------------- obiekty wybuchajace po odwiezieniu skrzynek
+
+area destroy3_skrzynki1 ;- plonaca palma
+        type          = obj_destroy_sk1
+        life          = low_shields
+        ch_sprite     = palma_z
+        morph         = 1
+        range         = 100
+        frame_delay   = 0.05
+        explode_sample= tree_burning_1
+endarea
+
+area destroy3_skrzynki2 ; - sam ogien - wybucha krzaczek
+        type         = obj_destroy_sk2
+        life         = low_shields
+        morph        = 1
+        ch_sprite    = firez
+        range        = 60
+        frame_delay  = 0.05
+        explode_sample= tree_burning_1
+endarea
+
+area destroy3_skrzynki3
+        type           = obj_destroy_load
+        life           = IMMORTAL
+        action         = disable_after
+        explode        = 1
+        ch_sprite      = 3loadz
+        range          = 100
+        frame_delay    = 0.05
+endarea
+
+;-------------------- trzecia baza
+
+
+ area destroy3_baza3 ; - do wysokiego domku, rozdupczona gora - wlacza bossa !
+        type         = obj_destroy4
+        action       = enable_after
+        life         = MEDIUM_SHIELDS
+        explode      = 1
+        morph        = 1
+        ch_sprite    = ruiny2gz
+        range        = 60
+        frame_delay  = 0.05
+ endarea
+
+ area destroy3_baza31 ; - plonace beczki
+        type         = obj_destroy3_b31
+        life         = LOW_SHIELDS
+        action       = enable_after
+        explode      = 1
+        morph        = 1
+        ch_sprite    = beczki_z
+        range        = 60
+        frame_delay  = 0.05
+ endarea
+
+ area kopulka_baza3   ; -  kopulki
+
+        type          = obj_destroy_kopulka_b3
+        life          = IMMORTAL
+        action        = enable_after
+        anim_sprite   = kop1ani
+        ch_sprite     = kop1en
+        range         = 60
+        collis        = 1
+        frame_delay   = 0.07
+ endarea
+
+
+
+;-------------------------- typy do sekretu z teleportem
+
+ area kopulka_telep1   ; -  kopulki
+
+        type          = obj_destroy_kopulka_t1
+        life          = IMMORTAL
+        action        = enable_after
+        anim_sprite   = kop1ani
+        ch_sprite     = kop1en
+        range         = 60
+        collis        = 1
+        frame_delay   = 0.07
+ endarea
+
+ area kopulka_telep2   ; -  kopulki
+
+        type          = obj_destroy_kopulka_t2
+        life          = IMMORTAL
+        action        = enable_after
+        anim_sprite   = kop1ani
+        ch_sprite     = kop1en
+        range         = 60
+        collis        = 1
+        frame_delay   = 0.07
+ endarea
+
+ area kopulka_telep3   ; -  kopulki
+
+        type          = obj_destroy_kopulka_t3
+        life          = IMMORTAL
+        action        = enable_after
+        anim_sprite   = kop1ani
+        ch_sprite     = kop1en
+        range         = 60
+        collis        = 1
+        frame_delay   = 0.07
+ endarea
+
+ area kopulka_telep4   ; -  kopulki
+
+        type          = obj_destroy_kopulka_t4
+        life          = IMMORTAL
+        action        = enable_after
+        anim_sprite   = kop1ani
+        ch_sprite     = kop1en
+        range         = 60
+        collis        = 1
+        frame_delay   = 0.07
+ endarea
+
+ area destroy3_telep1 ; - plonace beczki
+        type         = obj_destroy3_t1
+        life         = LOW_SHIELDS
+        action       = enable_after
+        explode      = 1
+        morph        = 1
+        ch_sprite    = beczki_z
+        range        = 60
+        frame_delay  = 0.05
+ endarea
+
+ area destroy3_telep2 ; - plonace beczki
+        type         = obj_destroy3_t2
+        life         = LOW_SHIELDS
+        action       = enable_after
+        explode      = 1
+        morph        = 1
+        ch_sprite    = beczki_z
+        range        = 60
+        frame_delay  = 0.05
+ endarea
+
+ area destroy3_telep3 ; - plonace beczki
+        type         = obj_destroy3_t3
+        life         = LOW_SHIELDS
+        action       = enable_after
+        explode      = 1
+        morph        = 1
+        ch_sprite    = beczki_z
+        range        = 60
+        frame_delay  = 0.05
+ endarea
+
+ area destroy3_telep4 ; - plonace beczki
+        type         = obj_destroy3_t4
+        life         = LOW_SHIELDS
+        action       = enable_after
+        explode      = 1
+        morph        = 1
+        ch_sprite    = beczki_z
+        range        = 60
+        frame_delay  = 0.05
+ endarea

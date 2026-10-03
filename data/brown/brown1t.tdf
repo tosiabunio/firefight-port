@@ -1,0 +1,212 @@
+area wiatrak
+  type = obj_destroy
+  life = medium_shields
+  range = 60
+  smoke = 1
+  explode =1
+  ch_sprite = wiatrakd
+  frame_delay = 0.05
+  action = enable_after
+  morph =1
+endarea
+
+area dest_1
+  type = obj_destroy
+  life = immortal
+  range = 60
+  explode =1
+  frame_delay = 0.05
+  action = disable_after
+endarea
+
+area dest_2
+  type = obj_destroy
+  life = immortal
+  range = 60
+  explode =1
+  frame_delay = 0.05
+  action = disable_after
+endarea
+
+area dest_3
+  type = obj_destroy
+  life = immortal
+  range = 60
+  explode =1
+  frame_delay = 0.05
+  action = disable_after
+endarea
+
+area dest_4
+  type = obj_destroy
+  life = immortal
+  range = 60
+  explode =1
+  frame_delay = 0.05
+  action = disable_after
+endarea
+
+area lotniskoA
+  type = landplaceA
+endarea
+
+area lotniskoB
+  type = landplaceB
+endarea
+
+area doo1
+  type = door_01
+  delay = 0
+  open = 0
+endarea
+
+area doo2
+  type = door_02
+  delay = 0
+  open = 0
+endarea
+
+area doo3
+  type = door_03
+  delay = 9999999999999
+  open = 0
+endarea
+
+area doo4
+  type = door_04
+  delay = 0
+  open = 0
+endarea
+
+area sterowanie_brama
+  type = landplaceA
+endarea
+
+area baza_glowna
+  type = landplaceB
+endarea
+
+area upgrade
+  type = obj_capsule
+  range = 30
+endarea
+
+area loteryjka
+  type = obj_capsule
+  range = 30
+endarea
+
+area upgradeSPEC
+  type = obj_capsule
+  range = 30
+endarea
+
+area unblock
+  type = obj_unblock
+  serv_type = visual
+  unblocked_type = unblock
+endarea
+
+area unblock2
+  type = obj_unblock
+  serv_type = visual
+  unblocked_type = unblock
+endarea
+
+area unblock3
+  type = obj_unblock
+  serv_type = visual
+  unblocked_type = unblock
+endarea
+
+area door2city3
+  type = obj_unblock
+  serv_type = collis
+  unblocked_type = unblock
+endarea
+
+area door2city4
+  type = obj_unblock
+  serv_type = collis
+  unblocked_type = unblock
+endarea
+
+area door2city5
+  type = obj_unblock
+  serv_type = visual
+  unblocked_type = unblock
+endarea
+
+
+area centrum_zasilania
+  type = obj_destroy
+  life = medium_shields
+  range = 60
+  smoke = 1
+  explode =1
+  ch_sprite = wiatrakd
+  frame_delay = 0.05
+  action = enable_after
+  morph =1
+endarea
+
+area kompresor
+  type = obj_destroy
+  life = medium_shields
+  range = 60
+  explode =1
+  ch_sprite = blow1d
+  action = enable_after
+  frame_delay = 0.05
+  morph =1
+endarea
+
+area elektrownia
+  type = obj_destroy
+  life = medium_shields
+  range = 60
+  explode=1
+  ch_sprite = 1elektrowniad
+  action = enable_after
+  frame_delay = 0.05
+  morph =1
+endarea
+
+;area river
+;  type = obj_destroy
+;  life = immortal
+;  range = 60
+;  action = enable_after
+;  frame_delay = 0.1
+;endarea
+
+area bar
+  type = obj_destroy
+  life = low_shields
+  range = 60
+  ch_sprite = bardest
+  anim_sprite = barani
+  frame_delay = 0.05
+  action = disable_after
+  explode_sample= bar
+endarea
+
+area pomp
+  type = obj_destroy
+  life = medium_shields
+  range = 60
+  explode = 1
+  ch_sprite = pompad
+  frame_delay = 0.05
+  action = enable_after
+endarea
+
+area pomp1
+  type = obj_destroy
+  life = medium_shields
+  range = 60
+  explode = 1
+  ch_sprite = pompad
+  frame_delay = 0.05
+  action = enable_after
+endarea

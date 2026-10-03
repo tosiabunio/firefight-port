@@ -1,0 +1,1384 @@
+
+NOT_READY		"not ready"
+
+
+WEAP1MIN_COLLECTED	"small pack of vulcan ammo"
+WEAP1MED_COLLECTED	"medium pack of vulcan ammo"
+WEAP1MAX_COLLECTED	"large pack of vulcan ammo"
+WEAP2MIN_COLLECTED	"small pack of swarmers"
+WEAP2MED_COLLECTED	"medium pack of swarmers"
+WEAP2MAX_COLLECTED	"large pack of swarmers"
+WEAP3MIN_COLLECTED	"small pack of plasma gun ammo"
+WEAP3MED_COLLECTED	"medium pack of plasma gun ammo"
+WEAP3MAX_COLLECTED	"large pack of plasma gun ammo"
+WEAP4MIN_COLLECTED	"small pack of missiles"
+WEAP4MED_COLLECTED	"medium pack of missiles"
+WEAP4MAX_COLLECTED	"large pack of missiles"
+WEAP5MIN_COLLECTED	"small pack of cannon ammo"
+WEAP5MED_COLLECTED	"medium pack of cannon ammo"
+WEAP5MAX_COLLECTED	"large pack of cannon ammo"
+WEAP6MIN_COLLECTED	"small pack of grenades"
+WEAP6MED_COLLECTED	"medium pack of grenades"
+WEAP6MAX_COLLECTED	"large pack of grenades"
+WEAP1_ACTIVATED 	"vulcan activated"
+WEAP2_ACTIVATED 	"swarmers activated"
+WEAP3_ACTIVATED 	"plasma gun activated"
+WEAP4_ACTIVATED 	"missiles activated"
+WEAP5_ACTIVATED 	"cannon activated"
+WEAP6_ACTIVATED 	"grenades activated"
+WEAP1_OUTOFAMMO 	"vulcan out of ammo"
+WEAP2_OUTOFAMMO 	"swarmers out of ammo"
+WEAP3_OUTOFAMMO 	"plasma gun out of ammo"
+WEAP4_OUTOFAMMO 	"missiles out of ammo"
+WEAP5_OUTOFAMMO 	"cannon out of ammo"
+WEAP6_OUTOFAMMO 	"grenades out of ammo"
+LIFEMIN_COLLECTED	"small shield energy"
+LIFEMED_COLLECTED	"medium shield energy"
+LIFEMAX_COLLECTED	"large shield energy"
+MEDIKIT_COLLECTED	"shield restore"
+CLOAK_COLLECTED 	"cloaking device"
+SKIN_COLLECTED		"weapons recycled"
+SHIP_RESPAWN		"respawning your ship"
+IMMORTALITY_COLLECTED	"doubled shield"
+CHAOS_COLLECTED 	"chaos works power-up"
+OUTOFAMMO		"out of ammo"
+INCOMING_MISSILE	"incoming missile"
+SHIELDRECHARGED 	"shield recharged"
+YOU_CLEAR_TO_LAND	"you are clear to land"
+CLEAR_TO_LAND		"is clear to land"
+LARGE_SHIP		"large ship in range"
+FUELLEAK		"fuel leak detected"
+HULLDAMAGE		"hull damage sustained"
+CARGOUNSTABLE		"cargo unstable"
+EXPLOSION		"explosion imminent"
+COOLINGFAIL		"cooling system failed"
+SHIELDLOW		"shield low"
+SHIELDCRITICAL		"shield critical"
+CLOAKACTIVE		"cloaking device activated"
+CLOAK10DEACTIVE 	"10 seconds of cloaking device remaining"
+CLOAKDEACTIVE		"cloaking device deactivated"
+SHIELDACTIVE		"doubled shield activated"
+SHIELD10DEACTIVE	"10 seconds of doubled shield remaining"
+SHIELDDEACTIVE		"doubled shield deactivated"
+BRICK_COLLECTED 	"base part"
+CAMERA_COLLECTED	"camera"
+SATELITE_COLLECTED	"satellite view"
+MINE_COLLECTED		"mines"
+MAGNETIC_COLLECTED	"em-shock"
+SECRET_PLACE		"you have found a secret place"
+NET_END_FRAGS		"has reached kills limit"	      ;koniec deathmatch'u na fragi
+YOU_NET_END_FRAGS	"you have reached kills limit"	      ;koniec deathmatch'u na fragi
+NET_TIMEUP		"time is up"			      ;koniec deathmatch'u na czas
+NET_ENDBASEB		"is the winner" 		      ;koniec basebulding
+YOU_NET_ENDBASEB	"you are the winner"		      ;koniec basebulding
+RESTARTING		"mission failed"
+MISSION_COMPLETED	"mission complete"
+MISSION_FAILED		"restarting mission"
+BEAMOK			"beaming up successful"
+BEAMINTERRUPT		"beaming up interrupted"
+MUTE_ON 		"sounds and music muted"
+MUTE_OFF		"sounds and music unmuted"
+KEYBOARD_ON		"keyboard on"
+MOUSE_ON		"mouse on"
+JOYSTICK_ON		"joystick on"
+HIRES_OFF		"low resolution"
+HIRES_ON		"high resolution"
+GAMMA_CHANGED		"gamma correction set"
+TURBO_UNLOCKED		"turbo mode off"
+TURBO_LOCKED		"turbo mode on"
+ALL_SHIPS_KILLED	"entire air and ground defense has been destroyed"
+DETAIL_LOW		"low detail level"
+DETAIL_HIGH		"high detail level"
+
+TRANSMISSION		"farcasting"
+
+firefight		"fire fight"
+netfrags		"kills limit"
+nettimeup		"time limit"
+basebuild		"base building"
+netbrickcount		"parts limit"
+
+press_any_key		"press any key..."
+
+chat_unavail		"chat not available"
+netmsg_unavail		"messages not available"
+lastobjective_unavail	"objectives not available"
+restart_unavail 	"restart not available"
+abort_unavail		"abort not available"
+
+;HELP
+syskeys 		"*system keys"
+gamekeys		"*game controls"
+
+
+;********************** net level names **********************
+
+  net1	  "WAR"
+  net2	  "SHOTGUN"
+  brown3  "D.M.Z."
+  green5  "AMAZON"
+  net4	  "STRIKE"
+  gray4   "BUH!"
+
+;********************** mission descriptions ***********************
+
+green6	"static"	    ;1
+
+"*UNAUTHORIZED TRANSMISSIONS"
+"*HAVE BEEN DETECTED ON JARVENTIA"
+"*AND WILL NOT BE TOLERATED. PER-"
+"*FORM A STANDARD \"SUPPRESSION"
+"*SWEEP\" BY DESTROYING ALL STRUC-"
+"*TURES IN THIS REMOTE AREA."
+
+brown2	"HOT CARGO"	    ;2
+
+"*SEVERAL NUCLEAR CONTAINERS ARE"
+"*STORED AT A PROCESSING PLANT ON"
+"*DARIUS. LOCAL POLITICS ARE UNEASY,"
+"*AND COUNCIL MEMBERS ARE NERV-"
+"*OUS. COLLECT ALL CONTAINERS AND"
+"*AWAIT FURTHER ORDERS."
+
+green1	"new order"	    ;3
+
+"*RETURN TO JARVENTIA UNDER GA-"
+"*LACTIC CODE 486-5. THE VERDICT OF"
+"*THE COUNCIL IS GUILTY. OBLITERATE"
+"*ANY AND ALL STRUCTURES AT YOUR"
+"*DROP ZONE TO ENSURE NO FURTHER"
+"*RESISTANCE."
+
+white1 "frost bite"	    ;4
+
+"*MILITARY HARDWARE AMASSED ON"
+"*CH'OK THREATENS TO UPSET THE"
+"*BALANCE OF POWER. TAKE OUT ALL"
+"*HOSTILE FORCES IN THE AREA AND"
+"*REMIND THEM THAT THE COUNCIL"
+"*IS STILL IN CHARGE."
+
+brown4 "THIN AIR"	    ;5
+
+"*CRIPPLE A SECTION OF ATMOSPHERIC"
+"*PROCESSORS ON DARIUS. THIS WILL"
+"*MOVE THEIR EFFORTS AWAY FROM"
+"*ANNOYING THE COUNCIL."
+
+gray1 "insurance"	    ;6
+
+"*AN ENVOY SENT BY THE COUNCIL TO"
+"*ARGUS-HIGH REQUESTS THE AREA BE"
+"*CLEARED OF HOSTILE OCCUPANTS."
+
+white2 "fire and ice"	    ;7
+
+"*OFFICERS LOYAL TO THE COUNCIL"
+"*HAVE BEEN TAKEN CAPTIVE ON"
+"*CH'OK! RESCUING THEM HAS BECOME"
+"*OUR TOP PRIORITY, AS WELL AS"
+"*TEACHING THE ICE PLANET A LESSON"
+"*IN RESPECT."
+
+green4 "JUMP THE GUN"	    ;8
+
+"*INTELLIGENCE REPORTS FORCES ON"
+"*JARVENTIA ARE MASSING FOR AN AT-"
+"*TACK: TARGET UNKNOWN. HEAD IN"
+"*AND FORCE THEM TO SCRAMBLE"
+"*EARLY. ELIMINATE THEIR ABILITY TO"
+"*LAUNCH A SUCCESSFUL OPERATION."
+
+net3 "NO ESCAPE"	    ;9
+
+"*A DARING ESCAPE ATTEMPT IS TAK-"
+"*ING PLACE AT THE BASTION PRISON"
+"*COLONY. HELP TO PREVENT THE"
+"*ESCAPE BY PROVIDING ANY"
+"*ASSISTANCE YOU CAN."
+
+white4 "COOL SURFACE"	    ;10
+
+"*THE COUNCIL SEES DISSIDENTS OF"
+"*CH'OK BLOCKING THE PATH TO PEACE."
+"*LEAD THE FINAL ASSAULT: COLLECT"
+"*MULTIPLE COMPONENTS OF AN EX-"
+"*PLOSIVE DEVICE AND USE IT TO DE-"
+"*STROY HEAD MILITARY OUTPOSTS."
+
+green2 "AKA FUTURE STRIKE"  ;11
+
+"*THE COUNCIL'S MAIN SATELLITE"
+"*UPLINK ON JARVENTIA HAS BEEN"
+"*COMMANDEERED. RESCUE FRIENDLY"
+"*PERSONNEL TO REACTIVATE THE SAT-"
+"*ELLITE ANTENNAS. ELIMINATE THE"
+"*ENEMY STRONGHOLD."
+
+brown1 "MUDSKIPPER"	    ;12
+
+"*THE DARIANS HAVE BUILT A NEW"
+"*WEAPONS FACTORY. NUCLEAR FUSION"
+"*CONTAINERS ARE HIDDEN BENEATH"
+"*THE RIVER BED. DESTROY WATER"
+"*PUMPS TO LOWER WATER LEVEL,"
+"*AND RETRIEVE THE CONTAINERS."
+
+green3 "MELTDOWN"	    ;13
+
+"*JARVENTIA IS NOW UNSAFE FOR"
+"*FRIENDS OF THE PHANTOM COUNCIL."
+"*RESCUE OUR OFFICERS WHO FLED"
+"*INTO THE JUNGLE, THEN TAKE OUT"
+"*THE REMAINING RESISTANCE ONCE"
+"*AND FOR ALL."
+
+gray3 "mission x"	    ;14
+
+"*VOLARIAN DELEGATES HAVE RE-"
+"*QUESTED ASSISTANCE IN LEAVING"
+"*THE SYSTEM. FAKE A KIDNAPPING"
+"*AND BRING THEM TO US."
+
+net5 "WATCHDOG" 	    ;15
+
+"*EN ROUTE TO DARIUS, COMMANDER"
+"*RILEY NOTED A DISTURBING NUMBER"
+"*OF FORCES GATHERING AT THE OUTER"
+"*EDGE OF NIHIL. SWEEP THE AREA AND"
+"*ELIMINATE POTENTIALLY HOSTILE"
+"*CRAFT."
+
+brown6 "RUNAWAY"	    ;16
+
+"*AN EMERGENCY SIGNAL HAS BEEN"
+"*RECEIVED FROM COMMANDER RILEY'S"
+"*ENVOY ON DARIUS. THE BARGE IN USE"
+"*HAS BEEN AMBUSHED AND BADLY"
+"*DAMAGED. ESCORT THE BARGE AND"
+"*LEAD IT TO SAFETY."
+
+gray2 "one way out"	    ;17
+
+"*A TRIP TO ARGUS-HIGH HAS LEFT YOU"
+"*SEEMINGLY LOST WITHIN ITS MASSIVE"
+"*CITYSCAPE. CUT OFF FROM COMMU-"
+"*NICATION, YOU MUST NAVIGATE THE"
+"*MAZE AND MAKE YOUR WAY BACK."
+
+brown5 "TOOL OF WAR"	    ;18
+
+"*THE PHANTOM COUNCIL HAS GROWN"
+"*TIRED OF DARIAN TURMOIL. LEAD THE"
+"*FINAL ASSAULT ON DARIUS BY CUT-"
+"*TING OFF THEIR FUEL SUPPLY. DE-"
+"*STROY GAS TANKERS AND ALL HOS-"
+"*TILE FORCES ALONG YOUR PATH."
+
+;********************** mission dialogs ***********************
+
+missing_event_text "missing text, report as a bug"
+
+;***** BROWN 1 *****
+
+brown_1_1	"destroy water pumps"
+brown_1_1_1	"locate and destroy the first two water pumps"	     ;RILEY
+brown_1_1_2	"affirmative"					     ;JAXON
+
+brown_1_2	"clear air defense"
+brown_1_2_1	"before proceeding, eliminate all guard ships"	     ;RILEY
+		"in the area"
+
+brown_1_3	"destroy water pumps"
+brown_1_3_1	"to completely drain the river you must destroy"     ;RILEY
+		"the remaining three water pumps"
+brown_1_3_2	"i'm on my way" 				     ;JAXON
+
+brown_1_4	"collect all containers"
+brown_1_4_1	"the containers should appear along"		     ;RILEY
+		"the river bed, retrieve them all"
+brown_1_4_2	"heads up - we show a slew of ships ahead"	     ;STACY
+
+brown_1_5	"proceed to landing site"
+brown_1_5_1	"i've got all the containers i can find"	     ;JAXON
+brown_1_5_2	"excellent"					     ;RILEY
+brown_1_5_3	"their progress will be hindered"		     ;RILEY
+brown_1_5_4	"return to base"				     ;RILEY
+
+brown_1_A	"Pick up explosives expert"
+brown_1_A_1	"Hey there, can you offer me a lift?"		     ;SHADOW
+brown_1_A_2	"There's an abandoned ship nearby I want to"	     ;SHADOW
+		"check out"
+brown_1_A_3	"Sure, but let's make it quick" 		     ;JAXON
+
+brown_1_B	"Drop off explosives expert"
+brown_1_B_1	"Drop me off at the ship"			     ;SHADOW
+
+brown_1_C	"Destroy enemy ship"
+brown_1_C_1	"Something's not right..."			     ;SHADOW
+brown_1_C_2	"Jaxon! Watch out! It's a trap!"		     ;SHADOW
+
+brown_1_D_1	"Thanks for the warning"			     ;JAXON
+brown_1_D_2	"No, problem"					     ;SHADOW
+brown_1_D_3	"You never cease to amaze me"			     ;SHADOW
+
+;***** BROWN 2 *****
+
+brown_2_1	"collect first container"
+brown_2_1_1	"you must collect all 19 containers"		     ;RILEY
+brown_2_1_2	"the first is located near your start position"      ;RILEY
+
+brown_2_2	"find and pick up all containers"
+brown_2_2_1	"the first container is on board"		     ;JAXON
+brown_2_2_2	"continue the search for the rest of the containers" ;RILEY
+brown_2_2_3	"the destruction of local structures may be"	     ;RILEY
+		"necessary in their location"
+brown_2_2_4	"use extreme prejudice if you encounter"	     ;RILEY
+		"any resistance"
+
+brown_2_3	"find and use the farcaster"
+brown_2_3_1	"#good work - all containers are accounted for"      ;RILEY
+brown_2_3_2	"#a farcaster has been activated to allow you"	     ;RILEY
+		"#access to a landing site"
+brown_2_3_3	"hey Jaxon, i've got reports of a large ship"	     ;STACY
+		"in the area prepped for attack - watch yourself"
+		"through that farcaster..."
+
+brown_2_4	"drop containers at landing site"
+brown_2_4_1	"the darians have just notified the council"	     ;RILEY
+		"of a proposed \"secession\""
+brown_2_4_2	"this is an outright act of aggression" 	     ;RILEY
+		"against the council"
+brown_2_4_3	"place all containers - set for self destruct -"     ;RILEY
+		"at selected landing sites"
+brown_2_4_4	"if they cannot be with us, they cannot be"	     ;RILEY
+
+brown_2_5	"drop containers at landing site"
+brown_2_5_1	"first one's down!"				     ;STACY
+brown_2_5_2	"head to the next site, and mind those guard towers" ;STACY
+
+brown_2_6	"drop containers at landing site"
+brown_2_6_1	"hang in there, only two more..."		     ;STACY
+
+brown_2_7	"drop containers at last landing site"
+brown_2_7_1	"there's one more site, just ahead"		     ;STACY
+brown_2_7_2	"we'll get you out before those suckers blow"	     ;STACY
+brown_2_7_3	"it's too bad, i have a couple friends in the area...";STACY
+
+brown_2_A_1	"way to go!"					     ;STACY
+brown_2_A_2	"it so happens the other guy is one"		     ;STACY
+		"of our top informants"
+brown_2_A_3	"bringing him back alive will earn you" 	     ;STACY
+		"a medal, at least"
+brown_2_A_4	"the council is asking why you haven't placed"	     ;STACY
+		"the final container - i'll stall them until"
+		"you find our man"
+
+brown_2_B_1	"thanks, jaxon, i owe you one"			     ;STACY
+brown_2_B_2	"jet back to the final landing site and"	     ;STACY
+		"get out of here!"
+
+;***** BROWN 4 *****
+
+brown_4_1	"find and pick up explosives expert"
+brown_4_1_1	"you've been briefed, shadow's here to help you"     ;STACY
+		"with a \"short cut\" to the processors"
+brown_4_1_2	"lucky me"					     ;JAXON
+
+brown_4_2	"drop off explosives expert"
+brown_4_2_1	"lucky you! drop me off at the ridge so i can"	     ;SHADOW
+		"blow it away"
+
+brown_4_3	"leave immediate area"
+brown_4_3_1	"all set - now clear out or you'll be sorry"	     ;SHADOW
+
+brown_4_4	"destroy atmospheric processors"
+brown_4_4_1	"i love that!"					     ;SHADOW
+brown_4_4_2	"somebody has to"				     ;JAXON
+brown_4_4_3	"continue with your mission and destroy"	     ;RILEY
+		"the processors"
+brown_4_4_4	"expediency is the key" 			     ;RILEY
+
+brown_4_5	"pick up agents"
+brown_4_5_1	"do we have the location of the rest?"		     ;JAXON
+brown_4_5_2	"two agents to the east can give you that info"      ;STACY
+brown_4_5_3	"did someone paint \"taxi\" on my 99?"		     ;JAXON
+brown_4_5_4	"funny. just pick them up"			     ;STACY
+
+brown_4_6	"continue with mission"
+brown_4_6_1	"alright - i've got the locations"		     ;JAXON
+
+brown_4_7	"locate explosives expert"
+brown_4_7_1	"nice gate"					     ;JAXON
+brown_4_7_2	"need some help? come and get me"		     ;SHADOW
+
+brown_4_8	"destroy atmospheric processors"
+brown_4_8_1	"the gate's code is too easy i didn't even have to"  ;SHADOW
+		"blow it up"
+brown_4_8_2	"poor guy"					     ;JAXON
+brown_4_8_3	"pardon me, but there are still some processors left";STACY
+brown_4_8_4	"i'm going in"					     ;JAXON
+
+brown_4_9	"destroy large ship and proceed to landing site"
+brown_4_9_1	"that should get our message across"		     ;RILEY
+brown_4_9_2	"return to base"				     ;RILEY
+brown_4_9_3	"stay on your toes, jax!"			     ;STACY
+brown_4_9_4	"they won't let you leave that easy"		     ;STACY
+brown_4_9_5	"take out whatever they send before you leave"	     ;STACY
+
+;***** BROWN 5 *****
+
+brown_5_1	"destroy all gas tanks"
+brown_5_1_1	"we are approaching our finest hour"		     ;RILEY
+brown_5_1_2	"your primary objective is to destroy"		     ;RILEY
+		"all gas tanks along the darian \"hot line\""
+brown_5_1_3	"be prepared for heavy ground fire"		     ;RILEY
+		"and air support"
+brown_5_1_4	"completion of this mission will ensure our"	     ;RILEY
+		"verdict will go unchallenged"
+brown_5_1_5	"perhaps a true peace is closer than you think"      ;RILEY
+brown_5_1_6	"a man can dream"				     ;JAXON
+brown_5_1_7	"air support and ground defense"		     ;STACY
+		"are off the scale"
+brown_5_1_8	"good luck - you'll need it"			     ;STACY
+brown_5_1_9	"i'll let you know"				     ;JAXON
+
+;***** BROWN 6 *****
+
+brown_6_1	"protect the barge at all costs!"
+brown_6_1_1	"the barge can't stop!" 			     ;STACY
+brown_6_1_2	"clear all mines in its path and shield it"	     ;STACY
+		"from enemy craft!"
+brown_6_1_3	"protection of the barge is your primary concern!"   ;STACY
+
+brown_6_2	"proceed to landing site"
+brown_6_2_1	"the barge is secured, commander riley is safe"      ;JAXON
+brown_6_2_2	"returning to nearest base"			     ;JAXON
+brown_6_2_3	"my deepest gratitude, captain jaxon"		     ;RILEY
+brown_6_2_4	"you are truly a great warrior" 		     ;RILEY
+
+;***** GREEN 1 *****
+
+green_1_1	"destroy command tower"
+green_1_1_1	"head to the command tower and destroy it"	     ;RILEY
+green_1_1_2	"the facility is heavily guarded, destroy all enemy" ;RILEY
+		"ships in the area"
+green_1_1_3	"the ships around the facility are slow"	     ;STACY
+		"and heavily armed"
+green_1_1_4	"move fast, strike quickly and you should have"      ;STACY
+		"no problem"
+green_1_1_5	"like i ever do"				     ;JAXON
+
+green_1_2	"destroy uplink tower"
+green_1_2_1	"proceed to the center satellite uplink tower"	     ;RILEY
+green_1_2_2	"this will cut all power to their headquarters"      ;RILEY
+green_1_2_3	"okay, hot shot - our radar has detected that"	     ;STACY
+		"the offenders are aware of your presence"
+		"and are scrambling troops as we speak"
+
+green_1_3	"destroy last tower"
+green_1_3_1	"#things are a little rougher than anticipated"      ;JAXON
+green_1_3_2	"what's last?"					     ;JAXON
+green_1_3_3	"take out the main tower in the area, this will"     ;RILEY
+		"leave them blind"
+green_1_3_4	"harsh as our actions are, this will secure the laws";RILEY
+		"of the phantom council"
+
+green_1_4	"locate and pick up downed pilots"
+green_1_4_1	"we got word that your play time at the com tower"   ;STACY
+		"caused two of our ships to crash not far from you"
+green_1_4_2	"do me a favor and check for survivors..."	     ;STACY
+green_1_4_3	"i'm downloading the location now..."		     ;STACY
+
+green_1_5	"locate and pick up remaining pilots"
+green_1_5_1	"#i've got em... where are the others?" 	     ;JAXON
+green_1_5_2	"i can't get a lock on the other crash site"	     ;STACY
+green_1_5_3	"you'll have to find them yourself, i can't let you" ;STACY
+		"leave them behind"
+
+green_1_6	"proceed to the nearest landing facility"
+green_1_6_1	"#all survivors are on board, can i leave now?"      ;JAXON
+green_1_6_2	"your rescue of the survivors is commendable,"	     ;RILEY
+		"but remember who gives the orders"
+green_1_6_3	"the judgment of the council has been carried out"   ;RILEY
+green_1_6_4	"return to base"				     ;RILEY
+
+;***** GREEN 2 *****
+
+green_2_1	"pick up officer to activate antenna"
+green_2_1_1	"retrieve the three security officers who have "     ;RILEY
+		"access codes to re-activate our satellite antennas"
+
+green_2_2	"pick up officer to activate antenna"
+green_2_2_1	"#the first antenna is activated"		     ;JAXON
+green_2_2_2	"proceed to the next antenna"			     ;RILEY
+
+green_2_3	"pick up officer to activate antenna"
+green_2_3_1	"#the second satellite has been activated"	     ;JAXON
+green_2_3_2	"to unlock the third antenna, find our last officer" ;RILEY
+
+green_2_4	"capture scientist"
+green_2_4_1	"#i've got him" 				     ;JAXON
+green_2_4_2	"the last part of the code sequence"		     ;JAXON
+		"has been entered..."
+green_2_4_3	"the antenna is active, but i'm showing"	     ;JAXON
+		"no data transfer"
+green_2_4_4	"we just got word that a scientist in your vicinity" ;STACY
+		"is conducting a transmission jam"
+green_2_4_5	"this will not be tolerated"			     ;RILEY
+green_2_4_6	"capture this scientist and halt the jamming signal" ;RILEY
+
+green_2_5	"capture an enemy to activate farcasters"
+green_2_5_1	"#i've convinced him to unjam the signal"	     ;JAXON
+green_2_5_2	"mission complete"				     ;JAXON
+green_2_5_3	"negative"					     ;RILEY
+green_2_5_4	"capture another insurgent and gain access"	     ;RILEY
+		"to the local farcasters"
+green_2_5_5	"use it to farcast directly into their headquarters" ;RILEY
+green_2_5_6	"secondary mission objective acknowledged"	     ;JAXON
+
+green_2_6	"enter the farcaster"
+green_2_6_1	"you now have access to the farcasters" 	     ;STACY
+green_2_6_2	"from the commander's tone, i suggest you use them"  ;STACY
+
+green_2_7	"destroy all local structures"
+green_2_7_1	"destroy the main building and all "		     ;RILEY
+		"communication towers"
+green_2_7_2	"why? what's happened?" 			     ;JAXON
+green_2_7_3	"it is not your place to question"		     ;RILEY
+		"the phantom council"
+
+green_2_8	"destroy last tower"
+green_2_8_1	"uh... there's one more tower"			     ;STACY
+green_2_8_2	"i'm going in..."				     ;JAXON
+
+green_2_9	"eliminate jarventian delegate"
+green_2_9_1	"level the last standing buildings"		     ;RILEY
+green_2_9_2	"wait!" 					     ;STACY
+green_2_9_3	"i'm getting a signal - the jarventian delegate"     ;STACY
+		"to the council is down there!"
+green_2_9_4	"carry out your orders" 			     ;RILEY
+
+green_2_10	"eliminate jarventian delegate"
+green_2_10_1	"#i don't think she was in there"		     ;JAXON
+green_2_10_2	"#looks empty"					     ;JAXON
+green_2_10_3	"she must have fled to another building"	     ;RILEY
+green_2_10_4	"take it out!"					     ;RILEY
+
+green_2_11	"proceed to landing site"
+green_2_11_1	"#that's a confirmed kill"			     ;STACY
+green_2_11_2	"i hope i've completed your vendetta"		     ;JAXON
+green_2_11_3	"you would be wise to watch your tone"		     ;RILEY
+green_2_11_4	"return to base"				     ;RILEY
+
+;***** GREEN 3 *****
+
+green_3_1	"find and pick up officers"
+green_3_1_1	"find several officers who have taken refugee"	     ;RILEY
+		"in the jungle"
+
+green_3_2	"find and pick up officers"
+green_3_2_1	"commander norrin radd on board"		     ;JAXON
+green_3_2_2	"he knows the location of our other officers"	     ;JAXON
+
+green_3_3	"find and pick up officers"
+green_3_3_1	"colonel rivus sanders is with us"		     ;JAXON
+green_3_3_2	"seems there are three more down there" 	     ;JAXON
+
+green_3_4	"find and pick up officers"
+green_3_4_1	"lt. chrighton stark is alive and well" 	     ;JAXON
+
+green_3_5	"destroy facility and pick up our officer"
+green_3_5_1	"dr. welby marcus is accounted for"		     ;JAXON
+green_3_5_2	"he's informed me captain halle jordan is"	     ;JAXON
+		"still trapped inside an occupied facility"
+green_3_5_3	"let nothing stand in the way of his rescue"	     ;RILEY
+
+green_3_6	"bring officers to landing site"
+green_3_6_1	"i've got jordan. that's all of them. where to?"     ;JAXON
+green_3_6_2	"we have a stronghold at the upcoming landing site"  ;RILEY
+green_3_6_3	"bring them there"				     ;RILEY
+
+green_3_7	"destroy control center"
+green_3_7_1	"time to head out?"				     ;JAXON
+green_3_7_2	"negative"					     ;RILEY
+green_3_7_3	"the council has ruled on jarventia"		     ;RILEY
+		"and the verdict is guilty"
+green_3_7_4	"under galactic code 501, disable and destroy"	     ;RILEY
+		"the defense center in your quadrant"
+
+green_3_8	"pick up reactor cores"
+green_3_8_1	"hey, stranger" 				     ;SHADOW
+green_3_8_2	"that trick dropped the defense grid"		     ;SHADOW
+		"on their weapons depot"
+green_3_8_3	"pick up the exposed reactor cores"		     ;SHADOW
+		"and we'll end this for good"
+
+green_3_9	"drop reactor cores at enemy base before they explode!"
+green_3_9_1	"these babies are hot!" 			     ;SHADOW
+green_3_9_2	"drop them somewhere they can do some damage,"	     ;SHADOW
+		"and drop 'em before they blow!"
+green_3_9_3	"i know just the place" 			     ;JAXON
+
+green_3_10	"access the farcaster and destroy enemy base"
+green_3_10_1	"i love the smell of napalm in the morning"	     ;SHADOW
+green_3_10_2	"i'm outta here"				     ;SHADOW
+green_3_10_3	"see ya 'round" 				     ;JAXON
+green_3_10_4	"you have access to a farcaster"		     ;RILEY
+green_3_10_5	"make your way to a remaining installation"	     ;RILEY
+		"and destroy it"
+
+green_3_11	"destroy large enemy ships"
+green_3_11_1	"one of the bigger ships is going to try"	     ;STACY
+		"a last ditch defense"
+green_3_11_2	"you'll have to take it out before we can"	     ;STACY
+		"bring you home"
+green_3_11_3	"haven't i done enough damage?" 		     ;JAXON
+
+green_3_12	"proceed to landing site"
+green_3_12_1	"i'm done here" 				     ;JAXON
+green_3_12_2	"jarventia is no longer a threat"		     ;JAXON
+green_3_12_3	"as always, your performance is admirable"	     ;RILEY
+green_3_12_4	"return to base"				     ;RILEY
+
+;***** GREEN 4 *****
+
+green_4_1	"clear this sector of all enemies"
+green_4_1_1	"intelligence is confirmed"			     ;RILEY
+green_4_1_2	"a massive military squadron is present"	     ;RILEY
+green_4_1_3	"time to let them know you're here..."		     ;STACY
+green_4_1_4	"the only way i know how"			     ;JAXON
+
+green_4_2	"continue to the next sector"
+green_4_2_1	"continue to the next sector"			     ;RILEY
+
+green_4_3	"clear this sector of all enemies"
+green_4_3_1	"they're not standing down"			     ;STACY
+green_4_3_2	"that is unfortunate"				     ;RILEY
+green_4_3_3	"didn't know you cared" 			     ;JAXON
+green_4_3_4	"i meant for them"				     ;RILEY
+green_4_3_5	"under galactic code 32-a, i hereby authorize you"   ;RILEY
+		"to eliminate their entire attack force"
+green_4_3_6	"riley out"					     ;RILEY
+
+green_4_4	"continue to the next sector"
+green_4_4_1	"head to the next sector"			     ;STACY
+
+green_4_5	"clear this sector of all enemies"
+green_4_5_1	"you heard the commander"			     ;STACY
+green_4_5_2	"clear it out"					     ;STACY
+
+green_4_6	"continue to the next sector"
+green_4_6_1	"we've got more up ahead"			     ;STACY
+
+green_4_7	"clear this sector of all enemies"
+green_4_7_1	"keep at it, make sure all craft and ground units"   ;STACY
+		"are destroyed"
+
+green_4_8	"continue to the next sector"
+green_4_8_1	"radar shows another unit ahead"		     ;JAXON
+green_4_8_2	"i'm going in"					     ;JAXON
+
+green_4_9	"clear this sector of all enemies"
+green_4_9_1	"looks like the last - drop these birds and"	     ;STACY
+		"you're done here"
+
+green_4_10	"proceed to the landing site"
+green_4_10_1	"that was tight"				     ;JAXON
+green_4_10_2	"i'm heading to the landing site"		     ;JAXON
+green_4_10_3	"we'll be waiting"				     ;STACY
+green_4_10_4	"nice to see you made it"			     ;STACY
+
+;***** GREEN 6 *****
+
+green_6_1	"destroy communication center"
+green_6_1_1	"locate and destroy the first of two"		     ;RILEY
+		"communication centers in this area"
+green_6_1_2	"affirmative"					     ;JAXON
+
+green_6_2	"destroy communication center"
+green_6_2_1	"the second com center is still active" 	     ;RILEY
+green_6_2_2	"cripple its capabilities"			     ;RILEY
+green_6_2_3	"#stay alert jaxon, your first attack"		     ;STACY
+		"#got some attention"
+green_6_2_4	"#air defense has increased - but nothing "	     ;STACY
+		"#you can't handle"
+
+green_6_3	"proceed to the nearest landing facility"
+green_6_3_1	"well done, i think they got the message"	     ;RILEY
+green_6_3_2	"proceed to the nearest landing facility"	     ;RILEY
+
+;***** WHITE 1 *****
+
+white_1_1	"clear sector of all enemies"
+white_1_1_1	"jaxon reporting - i'm near the cordata quadrant"    ;JAXON
+		"on ch'ok"
+white_1_1_2	"search the area and suppress any resistance"	     ;RILEY
+white_1_1_3	"you mean destroy"				     ;JAXON
+white_1_1_4	"the council trusts you to do what must be done"     ;RILEY
+
+white_1_2	"proceed to the next sector"
+white_1_2_1	"i see we understand each other perfectly"	     ;RILEY
+white_1_2_2	"continue to the next sector"			     ;RILEY
+
+white_1_3	"clear sector of all enemies"
+white_1_3_1	"clear this area of any unregistered forces"	     ;RILEY
+white_1_3_2	"we don't register out this far..."		     ;JAXON
+white_1_3_3	"this is true"					     ;RILEY
+
+white_1_4	"continue to the next sector"
+white_1_4_1	"continue to the next sector"			     ;RILEY
+
+white_1_5	"clear sector of all enemies"
+white_1_5_1	"eliminate all resistance"			     ;RILEY
+
+white_1_6	"continue to the next sector"
+white_1_6_1	"continue to the next sector"			     ;RILEY
+
+white_1_7	"clear sector of all enemies"
+white_1_7_1	"intelligence confirms these forests are hiding"     ;RILEY
+		"several aircraft as well as ground forces"
+white_1_7_2	"clear the area"				     ;RILEY
+
+white_1_8	"continue to the next sector"
+white_1_8_1	"continue to the next sector"			     ;RILEY
+
+white_1_9	"clear sector of all enemies"
+white_1_9_1	"one more run should minimize the resistance"	     ;RILEY
+		"in this quadrant"
+white_1_9_2	"leave nothing behind"
+
+white_1_10	"proceed to landing site"
+white_1_10_1	"well done"					     ;RILEY
+white_1_10_2	"the council is confident that the balance of power" ;RILEY
+		"has been restored"
+white_1_10_3	"return to base"				     ;RILEY
+
+;***** WHITE 2 *****
+
+white_2_1	"destroy bunkers and pick up agents"
+white_2_1_1	"jaxon, be prepared"				     ;STACY
+white_2_1_2	"the opposition is aggressive and heavily armed"     ;STACY
+white_2_1_3	"understood"					     ;JAXON
+white_2_1_4	"i have the coordinates of each prison bunker"	     ;STACY
+		"and have already locked-on"
+white_2_1_5	"to free our agents, destroy those bunkers"	     ;STACY
+
+white_2_2	"destroy enemy installation"
+white_2_2_1	"that's the final prisoner, get out of there"	     ;STACY
+white_2_2_2	"negative"					     ;RILEY
+white_2_2_3	"have them lead you to the enemy base"		     ;RILEY
+white_2_2_4	"demolish it"					     ;RILEY
+white_2_2_5	"must be a little angry over this"		     ;STACY
+white_2_2_6	"quiet" 					     ;RILEY
+white_2_2_7	"you have your orders"				     ;RILEY
+white_2_2_8	"yes, sir"					     ;JAXON
+
+white_2_3	"proceed to landing site"
+white_2_3_1	"they will think twice before crossing us again"     ;RILEY
+white_2_3_2	"return to base"				     ;RILEY
+white_2_3_3	"hey, jaxon - they thought twice"		     ;STACY
+white_2_3_4	"the path to the landing pad is swarming with craft" ;STACY
+white_2_3_5	"leave them to me"				     ;JAXON
+
+;***** WHITE 4 *****
+
+white_4_1	"eliminate aircraft"
+white_4_1_1	"report"					     ;RILEY
+white_4_1_2	"seems quiet"					     ;JAXON
+
+white_4_2	"eliminate aircraft"
+white_4_2_1	"spoke too soon"				     ;JAXON
+white_4_2_2	"clear the area of hostile aircraft before proceeding";RILEY
+
+white_4_3	"collect bomb component and destroy structures"
+white_4_3_1	"head to the first enemy installation"		     ;RILEY
+white_4_3_2	"collect the bomb component and destroy "	     ;RILEY
+		"all structures before you hit the next one"
+
+white_4_4	"collect bomb component and destroy structures"
+white_4_4_1	"destroy the second installation"		     ;RILEY
+white_4_4_2	"collect the bomb component and destroy"	     ;RILEY
+		"all structures before heading to the last base"
+
+white_4_5	"collect bomb component and destroy structures"
+white_4_5_1	"find the last bomb component"			     ;RILEY
+white_4_5_2	"destroy all structures before moving on"	     ;RILEY
+
+white_4_6	"pick up explosives expert"
+white_4_6_1	"all right, it's my turn"			     ;SHADOW
+white_4_6_2	"clear skies ahead, so come and get me" 	     ;SHADOW
+
+white_4_7	"drop bomb at enemy base before it explodes"
+white_4_7_1	"oops"						     ;SHADOW
+white_4_7_2	"what?!"					     ;JAXON
+white_4_7_3	"this bomb is already armed"			     ;SHADOW
+white_4_7_4	"can you still make the drop off?"		     ;SHADOW
+white_4_7_5	"watch me!"					     ;JAXON
+
+white_4_8	"drop bomb at enemy base before it explodes"
+white_4_8_1	"i'm going for the second drop off!"		     ;JAXON
+white_4_8_2	"go! go! go!"					     ;SHADOW
+
+white_4_9	"proceed to landing site"
+white_4_9_1	"nice work, flyboy"				     ;SHADOW
+white_4_9_2	"you like to cut it close"			     ;SHADOW
+white_4_9_3	"who said I liked it?"				     ;JAXON
+white_4_9_4	"your work is done"				     ;RILEY
+white_4_9_5	"return to base"				     ;RILEY
+
+white_4_A_1	"The person you just beamed up has updated our map"  ;STACY
+white_4_A_2	"Some new areas should be accessible to you"	     ;STACY
+
+;***** NET 3 *****
+
+net_3_1 	"destroy the escaping ship!"
+net_3_1_1	"we're too late! stop that ship!"		     ;STACY
+
+net_3_2_1	"your efforts are commendable"			     ;RILEY
+
+;***** NET 5 *****
+
+net_5_1 	"clear this sector of all enemies"
+net_5_1_1	"riley has left on a diplomatic mission, so i will be";STACY
+		"leading you through this hellhole"
+net_5_1_2	"say the word"					     ;JAXON
+net_5_1_3	"clear sector 1 of all enemies" 		     ;STACY
+net_5_1_4	"after that, your radar will guide you to"	     ;STACY
+		"the next sector"
+net_5_1_5	"affirmative!"					     ;JAXON
+
+net_5_2 	"continue to next sector"
+net_5_2_1	"proceed to sector 2 and clear the area"	     ;STACY
+
+net_5_3 	"clear this sector of all enemies"
+net_5_3_1	"clear sector 2 of all enemies, both airborne"	     ;STACY
+		"and surface"
+
+net_5_4 	"continue to next sector"
+net_5_4_1	"cleared sector 2"				     ;JAXON
+net_5_4_2	"I'm following radar to sector 3"		     ;JAXON
+
+net_5_5 	"clear this sector of all enemies"
+net_5_5_1	"heavy aircraft in the area"			     ;STACY
+net_5_5_2	"clear the sector on par"			     ;STACY
+
+net_5_6 	"continue to next sector"
+net_5_6_1	"proceed to sector 4 and clear the area"	     ;STACY
+
+net_5_7 	"clear this sector of all enemies"
+net_5_7_1	"now in sector 4"				     ;JAXON
+net_5_7_2	"proceeding with mission objective"		     ;JAXON
+
+net_5_8 	"continue to next sector"
+net_5_8_1	"head to sector 5 and clear the area"		     ;STACY
+net_5_8_2	"your radar still leads the way"		     ;STACY
+
+net_5_9 	"clear this sector of all enemies"
+net_5_9_1	"clear the entire sector of enemy presence"	     ;STACY
+
+net_5_10	"continue to next sector"
+net_5_10_1	"proceed to sector 6 and clear the area"	     ;STACY
+
+net_5_11	"clear this sector of all enemies"
+net_5_11_1	"clear sector 6"				     ;STACY
+net_5_11_2	"watch out for the large hms edco"		     ;STACY
+net_5_11_3	"it's captained by renegade commander illian iosi"   ;STACY
+
+net_5_12	"proceed to landing site"
+net_5_12_1	"all sectors clear, commander iosi included"	     ;JAXON
+net_5_12_2	"great work, jet to the nearest base"		     ;STACY
+
+;***** GREY 1 *****
+
+grey_1_1	"clear sector of all enemies"
+grey_1_1_1	"you have your orders"				     ;STACY
+grey_1_1_2	"clear all sectors of enemy presence"		     ;STACY
+
+grey_1_2	"continue to the next sector"
+grey_1_2_1	"head into the next sector"			     ;STACY
+
+grey_1_3	"clear sector of all enemies"
+grey_1_3_1	"this one is cake"				     ;STACY
+grey_1_3_2	"just do exactly like before"			     ;STACY
+
+grey_1_4	"continue to the next sector"
+grey_1_4_1	"good work"					     ;STACY
+grey_1_4_2	"proceed to the next sector"			     ;STACY
+
+grey_1_5	"clear sector of all enemies"
+grey_1_5_1	"here we go again"				     ;STACY
+grey_1_5_2	"clear this sector of all enemy presence"	     ;STACY
+
+grey_1_6	"continue to the next sector"
+grey_1_6_1	"next sector's dead ahead"			     ;STACY
+
+grey_1_7	"clear sector of all enemies"
+grey_1_7_1	"clear this and one other sector to ease our nerves" ;STACY
+
+grey_1_8	"continue to the next sector"
+grey_1_8_1	"perfect"					     ;STACY
+grey_1_8_2	"proceed to the final sector"			     ;STACY
+
+grey_1_9	"clear sector of all enemies"
+grey_1_9_1	"let's do it by the book"			     ;STACY
+grey_1_9_2	"take out all enemy presence in this sector"	     ;STACY
+
+grey_1_10	"proceed to the landing site"
+grey_1_10_1	"that was the last one" 			     ;JAXON
+grey_1_10_2	"great, take your ship to the nearest landing site"  ;STACY
+
+grey_1_A_1	"where are you going?"				     ;STACY
+grey_1_A_2	"you've been authorized to land"		     ;STACY
+grey_1_A_3	"what information do you have on this sector?"	     ;JAXON
+grey_1_A_4	"absolutely nothing"				     ;STACY
+grey_1_A_5	"you're on your own"				     ;STACY
+
+;***** GREY 2 *****
+
+grey_2_1	"navigate the maze and return to base"
+grey_2_1_1	"... made it through! ...not much time..."	     ;STACY
+		"... switches! look for the switches! ..."
+
+;***** GREY 3 *****
+
+grey_3_1	"destroy building and pick up delegates"
+grey_3_1_1	"destroy the building where the delegates"	     ;RILEY
+		"are waiting"
+grey_3_1_2	"pick them up and return to base"		     ;RILEY
+
+grey_3_2	"get to a landing site!"
+grey_3_2_1	"the delegates are on board... what? no! stop!"      ;JAXON
+grey_3_2_2	"jaxon! your system readings are going critical!"    ;STACY
+grey_3_2_3	"it was a trap! they've sabotaged the ship!"	     ;JAXON
+grey_3_2_4	"get to a landing site asap!"			     ;STACY
+
+grey_3_a_1     "hurry, jaxon!"					     ;STACY
+grey_3_b_1     "systems failing! condition critical!"		     ;JAXON
+grey_3_c_1     "move it! your 99 can't take much more!" 	     ;STACY
+
+
+;***** GAME OVER text ****
+
+finishtext
+
+"*The final assaults on Darius, Jarventia,"
+"*"
+"*and Ch'ok proved effective in halting"
+"*"
+"*aggressive uprisings."
+"*"
+"*Negotiations are under way for re-establishing"
+"*"
+"*Council laws and enforcement's."
+"*"
+"*Argus-High has already transmitted their"
+"*"
+"*allegiance to the Phantom Council."
+"*"
+"*The death and destruction that lead to these"
+"*"
+"*events will weigh heavy on us all, but"
+"*"
+"*hopefully it will be eased by what lies ahead"
+"*"
+"*an era of true peace..."
+""
+""
+""
+""
+""
+""
+"game over"
+""
+""
+""
+""
+""
+""
+""
+""
+""
+"fire fight"
+""
+""
+""
+"*a game by"
+"chaos works"
+""
+""
+""
+""
+""
+""
+""
+""
+""
+"*Game Designer"
+"Janusz Pelc"
+""
+"*Graphic Artists"
+"Rafal Trznadel"
+"Michal Doniec"
+""
+"*Lead Software Engineer"
+"Janusz Pelc"
+""
+"*Engine Programmers"
+"Marek Sobol"
+"Maciej Miasik"
+""
+"*Game Programmers"
+"Pawel Loj"
+"Grzegorz Kunstman"
+""
+"*Level Designers"
+"Michal Doniec"
+"Rafal Trznadel"
+""
+"*Music"
+"Janusz Pelc"
+""
+"*Voices"
+"Chris Minkiewicz"
+"Matt Payne"
+"Michael Paschal"
+"Steve Greber"
+""
+"*Voice Engineer"
+"Wojciech Kus"
+""
+"*Sound Editor"
+"Maciej Miasik"
+""
+"*Product Manager"
+"Slawomir Puchalski"
+""
+"*Special Thanks To"
+"Marek Surowka"
+"Pc duo computers"
+""
+""
+""
+""
+""
+"Electronic Arts"
+""
+"*Vice President of"
+"*High Score Entertainment"
+"Scott Orr"
+""
+"*Executive Producer"
+"Michael Pole"
+""
+"*Producer"
+"Happy Keller"
+""
+"*Associate Producer"
+"Tony Iuppa"
+""
+"*Assistant Producers"
+"Eric DeSantis"
+"John Melchior"
+"Michael Williams"
+""
+"*Technical Director"
+"Ken Zarifes"
+""
+"*Audio Specialist"
+"David Whittaker"
+""
+"*Story"
+"Eric DeSantis"
+"John Melchior"
+"Andrea Engstrom"
+""
+"*Additional Artwork"
+"Eric DeSantis"
+""
+"*Product Manager"
+"Albert Penello"
+""
+"*Public Relations"
+"Fiona Murphy"
+""
+"*Documentation"
+"Andrea Engstrom"
+"Paul Armatta"
+""
+"*Product Testing"
+"Chris Bennett"
+"Jim Donovan"
+"Nate Wright"
+"Dan Caraballo"
+""
+"*Special Thanks To"
+"Audrey Gustafson"
+"Margaret Foley"
+"Billy Schmitt"
+""
+""
+""
+""
+""
+"Epic MegaGames"
+""
+"*marketing"
+"Mark Rein"
+""
+"*Producer"
+"Doug Gibson"
+""
+"*Computer Voice"
+"Dianne Nola"
+""
+"*Voice Engineer"
+"Robert Allen"
+""
+""
+""
+"*copyright 1996 chaos works,"
+"*and Epic MegaGames,"
+"*and Electronic Arts,"
+"*all rights reserved."
+
+;									max
+;***** CHAT text ****							 |
+;									 V
+
+chat_help
+	"Chat daemon v0.96 available commands:"
+	"HELP QUIT BYE LEAVE DEFINE DEFINED CLS"
+	"QUERY BAN OP USERS WHOAMI"
+	"All commands must be preceded with '.' character."
+	"For more information type .HELP <COMMAND>."
+
+chat_help_help
+	"HELP command:"
+	"Prints a piece of information about available"
+	"commands."
+
+chat_help_quit
+	"QUIT command:"
+	"Terminates the session, no matter who"
+	"has started it."
+	"Usage: just type .QUIT"
+
+chat_help_bye
+	"BYE command:"
+	"Terminates the session, no matter who"
+	"has started it."
+	"Usage: just type .BYE"
+
+chat_help_leave
+	"LEAVE command:"
+	"Terminates the session, no matter who"
+	"has started it."
+	"Usage: just type .LEAVE"
+
+chat_help_define
+	"DEFINE command:"
+	"Defines the abbreviation. You can use it to simplify"
+	"typing the most recent expressions in your texts."
+	"Usage: type .DEFINE <DIGIT> <EXPRESSION>"
+	"where DIGIT is a decimal digit, EXPRESSION is"
+	"an optional text."
+	"The abbreviation defined in this way you can use by"
+	"typing .<DIGIT> at the beginning of the line."
+	"Everything you type after this expression is concatenated"
+	"to the result string. When result string is not a command"
+	"it is sent to the console immediately, otherwise it is"
+	"copied to the command line."
+	"See also: DEFINED."
+
+chat_help_defined
+	"DEFINED command:"
+	"Shows all defined abbreviations."
+	"Usage: just type .DEFINED"
+	"See also: DEFINE."
+
+chat_help_cls
+	"CLS command:"
+	"Clears the console."
+	"Usage: just type .CLS"
+
+chat_help_query
+	"QUERY command:"
+	"Sends specified user your message."
+	"Usage: .QUERY <USER> <MESSAGE>"
+	"where USER is a username of one player, MESSAGE is a string"
+	"you want to send him. This string is sent only to the specified"
+	"player, so nobody else can see it. At recipient's console it will"
+	"appear with '--->' string at the beginning of the message."
+	"List of active players you can obtain using USERS command."
+	"See also: USERS."
+
+chat_help_ban
+	"BAN command:"
+	"Locks specified player's console so he/she can't write anymore."
+	"Usage: .BAN <USER>"
+	"This command is for the channel operators only."
+	"Warning: messages from other stations are still visible"
+	"on locked console, so player that have been BANned can still"
+	"read everything. The only way to remove BAN from banned"
+	"players is to finish the session and start it again,"
+	"so, please, use this command wisely..."
+	"See also: USERS."
+
+chat_help_op
+	"OP command:"
+	"Gives specified player channel operator privileges."
+	"Usage: .OP <USER>"
+	"This command is for the channel operators only."
+	"See also: USERS."
+	"USERS"
+	"USERS command:"
+	"List all players connected to the session."
+	"Usage: just type .USERS"
+	"All players are listed in three columns. First one, containing"
+	"'+' or '-' character shows if the player has channel operator"
+	"privileges, second one is the player's name and third one is"
+	"an actual player's status."
+
+chat_help_whoami
+	"WHOAMI command:"
+	"Gives a piece of information about your name."
+	"Usage: just type .WHOAMI"
+	"<COMMAND>"
+
+chat_help_me
+	"I'm sorry, but it seems that there is nothing I can help _YOU_"
+	"with... Try to use help with proper command as a parameter."
+
+chat_error_help1
+	"HELP error (cripple user)."
+	"You should have called help with name of particular command"
+	"as a parameter - that is what expression <COMMAND> means."
+	"Well, if you have problems still, try to copy these examples:"
+	"help quit; help for QUIT command"
+	"help whoami; help for WHOAMI command"
+	"etc."
+
+chat_error_help2
+	"HELP error (invalid help topic)."
+	"Available help topics:"
+	"HELP QUIT BYE LEAVE DEFINE DEFINED CLS"
+	"QUERY BAN OP USERS WHOAMI"
+
+chat_error_define1
+	"DEFINE error (no parameters)."
+
+chat_error_define2
+	"DEFINE error (invalid first parameter)."
+
+chat_error_query1
+	"QUERY error ('%s' is not a valid username)."
+
+chat_error_query2
+	"QUERY error (no message specified)."
+
+chat_error_query3
+	"QUERY error (no parameters)."
+
+chat_error_shortcut1
+	"SHORTCUT error (no shortcut defined)."
+
+chat_error_shortcut2
+	"Invalid command: '%s'."
+
+chat_error_nocommand
+	"No command specified."
+
+chat_error_ban1
+	"BAN error ('%s' is not a valid username)."
+
+chat_error_ban2
+	"BAN error (no user specified to set ban on)."
+
+chat_error_ban3
+	"BAN error (cannot set ban on myself)."
+
+chat_error_ban4
+	"BAN error (user '%s' is already banned)."
+
+chat_error_ban5
+	"BAN error (no privileges to set ban)."
+
+chat_error_op1
+	"OP error ('%s' is not a valid username)."
+
+chat_error_op2
+	"OP error (no user specified to give op)."
+
+chat_error_op3
+	"OP error (cannot give op myself)."
+
+chat_error_op4
+	"OP error (user '%s' is already an operator)."
+
+chat_error_op5
+	"OP error (no privileges to give op)."
+
+chat_msg_shortcut1
+	"New shortcut for %d set."
+
+chat_msg_shortcut2
+	"Shortcut for %d cleared."
+
+chat_msg_shortcut3
+	"Defined shortcuts:"
+
+chat_msg_shortcut4
+	"There is no defined shortcuts."
+
+chat_msg_message
+	"Secret message to %s sent."
+
+chat_msg_ban1
+	"'%s' has set ban on '%s'."
+
+chat_msg_ban2
+	"'%s' has given an op '%s'."
+
+chat_msg_whoami
+	"You are %s."
+
+chat_msg_users
+	"Current players:"
+
+chat_msg_status1
+	"banned..."
+
+chat_msg_status2
+	"leaving..."
+
+chat_msg_status3
+	"active"
+
+chat_msg_chatreqest1
+	"Chat requested by %s."
+
+chat_msg_chatreqest2
+	"Type '.help' to view summary of special commands."
+
+chat_msg_chatreqest3
+	"Type '.quit' to end the conversation."
+
+chat_msg_usemenu
+	"Player %s is using menu now."
+
+chat_msg_endrequest1
+	"Connection closed by foreign host..."
+
+chat_msg_endrequest2
+	"Disconnecting players:"
+
+chat_msg_banned
+	"YOU HAVE BEEN BANNED BY THE CHANNEL OPERATOR..."
+
+
+
+
+
+
+

@@ -1,0 +1,70 @@
+;旼컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴커
+;�                              BROWN LEVEL 2                                 �
+;읕컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴켸
+area brown
+        area 2elektrownia                     ; podpora do drutow
+          source = -flics\brown\elektr.flc
+          hires = brown\sprites\elektr.sph
+         csource = -flics\brown\elektrk.flc
+          collis = brown\sprites\elektr.spc
+        endarea
+
+        area 2elektrowniad                    ; podpora do drutow zniszczona
+          source = -flics\brown\elektrd.flc
+          hires = brown\sprites\elektrd.sph
+        endarea
+
+        area 2pipes                           ; rury
+          source = -flics\brown\pipes.flc
+          hires = brown\sprites\pipes.sph
+        endarea
+
+        area 2collis                          ; kolizje do rur
+          source = -flics\brown\pipesk.flc
+          hires = brown\sprites\pipesk.sph
+          collis = brown\sprites\pipesk.spc
+        endarea
+
+        area 2roads                           ; druty i drogi
+          source = -flics\brown\roads.flc
+          hires = brown\sprites\roads.sph
+        endarea
+
+        area 2servo                           ; servo i boisko
+          source = -flics\brown\servo.flc
+          hires = brown\sprites\servo.sph
+        endarea
+
+        area 2kopula                          ; kopula dziala otwierajaca sie
+          source = -flics\brown\kopula.flc
+          hires = brown\sprites\kopula.sph
+        endarea
+
+        area 2kopulap                         ; kopula dziala na slupie
+          source = -flics\brown\kopulap.flc
+          hires = brown\sprites\kopulap.sph
+          csource = -flics\brown\kopulapk.flc
+          collis = brown\sprites\kopulap.spc
+        endarea
+
+        area 2kopulad                         ; kopula zniszczona
+          source = -flics\brown\kopulad.flc
+          hires = brown\sprites\kopulad.sph
+        endarea
+
+        area 2cooler                         ; wentylatorek
+          source = -flics\brown\cooler.flc
+          hires = brown\sprites\cooler.sph
+        endarea
+
+        area 2walldoor                        ; sciana drzwi
+          source = -flics\brown\walldoor.flc
+          hires = brown\sprites\walldoor.sph
+          csource = -flics\brown\walldook.flc
+          collis = brown\sprites\walldoor.spc
+        endarea
+
+endarea
+dome_open = brown\sounds\domeopen.wav
+
+

@@ -1,0 +1,36 @@
+dx=4096
+dy=4096
+  weather = fog
+
+  CheckPoints
+     "destroyA"
+     "landingB"
+
+  Bonus
+     "null"
+
+  area landingB
+    quit        = true
+    event       = landing
+    type        = landplaceA
+    radar       = 1
+    count       = 1
+  endarea
+
+
+  area destroyA
+    event       = destroy
+    type        = belkot_dest1
+    count       = ALL
+;   timer       = 15
+    radar       = 1
+;   DISPL_TEXT  "white3_destroyA_1" "mission" "BASE"
+  endarea
+
+  area null
+    event       =landing
+    type        =mine
+    count       =1
+  endarea
+
+

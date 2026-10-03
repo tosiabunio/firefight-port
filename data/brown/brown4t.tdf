@@ -1,0 +1,169 @@
+area upgrade
+  type = obj_capsule
+   range = 30
+endarea
+
+area loteryjka
+  type = obj_capsule
+  range = 30
+endarea
+
+area lotniskoA
+  type = landplaceA
+endarea
+
+area lotniskoB
+  type = landplaceB
+endarea
+
+area lotniskoC
+  type = landplaceC
+endarea
+
+area lotniskoD
+  type = landplaceD
+endarea
+
+area unblock
+  type = obj_unblock
+  serv_type = visual
+  unblocked_type = unblock
+endarea
+
+area unblock2
+  type = obj_unblockcel2
+  serv_type = visual
+  unblocked_type = unblock
+endarea
+
+area unblock3
+  type = obj_unblockcel3
+  serv_type = visual
+  unblocked_type = unblock
+endarea
+
+area unblock4
+  type = obj_unblockcel4
+  serv_type = visual
+  unblocked_type = unblock
+endarea
+
+area unblock5
+  type = obj_unblockcel5
+  serv_type = visual
+  unblocked_type = unblock
+endarea
+
+area wiatrak
+  type = obj_destroy
+  life = medium_shields
+  range = 60
+  smoke = 1
+  explode =1
+  ch_sprite = wiatrakd
+  frame_delay = 0.05
+  action = enable_after
+  morph =1
+endarea
+
+area wiatrak2
+  type = obj_destroy
+  life = medium_shields
+  range = 60
+  smoke = 1
+  explode =1
+  ch_sprite = wiatrakd
+  frame_delay = 0.05
+  action = enable_after
+  morph =1
+endarea
+
+area kompresor
+  type = obj_destroy
+  life = medium_shields
+  range = 60
+  explode =1
+  ch_sprite = blow1d
+  action = enable_after
+  frame_delay = 0.05
+  morph =1
+endarea
+
+area elektrownia
+  type = obj_destroy
+  life = medium_shields
+  range = 60
+  explode=1
+  ch_sprite = 4elektrowniad
+  action = enable_after
+  frame_delay = 0.05
+  morph =1
+endarea
+
+area dest_1
+  type = obj_destroy
+  life = immortal
+  range = 60
+  explode =1
+  frame_delay = 0.05
+  action = enable_after
+endarea
+
+area dest_2
+  type = obj_destroy
+  life = immortal
+  range = 60
+  explode =1
+  frame_delay = 0.05
+  action = enable_after
+endarea
+
+area dest_3
+  type = obj_destroy
+  life = immortal
+  range = 60
+  frame_delay = 0.05
+  action = disable_after
+endarea
+
+area dest_4
+  type = obj_destroy
+  life = immortal
+  range = 60
+  frame_delay = 0.05
+  action = disable_after
+endarea
+
+area generator
+  type         = obj_generator
+  generate_frq = 5
+  object_count = 10
+endarea
+
+area doo4
+  type = door_04
+  delay = 0
+  open = 0
+endarea
+
+area bar
+  type = obj_destroy
+  life = low_shields
+  range = 60
+  ch_sprite = bardest
+  anim_sprite = barani
+  frame_delay = 0.05
+  action = enable_after
+  explode_sample= bar
+endarea
+
+area cool
+  type = obj_destroy
+  life = low_shields
+  range = 60
+  ch_sprite = 03
+  anim_sprite = 02
+  frame_delay = 0.02
+  action = enable_after
+  explode_sample=wallexplode
+endarea

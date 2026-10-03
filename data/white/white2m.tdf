@@ -1,0 +1,72 @@
+dx=4096
+dy=4096
+  weather = fog
+
+  CheckPoints
+     "Ludki"
+     "BOOM"
+     "landing"
+
+  Bonus
+     "sekret1"
+
+  area landing
+    quit        = true
+    event       = landing
+    type        = landplaceA
+    radar       = 0
+    enable_action "Bronie1"
+    count       = 1
+    OBJ_TEXT "white_2_3"
+    DISPL_TEXT
+    "white_2_3_1" "white_2_3_1" "RILEY"
+    "white_2_3_2" "white_2_3_2" "RILEY"
+    "white_2_3_3" "white_2_3_3" "STACY"
+    "white_2_3_4" "white_2_3_4" "STACY"
+    "white_2_3_5" "white_2_3_5" "JAXON"
+  endarea
+
+
+  area Ludki
+    type         "obj_collect"
+                 "bunkier1_destroy"
+                 "bunkier2_destroy"
+    count       = ALL
+    radar       = 1
+    OBJ_TEXT "white_2_1"
+    DISPL_TEXT
+    "white_2_1_1" "white_2_1_1" "STACY"
+    "white_2_1_2" "white_2_1_2" "STACY"
+    "white_2_1_3" "white_2_1_3" "JAXON"
+    "white_2_1_4" "white_2_1_4" "STACY"
+    "white_2_1_5" "white_2_1_5" "STACY"
+  endarea
+
+  area sekret1
+    type         "kwiatek2_sekret"
+    count       = 1
+    radar       = 1
+    disable_action = sciany2_sekret
+;    DISPL_TEXT  "missing_event_text" "mission" "BASE"
+  endarea
+
+  area BOOM
+    type        "wieza1_dest"
+                "beczka1_dest"
+    count       = ALL
+    radar       = 1
+    handle
+                  "destroy_obj beczka9_dest"
+    OBJ_TEXT "white_2_2"
+    DISPL_TEXT
+    "white_2_2_1" "white_2_2_1" "STACY"
+    "white_2_2_2" "white_2_2_2" "RILEY"
+    "white_2_2_3" "white_2_2_3" "RILEY"
+    "white_2_2_4" "white_2_2_4" "RILEY"
+    "white_2_2_5" "white_2_2_5" "STACY"
+    "white_2_2_6" "white_2_2_6" "RILEY"
+    "white_2_2_7" "white_2_2_7" "RILEY"
+    "white_2_2_8" "white_2_2_8" "JAXON"
+  endarea
+
+

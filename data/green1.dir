@@ -1,0 +1,12 @@
+;旼컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴커
+;�                              GREEN LEVEL                                   �
+;읕컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴켸
+
+area green
+
+  area kadlub
+    source = -flics\green\kadlub.flc
+    hires  =  green\sprites\kadlub.sph
+   endarea
+
+endarea

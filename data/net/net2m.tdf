@@ -1,0 +1,14 @@
+  dx=4096
+  dy=4096
+  weather = none
+
+  CheckPoints
+     "landing"
+
+  area landing
+    quit        = true
+    event       = landing
+    type        = landplaceA
+    count       = 1
+    radar       = 1
+  endarea

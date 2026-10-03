@@ -1,0 +1,25 @@
+area palette
+  source = -flics\!global\palette.flc
+  target = !global\sprites\palette.spp
+endarea
+
+
+area screen1
+  source  = -flics\!global\screen1.flc
+  hires   =  !global\sprites\screen1.sph
+endarea
+
+area screen2
+  source  = -flics\!global\screen2.flc
+  hires   =  !global\sprites\screen2.sph
+endarea
+
+area press
+  source  = -flics\!global\press.flc
+  hires   =  !global\sprites\press.sph
+endarea
+
+area copy
+  source  = -flics\!global\copy.flc
+  hires   =  !global\sprites\copy.sph
+endarea

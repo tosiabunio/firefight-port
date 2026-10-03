@@ -1,0 +1,131 @@
+  weather = rain3
+  dx=4096
+  dy=4096
+  radar = 1
+
+  CheckPoints
+       "pluton"
+       "wall"
+       "boss"
+       "landingD"
+       "landingC"
+       "landingB"
+       "landingA"
+       "quit"
+  Bonus
+       "ludek1"
+       "ludek2"
+
+    area ludek1
+       type         "obj_collectLUDEK1"
+       count        = 1
+       displ_text
+       "brown_2_A_1" "brown_2_A_1" "STACY"
+       "brown_2_A_2" "brown_2_A_2" "STACY"
+       "brown_2_A_3" "brown_2_A_3" "STACY"
+       "brown_2_A_4" "brown_2_A_4" "STACY"
+    endarea
+
+    area ludek2
+       type         "obj_collectLUDEK2"
+       count        = 1
+       enable_action "nagroda"
+       displ_text
+       "brown_2_B_1" "brown_2_B_1" "STACY"
+       "brown_2_B_2" "brown_2_B_2" "STACY"
+    endarea
+
+    area wall
+      type          = obj_collectpluton
+      count         = all
+      enable_action "obj_alienm1"
+                    "obj_teleport2"
+                    "obj_teleport"
+      obj_text "brown_2_2"
+      DISPL_TEXT
+      "brown_2_2_1" "brown_2_2_1" "JAXON"
+      "brown_2_2_2" "brown_2_2_2" "RILEY"
+      "brown_2_2_3" "brown_2_2_3" "RILEY"
+      "brown_2_2_4" "brown_2_2_4" "RILEY"
+      set_radar     = 1
+    endarea
+
+    area boss
+      type          "obj_alienm1"
+      handle        "door walldoor"
+      count         = 1
+      radar         = 1
+      obj_text "brown_2_3"
+      DISPL_TEXT
+      "brown_2_3_1" "brown_2_3_1" "RILEY"
+      "brown_2_3_2" "brown_2_3_2" "RILEY"
+      "brown_2_3_3" "brown_2_3_3" "STACY"
+    endarea
+
+    area pluton
+      type          = obj_collect
+      radar         = 1
+      count         = 1
+      obj_text "brown_2_1"
+      DISPL_TEXT
+      "brown_2_1_1" "brown_2_1_1" "RILEY"
+      "brown_2_1_2" "brown_2_1_2" "RILEY"
+      set_radar     = 0
+    endarea
+
+    area landingD
+      type          = lotniskoD
+      count         = 1
+      radar         = 1
+      obj_text "brown_2_4"
+      DISPL_TEXT
+      "brown_2_4_1" "brown_2_4_1" "RILEY"
+      "brown_2_4_2" "brown_2_4_2" "RILEY"
+      "brown_2_4_3" "brown_2_4_3" "RILEY"
+      "brown_2_4_4" "brown_2_4_4" "RILEY"
+      enable_action "pack1"
+    endarea
+
+    area landingC
+      type          = lotniskoC
+      count         = 1
+      radar         = 1
+      obj_text "brown_2_5"
+      DISPL_TEXT
+      "brown_2_5_1" "brown_2_5_1" "STACY"
+      "brown_2_5_2" "brown_2_5_2" "STACY"
+      enable_action "pack2"
+    endarea
+
+    area landingB
+      type           = lotniskoB
+      count          = 1
+      radar          = 1
+      obj_text "brown_2_6"
+      DISPL_TEXT
+      "brown_2_6_1" "brown_2_6_1" "STACY"
+      enable_action "pack3"
+    endarea
+
+    area landingA
+      type           = lotniskoA
+      count          = 1
+      radar          = 1
+      obj_text "brown_2_7"
+      DISPL_TEXT
+      "brown_2_7_1" "brown_2_7_1" "STACY"
+      "brown_2_7_2" "brown_2_7_2" "STACY"
+      "brown_2_7_3" "brown_2_7_3" "STACY"
+      enable_action "unblock2"
+                    "pack4"
+    endarea
+
+    area quit
+      type           = unblock2
+      count          = 1
+      radar          = 1
+      quit           = 1
+      obj_text        "brown_2_7"
+      enable_action "loteryjka"
+    endarea
+

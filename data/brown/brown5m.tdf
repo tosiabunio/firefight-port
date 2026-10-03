@@ -1,0 +1,40 @@
+  weather = fog
+  dx=4096
+  dy=4096
+
+  CheckPoints
+       "wiatraki"
+  Bonus
+       "unblock2"
+       "unblock3"
+
+   area wiatraki
+        type = kompresor
+       count = all
+       radar = 1
+       quit = true
+       enable_action "loteryjka"
+    OBJ_TEXT "brown_5_1"
+    displ_text
+    "brown_5_1_1" "brown_5_1_1" "RILEY"
+    "brown_5_1_2" "brown_5_1_2" "RILEY"
+    "brown_5_1_3" "brown_5_1_3" "RILEY"
+    "brown_5_1_4" "brown_5_1_4" "RILEY"
+    "brown_5_1_5" "brown_5_1_5" "RILEY"
+    "brown_5_1_6" "brown_5_1_6" "JAXON"
+    "brown_5_1_7" "brown_5_1_7" "STACY"
+    "brown_5_1_8" "brown_5_1_8" "STACY"
+    "brown_5_1_9" "brown_5_1_9" "JAXON"
+   endarea
+
+   area unblock2
+     type = unblock3
+     count = 1
+     HANDLE "destroy_obj dest_1"
+   endarea
+
+   area unblock3
+     type = unblock2
+     count = 1
+     HANDLE "destroy_obj dest_2"
+   endarea

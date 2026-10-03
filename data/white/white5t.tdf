@@ -1,0 +1,89 @@
+;=====================================================================
+;
+;                               WHITE TYPY 1
+;
+;=====================================================================
+
+
+;---------------------------------------- STATKI
+
+
+
+;---------------------------------------- DESTROY
+
+area belkot_dest
+        type          = obj_destroy1
+        life          = 1000
+        range         = 60
+        ch_sprite     = belk_z
+        frame_delay   = 0.05
+endarea
+
+area belkot_dest1
+        type          = obj_destroy2
+        life          = 500
+        range         = 60
+        ch_sprite     = belk_z
+        frame_delay   = 0.05
+endarea
+
+area kwiatek_dest
+        type         = obj_destroy5
+        life         = 100
+        range        = 60
+        ch_sprite    = kwiat_z
+        frame_delay  = 0.06
+endarea
+
+;---------------------------------------- DZIALA
+
+area cannon1
+        type          = obj_cannon1
+        range         = 60
+        shootfrq      = 1
+        bullet_speed  = 200
+        prepare_time  = 1.5
+        anglerange    = 190
+        life          = 700
+ endarea
+
+area statcannon_05
+        type          = obj_statcannon05
+        shoot_frq     = 1.0
+        shoot_range   = 600
+        bullet_speed  = 200
+        range         = 50
+        life          = 1200
+endarea
+area statcannon_10
+        type          = obj_statcannon10
+        shoot_frq     = 1.5
+        shoot_range   = 600
+        bullet_speed  = 200
+        range         = 50
+        life          = 1200
+endarea
+
+area statcannon_15
+        type          = obj_statcannon15
+        shoot_frq     = 2.0
+        shoot_range   = 600
+        bullet_speed  = 200
+        range         = 50
+        life          = 1200
+endarea
+
+;---------------------------------------- BRONIE & LOTNISKA
+
+area landplaceA
+        type          = landplaceA
+endarea
+
+area landplaceB
+        type           = landplaceB
+endarea
+
+area Bronie
+        type           = obj_capsule
+        range          = 30
+endarea
