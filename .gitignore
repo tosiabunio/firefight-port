@@ -8,3 +8,11 @@
 # Runtime logs written by the engine and game
 lastexec.log
 firefght.log
+
+# Build output and local tool state
+/build/
+/out/
+/vcpkg_installed/
+/.vs/
+/.vscode/
+CMakeUserPresets.json
