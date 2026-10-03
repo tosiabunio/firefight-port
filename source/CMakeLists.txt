@@ -100,8 +100,11 @@ target_link_libraries(firefight PRIVATE regdata cwengine)
 ff_legacy_options(firefight)
 
 # Phase 1 exit check: boot headless against data/ through Game::init_all, then shut down
-# cleanly. Rebuilds missing sprite caches in data/ (git-ignored); the log goes to TEMP.
+# cleanly. Rebuilds missing sprite caches in data/ (git-ignored); the log goes to TEMP and is
+# echoed to stderr, where the test requires the loaded sprite totals and a clean finish.
 add_test(NAME headless_init COMMAND firefight --data "${FF_DATA_DIR}" --headless)
 set_tests_properties(headless_init PROPERTIES
   ENVIRONMENT "TEMP=${CMAKE_CURRENT_BINARY_DIR}"
+  PASS_REGULAR_EXPRESSION "99 sprites, 2510 phases.*heap ok.*Program status:  completed successfully"
+  FAIL_REGULAR_EXPRESSION "execution failed"
   TIMEOUT 300)
