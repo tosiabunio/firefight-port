@@ -31,6 +31,7 @@ int              Eem::queue_last(0);
 int              Eem::queue_delay(0);
 int              Eem::timer_id(0);
 int              Eem::timer_frq(0);
+int              Eem::untimed(0);
 Comm::wpp        Eem::old_window_proc=NULL;
 int              Eem::last_return_code=0;
 int              Eem::players_max(0);
@@ -332,11 +333,14 @@ void Eem::init (int size, int frequency, int network_supported, int check_sync,
 
     if (frequency)
     {
-      if (!Timer::is_initialized())
-        FAILURE("timer not initialized [Eem::init]");
-      timer_id = Timer::add(1000/frequency, callback_timer, "Eem queue timer");
-      timer_frq = frequency;
-      status.set(eem_Timed);
+      timer_frq = frequency;  // game time per tick, also without the clock
+      if (!untimed)
+      {
+        if (!Timer::is_initialized())
+          FAILURE("timer not initialized [Eem::init]");
+        timer_id = Timer::add(1000/frequency, callback_timer, "Eem queue timer");
+        status.set(eem_Timed);
+      }
     }
     ENGINFO ("eem status: queue size = %d, frequency = %d, debug %s, network %s", 
              size, frequency, debug?"on":"off", status.is(eem_Multi)?"on":"off");

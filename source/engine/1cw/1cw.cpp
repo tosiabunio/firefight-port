@@ -360,9 +360,9 @@ void Cwe::init (Cwe_param *param)
       dz = text.value(eem_joy_dead_zone);
     // Port: fast=1 runs without the clock. Eem then makes one simulation step per frame, as
     // fast as possible, so a run is the same frame for frame (for tests and replays).
-    int frequency = Cmd_line::get_int("fast",0) ? 0 : text.value(eem_timer_frequency);
+    Eem::untimed = Cmd_line::get_int("fast",0);
     Eem::init(text.value(eem_queue_size),
-              frequency, 
+              text.value(eem_timer_frequency), 
               text.value(eem_net_supported),
               text.value(eem_check_sync),
               text.value(eem_compress_packets),

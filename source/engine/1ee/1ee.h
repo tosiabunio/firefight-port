@@ -702,6 +702,11 @@ private:
   static int   *queue;
 	static int   timer_id;
 	static int   timer_frq;
+public:
+  // Port: run without the clock (--fast): one tick per read, as fast as possible, while the
+  // game still counts 1/frequency seconds per tick.
+  static int   untimed;
+private:
   static int   queue_tail;
   static int   queue_head;
   static int   queue_size;
