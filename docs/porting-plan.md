@@ -182,7 +182,7 @@ Each phase ends with something runnable and an exit check. Phases 5–7 can over
 - **Other changes:**
   - drop the Win32 progress dialog;
   - screenshots go to the pref path.
-- **Exit:** the title, menus, mission briefing and missions render and match reference screenshots from the original game. Capture those from the retail CD image, set up as described in the archive's `Instructions.txt`. Those instructions cover Windows Vista–8; Windows 11 is untested.
+- **Exit:** the title, menus, mission briefing and missions render and match reference screenshots from the original game. Capture those from the retail CD image, set up as described in the archive's `Instructions.txt`, or from the 1.1 build in the archive ([original-archive.md](original-archive.md#executables)). Those instructions cover Windows Vista–8; Windows 11 is untested.
 - **Outcome** (2026-10-04). Everything above is in place except the comparison with the original game, which needs reference screenshots captured from the retail CD image (`--shot-every`/`--shots` dump the port's frames for the comparison).
   - **Rendering is bit-identical across platforms.** The `golden_title` test runs the title sequence in `--fast` mode, whose logo flight uses float arithmetic. Every 20th of its first 200 frames is identical on Windows/MSVC x64, Linux GCC and Clang x86-64 and macOS arm64.
   - **Floats:** that needed `-ffp-contract=off` on GCC/Clang. Clang on arm64 otherwise fuses `a*b+c` into one multiply-add, which rounds differently from x86. This matters for the simulation too.
@@ -191,11 +191,11 @@ Each phase ends with something runnable and an exit check. Phases 5–7 can over
   - **Video:** `VD_sdl` replaces both the DirectDraw and the GDI-bitmap devices; the window is created by `Spr::create_window`. Display options are command-line switches for now (`--fullscreen`, `--stretch`); the phase 8 menus take them over. The game draws on every batch of ticks, presented with vsync.
   - **Sprites:** built in memory on every load in about 1 s (`keep_prepared`). Nothing is written to `data/`, and the "building …" screens the original showed for a missing cache are gone.
     - Lores bounds come from `Lsprite::measure` (the `source` FLC at the lores scale, no pixels), for every sprite that has a `source` and wants lores.
-    - **Open question:** the removed manifest lines would show which sprites really had a lores target. The original manifests in the archive can settle it if phase 5 points here.
+    - **Settled against the archive (2026-10-04):** every hires sprite had a lores target. The rule is exact for 481 sprites, but 15 differ: a `1x1` override or a separate lores master (`lsource`) was on the removed lines. One of them is the level sprite `bronie` (ship upgrades), whose bounds decide when its builders fire. Details and fix options in [original-archive.md](original-archive.md#lores-bounds-15-sprites-differ-one-of-them-a-level-sprite); the fix belongs to phase 5.
   - **Test tools, pulled forward from phase 5:**
     - `--fast` runs without the clock: one simulation step per frame, game time still 1/30 s per tick (`Eem::untimed`).
     - `--demo <name>` plays one recorded demo.
-    - With both, `level1` desyncs at check number 0x109. That is expected until the phase 5 compat clones (MSVC `rand`, `qsort`, x87 conversions) are in place.
+    - With both, `level1` desyncs at check number 0x109. That is expected until the phase 5 compat clones (MSVC `rand`, `qsort`) and the lores bounds fix are in place.
   - **Not ported:** sound stays inactive until phase 6 (the DirectSound stub would fail init). Mouse mapping waits for phase 4.
 
 ### Phase 4: input; single player becomes playable
@@ -210,9 +210,12 @@ Each phase ends with something runnable and an exit check. Phases 5–7 can over
 
 ### Phase 5: determinism and the demo regression suite
 - **Clone the old-toolchain behaviours in `compat/`:**
-  1. **MSVC `rand()`.** `Rand::init` fills its table with `srand(0)` and 1024 × CRT `rand()` (`gobj.cpp:39-42`). glibc and Apple's libc produce different numbers, so embed the MSVC LCG.
-  2. **MSVC 4 `qsort`.** The collision results are sorted with every priority 0 (`1sp.h:267-268`, `1sp_scr2.cpp:107-121`), so the order of equal keys is whatever MSVC's algorithm produced.
-  3. **x87 float→tick conversions.** `(int)(seconds*1000)` with `float` inputs (`params.cpp:3,781,…`) gives a different answer under x87 than under SSE for 11 of the 35 decimal values in `data/`, for example 0.7 s → 699 vs 700. Doing the multiply in `double` reproduces x87. Whether MSVC 4 kept the extended precision is unknown, so make it a switch and let the demos decide.
+  1. **MSVC `rand()`.** `Rand::init` fills its table with `srand(0)` and 1024 × CRT `rand()` (`gobj.cpp:39-42`). glibc and Apple's libc produce different numbers, so embed the MSVC LCG. Confirmed in the 1.1 exe.
+  2. **MSVC 4 `qsort`.** The collision results are sorted with every priority 0 (`1sp.h:267-268`, `1sp_scr2.cpp:107-121`), and so are the visible level objects (`1sp_lev.cpp:768`). The order of equal keys is whatever MSVC's algorithm produced. The 1.1 exe holds the classic pre-2005 CRT `qsort`; [original-archive.md](original-archive.md#msvc-4-qsort-confirmed) has it.
+  3. **x87 floats: no switch needed.** The CRT ran x87 at 53-bit precision.
+     - `METRONQUALITY` is 1024, so the `(int)(seconds*METRONQUALITY)` tick conversions are exact under x87 and SSE alike. The earlier ×1000 analysis (0.7 s → 699 vs 700) was wrong.
+     - What can differ is a float result the original used straight from the register: converted to `int` or fed into the next operation. Evaluate those in `double` (sites in [original-archive.md](original-archive.md#x87-the-tick-conversions-are-exact)).
+  4. **Lores bounds.** 15 sprites' phase bounds depend on the removed lores manifest lines, among them the level sprite `bronie`, whose bounds decide when its builders fire. See phase 3 and [original-archive.md](original-archive.md#lores-bounds-15-sprites-differ-one-of-them-a-level-sprite).
 - **Headless demo runner:**
   - `firefight --headless --play-demo <file> --strict-sync` exits non-zero on `Eem_demo_sync_failure`. The original catches that exception silently and just ends the demo;
   - it also checks that the replay reached the demo's last frame;
@@ -220,13 +223,14 @@ Each phase ends with something runnable and an exit check. Phases 5–7 can over
 - **Built-in sync signal:** each frame the game compares the sum over ships of x + y + angle + life, plus the `Rand` index (`game.cpp:909-937`).
 - **Diagnostic traces:** `randdebug`, `shipdebug` and `netdebug` (`MAIN.TDF` levels) already dump traces for diagnosing a divergence.
 - **If an original demo desyncs, suspects in order:**
-  1. the three compat behaviours above;
+  1. the compat behaviours above;
   2. collision scan order;
-  3. lores bounds;
+  3. phase bounds: compare the in-memory sprites with the shipped caches in the archive;
   4. render-path side effects: `World::display` calls `look_at` **with builders** (`world.cpp:74-81`). Until that is proven harmless, keep the original cadence of one render per batch of ticks, and run the same calls in headless mode;
   5. the uninitialised `ACannon::global_time` read (`alien.cpp:1726`, `==` instead of `=`);
-  6. finally, a real 1.0 → 1.1 gameplay change. The demos are dated May 1996; this source is August 1996.
+  6. finally, a real 1.0 → 1.1 gameplay change. The demos were recorded on 20 May 1996; this source is August 1996. Every gameplay `.tdf` predates the demos, so only code changed; the archive's file dates list the candidate files ([original-archive.md](original-archive.md#the-demos-and-10--11)).
 - **Golden demos:** record a further set with the port across several missions and skill levels. CI replays them on all three OSes; this is the cross-platform determinism gate.
+- **1.1 demos:** the archive holds the original 1.1 executables, built from this source. If they run, demos they record are an exact 1.1 oracle without the 1.0 question.
 - **Exit:** the original demos replay in sync, or any divergence is explained and documented, and the golden demos pass on Windows, Linux and macOS.
 
 ### Phase 6: audio (`1ss`)
@@ -282,7 +286,7 @@ Each phase ends with something runnable and an exit check. Phases 5–7 can over
 
 | Risk | Impact | Mitigation |
 |---|---|---|
-| Original demos desync even with the compat clones (possible 1.0 → 1.1 change) | Lose the strongest exactness oracle | Golden demos from the port. Debug traces. Reference screenshots from the retail game |
+| Original demos desync even with the compat clones (possible 1.0 → 1.1 change) | Lose the strongest exactness oracle | Golden demos from the port. Debug traces. Reference screenshots from the retail game. Demos recorded with the original 1.1 exe from the archive |
 | Simulation side effects in the render path (builders in `look_at`) | Headless runs or a different frame pacing change outcomes | Keep the original render cadence; investigate in phase 5 |
 | `FastAlloc` slot overflow on other ABIs (992/1024 bytes on MSVC x64; GCC/Clang unknown) | Memory corruption | `static_assert` all object sizes; enlarge the slot if needed. Doesn't affect determinism |
 | Blitter reimplementation not pixel-exact | Visual differences; collision order changes | Unit-test each mode against the asm semantics. Screenshot diffs |

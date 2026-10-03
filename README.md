@@ -11,9 +11,11 @@ This is the subset of the original Fire Fight (Chaos Works, 1996) material neede
 | `data/` | Retail game data, laid out exactly as the `*.dir` manifests expect (see below) |
 | `music/` | CD-audio soundtrack, `track02.flac` … `track09.flac` (lossless rips of the CD tracks) |
 | `docs/porting-plan.md` | The port plan: SDL2 + CMake, phases, decisions |
+| `docs/original-archive.md` | What the original archive holds beyond this subset (built 1.1 executables, shipped sprite caches, the 1.2 CD), and what was verified against it |
 | `CMakeLists.txt`, `CMakePresets.json`, `vcpkg.json`, `cmake/` | Build system |
 | `source/compat/` | Port layer: MSVC CRT extensions and stand-ins for the Win32/DirectX APIs (inert stubs until the SDL2 drivers replace them) |
 | `tools/smoke/` | Dependency smoke test (SDL2 window and paletted present, SDL2_mixer FLAC/WAV, ENet loopback) |
+| `tools/archive/` | `ffarchive.py`: unpacks the original volumes, reads sprite caches, checks the port's data and sprite bounds against the archive |
 
 ## Building
 
@@ -96,14 +98,14 @@ build/linux-gcc/tools/smoke/Debug/ff_smoke --music music/track02.flac --wav 'dat
 
 - **Source:** the source and the data in `data/` form a consistent pair, both version 1.1.
   - The source snapshot dates from 31 Aug 1996, which is version 1.1. The original build scripts produced the `ff11up` patch from it.
-  - `data/` comes from `FF/WORK.RTL`. Its content matches the data volumes shipped on the retail CD (dated May 1996).
-- **The 1.2 CD differs in two files:** a newer `FIREFGHT.EXE`/`LOADER.EXE` (Jul 1997) and a newer `PARAMS.VOL`. `PARAMS.VOL` holds the `.tdf` parameter files. No source exists for 1.2, so this tree reproduces 1.1.
+  - `data/` comes from `FF/WORK.RTL`. Every file in the retail CD's data volumes (dated May 1996) is byte-identical to `data/` or to a sprite cache in `FF/WORK.RTL`.
+- **The 1.2 CD differs only in its executables:** a newer `FIREFGHT.EXE`/`LOADER.EXE` (Jul 1997). Its `PARAMS.VOL` is dated 1997 but repacks the same `.tdf` files. No source exists for 1.2, so this tree reproduces 1.1. See `docs/original-archive.md`.
 
 ## What was deliberately left out
 
 | Left out | Why | Where it is in the original tree |
 |---|---|---|
-| Lores art: `.spl` sprites and `lsource` FLCs | The port is hires-only. 525 `lores =`/`lsource =` lines were removed from the manifests | `FF/WORK.RTL` |
+| Lores art: `.spl` sprites and `lsource` FLCs | The port is hires-only. 525 `lores =`/`lsource =` lines were removed from the manifests. Their `1x1` overrides and lores masters still shaped 15 sprites' phase bounds (`docs/original-archive.md`) | `FF/WORK.RTL` |
 | Built sprite caches: `.sph` (hires), `.spc` (collision), `.spp` (palette tables) | Regenerated from the FLC masters (see "Sprites"). They are compiled, engine-specific RLE formats | `FF/WORK.RTL` |
 | Launcher `LOADER.EXE` (MFC options/network wizard), `FFSTART`, `INFO`, the LED level editor | Platform-specific front-ends and tools, not the game. `RegData` (kept) is the settings model the launcher edited | `FF/C/LOADER`, `FF/C/FFSTART`, `FF/C/INFO`, `FF/C/LED` |
 | Makefiles (`.mak`/`.mdp`), engine test harnesses, DirectX SDK headers | MSVC 4 / Win95 only | `FF/C`, `LIB` |

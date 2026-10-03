@@ -11,7 +11,11 @@ This repo is the porting basis for **Fire Fight** (Chaos Works, 1996), a Win95/D
 
 Everything was selected by rule from the original archive. `README.md` documents the provenance, the selection rules, what was left out, and the full data, sprite and music details. Comments and many identifiers are in Polish.
 
-- **Version 1.1 only.** This source is v1.1 (Aug 1996). The retail CD is 1.2 and has a newer executable and `PARAMS.VOL`, but no 1.2 source exists. Don't try to reproduce 1.2 behaviour.
+- **Version 1.1 only.** This source is v1.1 (Aug 1996). The retail CD is 1.2, but it differs only in the executables (its `PARAMS.VOL` repacks the same files), and no 1.2 source exists. Don't try to reproduce 1.2 behaviour.
+- **Original archive:** `docs/original-archive.md` covers what the original archive (outside this repo) offers the port.
+  - It has the 1.1 executables built from this source, which confirm the MSVC `rand`/`qsort` and the x87 precision.
+  - It has the shipped sprite caches, an exact oracle for the in-memory sprite build. They show 15 sprites whose phase bounds the port gets wrong.
+  - `tools/archive/ffarchive.py` runs the checks.
 - **Port plan:** SDL2 + CMake, in phases with exit criteria, in `docs/porting-plan.md`. Follow its phase order and its determinism rules.
 - **Status: phase 3 done; the game shows in a window but has no input or sound yet.** The original sources build on every platform. Runtime (phase 2) and video (phase 3) are on SDL2. Sound, input and network still go through `source/compat/`, whose inert Win32/DirectX stand-ins phases 4–7 replace. Without input, the game runs its title loop and attract demos; sound is inactive until phase 6.
 
