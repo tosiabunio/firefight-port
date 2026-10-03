@@ -386,7 +386,8 @@ void MManager::display(Screen& screen)
 void MManager::run(void)
 {
   if (gamemanager->get_restart()) flush_notxt();
-  for (int i=0;i<Max_mmessage;i++)
+  int i;
+  for (i=0;i<Max_mmessage;i++)
   {
     table[i].time-=KbdStat::time();
     if (table[i].time<0) table[i].time=0;

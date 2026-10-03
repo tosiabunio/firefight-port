@@ -60,7 +60,8 @@ void GameManager::start(void)
   level_descript.load("level_descript");
   game_text.load("game_text");
 
-  for (int i=0;i<level_descript.size("Missions_order");i++)
+  int i;
+  for (i=0;i<level_descript.size("Missions_order");i++)
   {
     sprintf(mis,"%s_MISSION",level_descript.string("Missions_order",i));
     sprintf(type,"%s_TYPES",level_descript.string("Missions_order",i));
@@ -83,7 +84,8 @@ void GameManager::start(void)
 void GameManager::stop(void)
 {
   if (!textloaded) return;
-  for (int i=0;i<level_descript.size("Missions_order");i++)
+  int i;
+  for (i=0;i<level_descript.size("Missions_order");i++)
   {
     missions[i].free();
     types[i].free();
@@ -303,7 +305,8 @@ int GameManager::end_level(void)
       Counter::update_registry();
       Pilot::reckon_level(Pilot::get_level());
       int num=GameManager::level_descript.size("Missions_order");
-      for(int i=0;i<num;i++)
+      int i;
+      for(i=0;i<num;i++)
       {
         if (!Pilot::level_status(i)) break;
       }
@@ -678,7 +681,8 @@ void GameManager::active_action(Field* fld)
 void GameManager::read_actionsection(int** action,int* size,Text* text,char *txt,int en)
 {
   int count=0;
-  for (int i=0;i<(*text).size(txt);i++)
+  int i;
+  for (i=0;i<(*text).size(txt);i++)
   {
     int num=world->get_level().typenum((*text).string(txt,i));
     if (!num) DBG_FAILURE("<%s> nie ma obiektu %s na pozimie",txt,(*text).string(txt,i));
@@ -987,7 +991,7 @@ void GameManager::prologue(void)
 void GameManager::slow_down(void)
 {
 }
-const MAX_BASE=4;
+const int MAX_BASE=4;
 //
 void GameManager::check_restart(void)
 {
@@ -1197,7 +1201,8 @@ void GameManager::check_restart(void)
 void GameManager::read_all_text(void)
 {
   int i=0;
-  for (Field* temp=necessary->reset();temp;temp=necessary->get_next(),i++)
+  Field *temp;
+  for (temp=necessary->reset();temp;temp=necessary->get_next(),i++)
   {
     if (i==text_num)
     {

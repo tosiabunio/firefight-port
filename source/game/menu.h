@@ -1,8 +1,8 @@
 #ifndef __MENU__
 #define __MENU__
 
-const MAX_KEYS=100;
-const MAX_KEYS_LEN=100;
+const int MAX_KEYS=100;
+const int MAX_KEYS_LEN=100;
 
 //KLASA MENU
 class Item;

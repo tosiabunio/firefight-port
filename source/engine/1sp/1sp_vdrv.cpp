@@ -545,6 +545,8 @@ static inline void clear (Screen &scr,unsigned randx, unsigned randy)
      (scr.checknc(randx%scr.sx, randy%scr.sy) !=0))
   scr.cls(0);
 }
+// MSVC 4 bound temporaries to Screen&.
+static inline void clear (Screen &&scr,unsigned randx, unsigned randy) {clear(scr,randx,randy);}
 
 static inline void show (DDSURFACEDESC	&ddsd)
 {

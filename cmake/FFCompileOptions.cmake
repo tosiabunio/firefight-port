@@ -21,3 +21,19 @@ function(ff_modern_options target)
     target_compile_options(${target} PRIVATE -Wall -Wextra -Wpedantic)
   endif()
 endfunction()
+
+# The original 1996 sources (game, engine, regdata). Pre-standard MSVC 4 C++: string literals
+# bound to `char*` (~1,540 sites) and MSVC-only pragmas are tolerated for now; everything
+# else is fixed in the source.
+function(ff_legacy_options target)
+  ff_common_options(${target})
+  if(MSVC)
+    target_compile_options(${target} PRIVATE /Zc:strictStrings- /wd4996)
+  else()
+    target_compile_options(${target} PRIVATE -Wno-write-strings -Wno-unknown-pragmas)
+    if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+      target_compile_options(${target} PRIVATE -Wno-c++11-compat-deprecated-writable-strings
+        -Wno-ignored-pragmas -Wno-pragma-pack)
+    endif()
+  endif()
+endfunction()

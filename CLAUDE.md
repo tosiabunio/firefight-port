@@ -13,7 +13,7 @@ Everything was selected by rule from the original archive. `README.md` documents
 
 - **Version 1.1 only.** This source is v1.1 (Aug 1996). The retail CD is 1.2 and has a newer executable and `PARAMS.VOL`, but no 1.2 source exists. Don't try to reproduce 1.2 behaviour.
 - **Port plan:** SDL2 + CMake, in phases with exit criteria, in `docs/porting-plan.md`. Follow its phase order and its determinism rules.
-- **The game doesn't compile yet.** `source/` is still the original MSVC 4 / Win32 / DirectX code. It is pre-standard C++ (`<iostream.h>`, implicit-`int` constants such as `const MAX_X=24;`). Phase 1 makes it compile. Until then the game targets are behind `-DFF_BUILD_GAME=ON` (default OFF).
+- **The game compiles but doesn't play yet.** Phase 1 is done: the original sources build on every platform against `source/compat/`, which stands in for the Win32, DirectX and multimedia APIs with inert stubs. `firefight --headless` boots through `Game::init_all` and shuts down cleanly; without `--headless` it stops at "direct draw not installed". The SDL2 drivers arrive in phases 2–7.
 
 ## Build
 
@@ -21,11 +21,12 @@ Everything was selected by rule from the original archive. `README.md` documents
 - **Presets:** `windows-msvc`, `linux-gcc`, `linux-clang`, `macos-clang` (arm64 only, macOS 11+).
   - Build presets are `<preset>-debug` and `<preset>-release`; test presets use the same names.
   - All-in-one: `cmake --workflow --preset <preset>` (configure, build Debug and Release, run all tests).
-  - Single test: `ctest --preset <preset>-debug -R smoke`.
+  - Single test: `ctest --preset <preset>-debug -R smoke`. Tests: `smoke` (dependencies) and `headless_init` (the game boots headless against `data/`).
 - **Windows on this machine:** MSVC is not on `PATH`. Run from an x64 Developer PowerShell, or call `C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Auxiliary\Build\vcvars64.bat` first. `VCPKG_ROOT` can be the bundled `…\BuildTools\VC\vcpkg`.
 - **Compile options:** `cmake/FFCompileOptions.cmake` sets them. `ff_common_options` (every target) adds `-fwrapv -fno-strict-aliasing -fsigned-char`; `ff_modern_options` (new code) adds strict warnings.
 - **Dependency targets:** `cmake/FFDependencies.cmake` normalises them to `ff::sdl2`, `ff::mixer` and `ff::enet`.
-- **Targets:** `tools/smoke/ff_smoke` is the dependency smoke test. `source/CMakeLists.txt` defines `cwengine` (all engine modules), `regdata` and `firefight`.
+- **Targets:** `tools/smoke/ff_smoke` is the dependency smoke test. `source/CMakeLists.txt` defines `compat`, `cwengine` (all engine modules), `regdata` and `firefight`. The original sources use `ff_legacy_options` (tolerates `char*` string literals and MSVC pragmas); new code uses `ff_modern_options`.
+- **Running:** `firefight [--data <dir>] [--headless] [switch[=value] ...]`. `--data` is the directory with `cwe.ini` (default: the current one); other arguments are the original engine switches (`debug=1`, `check`, ...). The log (`Firefght.log`) goes to `$TEMP`, else to the data directory. The first run rebuilds the sprite caches into `data/` (git-ignored).
 - **CI:** `.github/workflows/ci.yml` runs the workflow presets. Which platforms run:
   - branch pushes: Windows and Linux;
   - pull requests: macOS only;
@@ -38,6 +39,7 @@ Everything was selected by rule from the original archive. `README.md` documents
 
 | Path | Contents |
 |---|---|
+| `source/compat/` | Port layer: `crt.h` (MSVC CRT extensions) and `win32.h` (Win32/DirectX/MCI stand-ins, used on every platform, Windows included). Original sources include these instead of `<windows.h>`, `<io.h>` and friends. Drivers stop using `win32.h` as they move to SDL |
 | `source/game/` | Game code. Every `.cpp` includes only `headers.h`, which pulls in the engine and all game headers in dependency order. Add new headers there |
 | `source/engine/<module>/` | CW engine libraries; `1sp/asm/` holds the TASM blitters |
 | `source/engine/common/` | `first.h` and `1cw_strg.h` |
@@ -45,7 +47,7 @@ Everything was selected by rule from the original archive. `README.md` documents
 | `data/` | Game data in the engine's loose-file layout (`*.dir` manifests at the root) |
 | `music/` | `track02.flac` … `track09.flac` |
 
-Include paths for a build: `source/game`, `source/regdata`, `source/engine/common` and every `source/engine/<module>`.
+Include paths for a build: `source`, `source/game`, `source/regdata`, `source/engine/common` and every `source/engine/<module>`.
 
 ## Rules for this repo
 
@@ -55,6 +57,7 @@ Include paths for a build: `source/game`, `source/regdata`, `source/engine/commo
 - **Lowercase names:** keep new file names lowercase.
 - **Path resolution:** manifest paths are mixed-case DOS paths (the original engine `strupr()`s them). Resolve them as lowercase with `\` changed to `/`, relative to `data/`.
 - **Source files** are UTF-8. Git normalises their line endings.
+- **Port changes to the original code** stay minimal and say why in a short comment (`// was ...`, `// MSVC 4 ...`). The pristine original is `d73171a`.
 - **Build caches:** `*.sph`, `*.spc`, `*.spp` and `*.spl` are regenerated caches and are git-ignored. Don't commit them.
 
 ## Engine (`source/engine`, umbrella header `1cw.h`)

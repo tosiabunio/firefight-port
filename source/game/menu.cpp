@@ -170,7 +170,8 @@ Menu::Menu(char *_label_name,MenuType _menutype)
 #endif
   char type=0;
   int global_y=between_y;
-  for (int i=0;i<size;i++)
+  int i;
+  for (i=0;i<size;i++)
   {
     sscanf(descript_text.string("definition",2*i),"%c,%c,%c,%d,%d",&type,&menuinfo[i].this_letter,&menuinfo[i].next_letter,&menuinfo[i].x,&menuinfo[i].y);
     switch (type)
@@ -1081,7 +1082,8 @@ void Menu::draw_help(Screen &screen)
   //screen.rectangle(Tools::tool[Tools::LSHADOW],10,5,300,140);
   //screen.rectangle(Tools::tool[Tools::HELP],Layout::helppanel.x,Layout::helppanel.y,Layout::helppanel.w,Layout::helppanel.h);
   Print::print(screen,Print::TSPRITE,Print::FHIGHLIGHTED,x,10,GAMETXT("syskeys"));
-  for(int i=0;i<2*MAX_KEYS;i+=2)
+  int i;
+  for(i=0;i<2*MAX_KEYS;i+=2)
   {
      if (key_table[i][0]=='\0') break;
      sprintf(tmp,"%-22s %s",key_table[i],key_table[i+1]);

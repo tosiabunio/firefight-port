@@ -1,5 +1,10 @@
 #include "1io_hdrs.h"
 
+static inline char *align_up (char *p, size_t a)
+{
+  return (char*)(((uintptr_t)p+(a-1))&~(uintptr_t)(a-1));
+}
+
 #define OLD_LOGGING_STYLE 0
 #define NEW_LOGGING_STYLE (1-OLD_LOGGING_STYLE)
 
@@ -28,11 +33,11 @@ static const char LF = 0x0a;
 
 int Text::find_unused_labels_disable;
 
-static const max_active=8;
+static const int max_active=8;
 static char *active_sections[max_active];
 static int loaded_sections[max_active];
 
-static const hstat_size=6;
+static const int hstat_size=6;
 
 static Text *now_loading;
 
@@ -86,7 +91,8 @@ static inline int get_label (char *&dst, char *&src, int &len, int lines)
     dst+=l;
   }
 
-  for (int l=0; (l<Text::max_label+2)&&(!end)&&(len>0); l++)
+  int l;
+  for (l=0; (l<Text::max_label+2)&&(!end)&&(len>0); l++)
   {
     char c=*src;
     if ((c=='_') || ((c>='a')&&(c<='z')) || ((c>='A')&&(c<='Z')) || ((c>='0')&&(c<='9')))
@@ -494,13 +500,17 @@ int Text::compile_texts (char *dst, char *src)
     if (dst!=NULL)
       add_group (gn);
 
-    int tnum=*(int*)src;
+    int tnum;
+    memcpy(&tnum,src,sizeof(int));  // unaligned in the parsed source
     src+=sizeof(int);
 
+    // Port: the pointer array and the int value slots are aligned (64-bit pointers); the
+    // sizing pass reserves the worst-case padding.
     if (dst==NULL)
-      len+=sizeof(char*)*tnum;
+      len+=sizeof(char*)-1+sizeof(char*)*tnum;
     else
     {
+      dst=align_up(dst,sizeof(char*));
       group[gn].texts_num=tnum;
       group[gn].texts=(char**)dst;
       group[gn].used=0;
@@ -513,13 +523,14 @@ int Text::compile_texts (char *dst, char *src)
     {
       if (dst==NULL)
       {
-        len+=sizeof(int);
+        len+=sizeof(int)-1+sizeof(int);
         int w=strlen(src);
         len+=w+1;
         src+=w+1;
       }
       else
       {
+        dst=align_up(dst,sizeof(int));
         *(int*)dst=0; // value
         *dst=*src; // niezainicjalizowane
         dst+=sizeof(int);
@@ -819,7 +830,8 @@ void Text::display_unused(void)
   if (find_unused_labels&&(!find_unused_labels_disable))
   {
     int n=0;
-    for (int i=0; i<groups_num; i++)
+    int i;
+    for (i=0; i<groups_num; i++)
       if (group[i].used==0)
         n++;
     if (n)

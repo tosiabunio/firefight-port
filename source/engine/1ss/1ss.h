@@ -1,8 +1,7 @@
 #ifndef _1SS_H_INCLUDED
 #define _1SS_H_INCLUDED
 
-#include <mmsystem.h>
-#include <dsound.h>
+#include <compat/win32.h>
 
 #ifndef EXCLUDE_LIBS
 #ifdef _DEBUG

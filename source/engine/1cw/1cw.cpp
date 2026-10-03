@@ -2,17 +2,13 @@
 # include <first.h>
 # include <stdio.h>
 # include <stdlib.h>
-# include <iostream.h>
 # include <stdarg.h>
-# include <dos.h>
-# include <io.h>
+# include <compat/crt.h>
 # include <fcntl.h>
-# include <conio.h>
 # include <string.h>
 # include <errno.h>
 # include <signal.h>
-# include <windows.h>
-# include <windowsx.h>
+# include <compat/win32.h>
 
 # include "1cw.h"
 
@@ -120,9 +116,9 @@ void Cwe::init (Cwe_param *param)
       Log::init(param->log_file?param->log_file:cwe_log_file);
     else
     {
-      if (tmp[tlen-1]!='\\')
+      if ((tmp[tlen-1]!='\\')&&(tmp[tlen-1]!='/'))
       {
-        tmp[tlen]='\\';
+        tmp[tlen]='/';  // was '\\'; '/' also works on Windows
         tmp[tlen+1]=0;
       } 
       strcat(tmp, param->log_file?param->log_file:cwe_log_file);
@@ -193,7 +189,7 @@ void Cwe::init (Cwe_param *param)
 		  wc.cbWndExtra      = 0;
 		  wc.hbrBackground   = NULL;
 		  if (!RegisterClass (&wc))
-        FAILURE2(Cwe_error::general, "unable to register window class");
+        FAILURE2(Cwe_error::general, "unable to window class");
       text.area(reg_area);
       main_hwnd=Spr::create_window (
         spr_work_mode,
@@ -325,6 +321,7 @@ void Cwe::init (Cwe_param *param)
       else if (ui==0)
         use_320x200 = text.value(spr_use_320x200);
 
+      Video::headless=Cmd_line::get_int("headless",0);
       Spr::init(spr_work_mode, use_320x200, use_640x400);
     }
     text.endarea();

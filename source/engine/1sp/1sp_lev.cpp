@@ -32,7 +32,7 @@ static char F_nlsprite[]  = "unable to access level sprite %d (check '*' flag)";
 static int now_building;
 #endif
 
-const         buffer_size=2048;
+const int buffer_size=2048;
 static unsigned short buffer[buffer_size];
 static int    lsize;
 
@@ -452,7 +452,8 @@ void Level::load (char *_filename, char *l2load)
       }
       else
       {
-        for (int num=0; num<i; num++)
+        int num;
+        for (num=0; num<i; num++)
           if (strcmpi(names[i],names[num])==0)
             break;
         if ((num<i)&&(sprite.is_loaded[num]==Levsprite::loaded))
@@ -531,7 +532,8 @@ void Level::update (int num)
             plane[l][p].reginfo[i].maxl=plane[l][p].reginfo[i].maxu=0;
             plane[l][p].reginfo[i].first=reserved_first;
           }
-    for (int i=1; i<size; i++)
+    int i;
+    for (i=1; i<size; i++)
     {
       regnode[i].next=regnode[i].prev=0;
       regnode[i].handle=reserved_handle;
@@ -797,7 +799,8 @@ int Level::bregister (char *type_name, Buildable &buildable)
 {
   char name [max_typename+1];
   memset(name,'?',sizeof(name));
-  for (int num=0; (num<sizeof(name))&&(type_name[num])&&(type_name[num]!='*'); num++)
+  int num;
+  for (num=0; (num<sizeof(name))&&(type_name[num])&&(type_name[num]!='*'); num++)
     name[num]=type_name[num];
   int found=0;
   for (num=1; num<types_num; num++)

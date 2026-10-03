@@ -154,7 +154,30 @@ void Kill::run(void)
 }
 
 //KLASA FASTALLOC
-unsigned FastAlloc::objects_table[2]={1024,0};
+size_t FastAlloc::objects_table[2]={1024,0};
+
+// Every game object (all classes derived from Object) is allocated from a FastAlloc slot of
+// objects_table[0] bytes, and release builds do not check the size at run time.
+#define FASTALLOC_FITS(type) static_assert(sizeof(type)<=1024, #type " does not fit a FastAlloc slot")
+FASTALLOC_FITS(ACannon); FASTALLOC_FITS(ASplash); FASTALLOC_FITS(AlienChgun); FASTALLOC_FITS(AlienSmoke);
+FASTALLOC_FITS(Background); FASTALLOC_FITS(Base); FASTALLOC_FITS(Boom); FASTALLOC_FITS(Brick);
+FASTALLOC_FITS(Bullet); FASTALLOC_FITS(Buoy); FASTALLOC_FITS(Capsule); FASTALLOC_FITS(ChGun);
+FASTALLOC_FITS(Cinders); FASTALLOC_FITS(Cloud); FASTALLOC_FITS(Collect); FASTALLOC_FITS(Countdown);
+FASTALLOC_FITS(Destroy); FASTALLOC_FITS(Destsmoke); FASTALLOC_FITS(DispInfo); FASTALLOC_FITS(Door);
+FASTALLOC_FITS(Explode); FASTALLOC_FITS(Fire); FASTALLOC_FITS(Fog); FASTALLOC_FITS(Generator);
+FASTALLOC_FITS(KillerWall); FASTALLOC_FITS(Landplace); FASTALLOC_FITS(Laser); FASTALLOC_FITS(LevelCapsule);
+FASTALLOC_FITS(LevelSmoke); FASTALLOC_FITS(Light); FASTALLOC_FITS(Listmanager); FASTALLOC_FITS(MBoss1);
+FASTALLOC_FITS(Mine); FASTALLOC_FITS(Morph); FASTALLOC_FITS(MorphDest); FASTALLOC_FITS(MyBomb);
+FASTALLOC_FITS(MyCannon); FASTALLOC_FITS(MyRocket); FASTALLOC_FITS(Mymine); FASTALLOC_FITS(Myship);
+FASTALLOC_FITS(NetMine); FASTALLOC_FITS(Night); FASTALLOC_FITS(NormalWall); FASTALLOC_FITS(Plask);
+FASTALLOC_FITS(Raft); FASTALLOC_FITS(Rain); FASTALLOC_FITS(Rocket); FASTALLOC_FITS(ScrCatch);
+FASTALLOC_FITS(ShootGun); FASTALLOC_FITS(Simple1); FASTALLOC_FITS(Simple3); FASTALLOC_FITS(Skin);
+FASTALLOC_FITS(Smoke); FASTALLOC_FITS(Snow); FASTALLOC_FITS(Splash); FASTALLOC_FITS(Splinter);
+FASTALLOC_FITS(SplinterGen); FASTALLOC_FITS(Splinters); FASTALLOC_FITS(Swarmer); FASTALLOC_FITS(Switch);
+FASTALLOC_FITS(Taran); FASTALLOC_FITS(Teleport); FASTALLOC_FITS(Thief); FASTALLOC_FITS(Unblock);
+FASTALLOC_FITS(User); FASTALLOC_FITS(Wall); FASTALLOC_FITS(Wave); FASTALLOC_FITS(Weapon);
+FASTALLOC_FITS(WeaponWall);
+#undef FASTALLOC_FITS
 unsigned FastAlloc::objects_number=512;
 Fast_heap FastAlloc::my_heap;
 int FastAlloc::initialized=0;
@@ -980,7 +1003,7 @@ Listmanager::~Listmanager(void)
   list->remove(this);
 }
 
-void Listmanager::run(void)
+void Listmanager::run_all(void)
 {
   DBG_CHECK(initialized);
   for (Object* temp=(Object*)list->reset();temp!=NULL;temp=(Object*)list->get_next())
@@ -1048,7 +1071,8 @@ void LowColis::init(void)
   messages=(LowColis::Msg_unit*)Heap::alloc(sizeof(LowColis::Msg_unit)*Mp::COLISQUEUESIZE,gobjects_mbn);
   free_msg_cells=NEW(NoQueue<int>(Mp::COLISQUEUESIZE,"LowColis::free_msg_cells",1),queue_mbn);
   logged_objects=NEW(NoQueue<LowColis*>(Mp::COLISQUEUESIZE,"LowColis::logged_objects"),queue_mbn);
-  for (int i=0;i<Mp::COLISQUEUESIZE;i++)
+  int i;
+  for (i=0;i<Mp::COLISQUEUESIZE;i++)
   {
     messages[i].next=NIL;
     free_msg_cells->add(&i);
@@ -1468,7 +1492,7 @@ int Colis::wall_angle(int edge,int circle_size)
   int dx=0;
   int dy=0;
 
-  for (register int i=0;i<Mp::TURNQUALITY;i+=8)
+  for (int i=0;i<Mp::TURNQUALITY;i+=8)
   {
     _x=x+Posit::x_offset(i,size);
     _y=y+Posit::y_offset(i,size);
@@ -1509,7 +1533,7 @@ int Colis::wall_angle2(int circle_size)
   int wll=0;
   int cnt=0;
 
-  for (register int i=0;i<Mp::TURNQUALITY;i+=8)
+  for (int i=0;i<Mp::TURNQUALITY;i+=8)
   {
     cnt++;
     _x=x+Posit::x_offset(i,size);
@@ -1549,7 +1573,7 @@ Link::Link(int _l_num,int _precision)
 void Link::init(void)
 {
   prv_link=(unsigned short*)Heap::alloc(sizeof(unsigned short)*world->get_level().size,gobjects_mbn);
-  for (register int i=1;i<world->get_level().size;i++)
+  for (int i=1;i<world->get_level().size;i++)
   {
     if (world->get_level()[i].link)
     {
@@ -1640,7 +1664,7 @@ void Radar::init(void)
   R=Mp::TURNQUALITY/Mysprites::radar_point.phases;
   ttime=time=last=0;
   range=Mp::RADARDISTANCE/Tools::max_radartools;
-  for(register int i=0;i<32;i++) points[i]=queue[i]=0;
+  for(int i=0;i<32;i++) points[i]=queue[i]=0;
   dott=NEW(NoQueue<Radar*>(70,"Radar Queue"),queue_mbn);
   memset((void*)cur_type,0,sizeof(int)*5);
   current=NULL;
@@ -1816,7 +1840,7 @@ void Radar::draw(Screen& screen)
   for (Radar** temp=dott->see_first();temp;temp=dott->see_next())
     if (temp) (*temp)->login();
 
-  for (register int i=0;i<32;i++)
+  for (int i=0;i<32;i++)
   {
     put(screen,i,points[i]);
     points[i]=0;

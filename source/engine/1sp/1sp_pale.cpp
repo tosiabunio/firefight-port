@@ -28,24 +28,11 @@ int Color::distance (Color &c)
   int result;
   int c1=rgb;
   int c2=c.rgb;
-  __asm
-  {
-    mov ecx,[c1]
-    mov edx,[c2]
-    xor eax,eax
-    mov al,cl
-    sub al,dl
-    mov ebx,[ccpower_tab+eax*4]
-    mov al,ch
-    sub al,dh
-    add ebx,[ccpower_tab+eax*4]
-    ror ecx,8
-    ror edx,8
-    mov al,ch
-    sub al,dh
-    add ebx,[ccpower_tab+eax*4]
-    mov [result],ebx
-  }
+  // Was x86 asm: each channel difference is taken modulo 256 (8-bit register
+  // arithmetic) and indexes ccpower_tab.
+  result =ccpower_tab[(unsigned char)(c1-c2)];
+  result+=ccpower_tab[(unsigned char)((c1>>8)-(c2>>8))];
+  result+=ccpower_tab[(unsigned char)((c1>>16)-(c2>>16))];
   return(result);
 }
 

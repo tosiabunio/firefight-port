@@ -1,4 +1,6 @@
 #include "1io_hdrs.h"
+#include <filesystem>
+#include <system_error>
 
 #define CLOSED 0
 #define READ   1
@@ -119,7 +121,10 @@ int File::parse_label(char const* label)
       info.attrib=NONE;
     }
     sscanf(real_name,"%260s %32s",info.real_name,info.flags);
-    strupr(info.real_name);
+    // Manifests hold mixed-case DOS paths; the data on disk is lowercase (was strupr).
+    strlwr(info.real_name);
+    for(char* c=info.real_name; *c; c++)
+      if(*c=='\\') *c='/';
     strupr(info.long_name);
     return 0;
   }
@@ -139,7 +144,7 @@ void File::open(char const* long_name)
     if(handle==-1)
       FAILURE2(XIO_ERROR,"file open failed [File::open(%s [%s])]",info.long_name,info.real_name);
     _finddata_t fileinfo;
-    int find=_findfirst(info.real_name,&fileinfo);
+    intptr_t find=_findfirst(info.real_name,&fileinfo);
     _findclose(find);
     info.date=fileinfo.time_write;
     info.size=fileinfo.size;
@@ -168,6 +173,9 @@ void File::create(char const* long_name)
   {
     if(parse_label(long_name))
       FAILURE2(XIO_ERROR,"file not found in directory [File::create(%s)]",source_directory.missing_label);
+    // The sprite cache directories are not in the repository; create them on demand.
+    std::error_code ec;
+    std::filesystem::create_directories(std::filesystem::path(info.real_name).parent_path(),ec);
     handle=_open(info.real_name,_O_BINARY|_O_WRONLY|_O_CREAT|_O_TRUNC,_S_IWRITE);
     if(handle==-1)
       FAILURE2(XIO_ERROR,"file create failed [File::create(%s [%s])]",info.long_name,info.real_name);
@@ -315,7 +323,7 @@ void File::get_info(char const* long_name)
       FAILURE2(XIO_ERROR,"file not found in directory [File::get_info(%s)]",source_directory.missing_label);
 #if 1
     _finddata_t fileinfo;
-    int find=_findfirst(info.real_name,&fileinfo);
+    intptr_t find=_findfirst(info.real_name,&fileinfo);
     _findclose(find);
     if(find==-1)
       FAILURE2(XIO_ERROR,"file info retrieve failed [File::get_info(%s [%s])]",info.long_name,info.real_name);
@@ -367,7 +375,7 @@ unsigned File::exists(char const* long_name)
   {
     if(parse_label(long_name)) return 0;
     _finddata_t fileinfo;
-    int find=_findfirst(info.real_name,&fileinfo);
+    intptr_t find=_findfirst(info.real_name,&fileinfo);
     _findclose(find);
     if(find==-1) return 0;
     return fileinfo.size;
@@ -422,7 +430,7 @@ void File::free_volume_memory(void)
   }
 }
 //-----------------------------------------------------------------------------
-void File::link_entries(File_Info* first,unsigned files,unsigned base)
+void File::link_entries(File_Info* first,unsigned files,uintptr_t base)
 {
   File_Info* next=NULL;
   for(int i=(int)files-1;i>=0;i--) 
@@ -445,7 +453,7 @@ void File::access_on(char* volumenames,char* patch_path,int mode,Progress progre
   DBG_CHECK(strlen(volumenames)<1023);
   char filename[260];
   _finddata_t fileinfo;
-  int find=_findfirst("*.dir",&fileinfo);
+  intptr_t find=_findfirst("*.dir",&fileinfo);
   _findclose(find);
   if(find==-1) // there are no "*.dir" files in current directory, load volumes not directories
   {
@@ -598,7 +606,7 @@ volume_again:
           if(volumes==0) volume_directory=new_directory;
           else last->next=new_directory;
           // link recently read directory with previous one and link directory entries
-          link_entries(new_directory,header.volume_files,(unsigned)volume_memory[volumes]);
+          link_entries(new_directory,header.volume_files,(uintptr_t)volume_memory[volumes]);
           last=&new_directory[header.volume_files-1];
           volume_files+=header.volume_files;
           volumes++;
@@ -634,6 +642,7 @@ volume_cont:
       {
         DBG_CHECK(strlen(token)<259);
         sprintf(filename,"%s.dir",token);
+        strlwr(filename);  // the manifests on disk are lowercase
         MESSAGE("reading directory: %s",filename);
         int src=_open(filename,_O_BINARY|_O_RDONLY);
         if(src==-1) 
@@ -705,7 +714,8 @@ void File::access_off(int dump_unused_files)
 //-----------------------------------------------------------------------------
 #define MAX_BLOCK 0x4000
 
-static unsigned char hash_table[4*4096+3];
+// 4096 pointers for __compress, plus room to align them (was 4*4096+3 for 32-bit pointers).
+static unsigned char hash_table[sizeof(unsigned char*)*4096+sizeof(unsigned char*)-1];
 
 unsigned Xio::compress(void* destination,void* source,unsigned source_len)
 {

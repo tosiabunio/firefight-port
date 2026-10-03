@@ -271,7 +271,7 @@ int Sounds::playing(Sample* sample)
        // handle identifies the sample occupying this channel
       if(channels[channel]->handle==sample->handle) {
         // check playing status
-        unsigned long status;
+        DWORD status;
         channels[channel]->buffer->GetStatus(&status);
         return status==DSBSTATUS_PLAYING;
       }
@@ -332,7 +332,7 @@ void Sounds::play(Sample* sample,int panning,int volume)
     // check if sample has already been played on some channel
     if(channels[channel]!=NULL) {
       if(channels[channel]->handle==sample->handle) {
-        unsigned long status;
+        DWORD status;
         channels[channel]->buffer->GetStatus(&status);
         if(status!=DSBSTATUS_PLAYING) {
           channels[channel]->volume=0;
@@ -346,7 +346,7 @@ void Sounds::play(Sample* sample,int panning,int volume)
     for(channel=0;channel<total_channels;channel++) {
       // free channel if sample has stopped
       if(channels[channel]!=NULL) {
-        unsigned long status;
+        DWORD status;
         channels[channel]->buffer->GetStatus(&status);
         if(status!=DSBSTATUS_PLAYING) {
           channels[channel]=NULL;

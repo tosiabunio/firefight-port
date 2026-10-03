@@ -10,6 +10,8 @@ struct Demo_header
   unsigned blocks;
   unsigned players_num;
 };
+// Stored in demo files as raw bytes.
+static_assert(sizeof(Demo_header)==24, "Demo_header layout differs from the original");
 
 #define store_Plain 1
 #define store_LZW   2

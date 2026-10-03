@@ -39,7 +39,8 @@ void Print::init(char *small_name,char *small_italic_name,char *big_name,char *b
   DBG_CHECK(tools_numb==(int)_FLAST);
   unsigned char *ptr=(unsigned char*)text.string("conv_table");
   int conv_size=strlen((char*)ptr);
-  for (int i=0;i<256;i++)
+  int i;
+  for (i=0;i<256;i++)
   {
     conv[i]=0;
   }

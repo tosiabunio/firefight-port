@@ -148,7 +148,8 @@ template<class T,class P,int types> void List<T,P,types>::add_end(T* which,P prt
 
 template<class T,class P,int types> void List<T,P,types>::remove(T* which)
 {
-  for (T* temp=head;temp!=NULL&&temp!=which;temp=temp->next);
+  T *temp;
+  for (temp=head;temp!=NULL&&temp!=which;temp=temp->next);
   DBG_CHECK(temp!=NULL);
   DBG_CHECK((int)which->prty>=0&&(int)which->prty<types);
   objects_numb--;

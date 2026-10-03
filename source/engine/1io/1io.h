@@ -138,7 +138,7 @@ typedef struct FI{
   char        flags[32];
   unsigned    size;
   unsigned    date;
-  unsigned    offset;
+  uintptr_t   offset;  // a pointer once the volume is loaded (was unsigned)
   char        attrib;
   FI*         next;
 } File_Info;
@@ -188,7 +188,7 @@ private:
   static int              parse_label(char const* label);
   static File_Info*       find_file(char const* long_name);
   static void             free_volume_memory(void);
-  static void             link_entries(File_Info* first,unsigned files,unsigned base);
+  static void             link_entries(File_Info* first,unsigned files,uintptr_t base);
 //variables
   static int              access;
   static Text             source_directory;

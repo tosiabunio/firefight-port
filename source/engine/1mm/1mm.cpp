@@ -29,7 +29,7 @@ char *Heap_object::new_blockname=NULL;
 //---------------------------------------------------------------------------
 // Fast_object static variables
 //---------------------------------------------------------------------------
-unsigned int Fast_object::objects_table[2]={0,0};
+size_t Fast_object::objects_table[2]={0,0};
 Fast_heap Fast_object::my_heap;
 #if HI_DEBUG
   int Fast_object::initialized(0);
@@ -150,7 +150,7 @@ void* Heap::alloc(unsigned block_size,char const* owner)
         DBG_ONLY check_block (first, 1, "Heap::alloc");
         if (owner==NULL) 
           owner=other;
-        block_size+=((block_size%4)!=0)?4-block_size%4:0;
+        block_size+=((block_size%mcb_align)!=0)?mcb_align-block_size%mcb_align:0;
         mcb* best_free=find_best(block_size);
         if ((best_free->size<block_size)||(!best_free->free))    // wywalic do find_best
           FAILURE("out of memory [Heap::alloc]");
@@ -362,9 +362,9 @@ void Heap::check_block(mcb* block, int block_counter, char const* who,char const
 #ifndef MMU_USE_WINDOWS_HEAP
       if (where==NULL)
         where=who;
-      if ((unsigned)block<(unsigned)memory) 
+      if ((uintptr_t)block<(uintptr_t)memory) 
         TERMINATE("[%s] - attempt to access memory below heap, block %d [%s]", who, block_counter,where);
-      if ((unsigned)block>=((unsigned)memory+(unsigned)size)) 
+      if ((uintptr_t)block>=((uintptr_t)memory+(uintptr_t)size)) 
         TERMINATE("[%s] - attempt to access memory above heap, block %d [%s]", who, block_counter,where);
       if (block->id!=mcb_id)
         TERMINATE("[%s] - attempt to access corrupted block, block %d [%s]", who, block_counter,where);

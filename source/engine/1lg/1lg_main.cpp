@@ -14,7 +14,7 @@ char *format_message (char *message, ...)
   return(formated_message);
 }
 
-static const info_size=10000;
+static const int info_size=10000;
 static char sysinfo[info_size+1];
 static char enginfo[info_size+1];
 static char msginfo[info_size+1];
@@ -52,8 +52,7 @@ void Log::init (char *_name)
   if(strcmpi(path,"extended")==0)
     Comm::production=0;
 
-  sprintf(name,"%s",_name);
-  strupr(name);
+  sprintf(name,"%s",_name);  // was upper-cased, which breaks paths on case-sensitive systems
 
   int fh=_creat(name,_S_IWRITE);
   if(fh!=-1) _close( fh );
@@ -86,7 +85,7 @@ void Log::init (char *_name)
 
   write_string("System info:     ");
 
-  unsigned long i=MAX_COMPUTERNAME_LENGTH;
+  DWORD i=MAX_COMPUTERNAME_LENGTH;
   if ( !GetUserName( path, &i )) strcpy( path, unknown);
   write_string("user ");
   write_string(path);
@@ -194,7 +193,8 @@ void Log::quit (void)
     sprintf(error_param,"error=%d",Comm::exit_code);
 
     argv[0]=Comm::spawn_name;
-    for(int i=0; Comm::spawn_argv[i]; i++)
+    int i;
+    for(i=0; Comm::spawn_argv[i]; i++)
       argv[i+1]=Comm::spawn_argv[i];
     argv[i+1]=error_param;
     argv[i+2]=NULL;

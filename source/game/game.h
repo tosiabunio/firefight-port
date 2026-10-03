@@ -44,6 +44,8 @@ class Game
      char mission[256];
      int skill; 
    };
+   // Stored in demo files as raw bytes.
+   static_assert(sizeof(DemoInfo)==264, "DemoInfo layout differs from the original");
   static int demo_playtype;
   static char *demo_filename;
   static int demo_number;

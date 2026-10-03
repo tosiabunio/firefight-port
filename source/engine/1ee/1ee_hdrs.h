@@ -2,16 +2,14 @@
 #define _HEADERS_H_INCLUDED
 
 #include <first.h>
-#include <crtdbg.h>
+#include <compat/crt.h>
 #include <stdio.h>
-#include <dos.h>
-#include <io.h>
 #include <fcntl.h>
 #include <sys/types.h> 
 #include <sys/stat.h>
 
 #ifndef _MFC_VER
-#include <windows.h>
+#include <compat/win32.h>
 #endif
 
 #ifndef _1LG_H_INCLUDED
@@ -39,9 +37,7 @@
 #endif 
 
 #ifndef _1EE_H_INCLUDED
-#define EXCLUDE_LIBS
 #  include "1ee.h"
-#undef EXCLUDE_LIBS
 #endif
 
 #endif

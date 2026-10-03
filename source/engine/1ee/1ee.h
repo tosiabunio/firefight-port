@@ -1,8 +1,7 @@
 #ifndef _1EE_H_INCLUDED
 #define _1EE_H_INCLUDED
 
-#include <mmsystem.h>
-#include <dplay.h>
+#include <compat/win32.h>
 
 #ifndef EXCLUDE_LIBS
 #ifdef _DEBUG
@@ -557,8 +556,8 @@ class Timer
   static Timer_item timers[TIMER_ARRAY_SIZE];
 
   static void quit(void);
-  static void CALLBACK callback_timer (UINT  IDEvent, UINT  uReserved, DWORD  dwUser,	
-                                      DWORD  dwReserved1,	DWORD  dwReserved2);	
+  static void CALLBACK callback_timer (UINT  IDEvent, UINT  uReserved, DWORD_PTR dwUser,	
+                                      DWORD_PTR dwReserved1,	DWORD_PTR dwReserved2);	
 public:
   static void init(int accuracy=1, int critical_accuracy=1);
   static int add(int interval, Timer_function function, 
@@ -669,6 +668,8 @@ private:
     St_vkey  vkey;
     St_joy   joy;
   };
+  // Sent over the network and stored in demos as raw bytes.
+  static_assert(sizeof(Player_state)==154, "Player_state layout differs from the original");
   struct User_block
   {
     unsigned char type;

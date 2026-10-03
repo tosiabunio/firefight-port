@@ -88,6 +88,29 @@ Each phase ends with something runnable and an exit check. Phases 5–7 can over
   - little-endian.
 - **Stubs:** platform calls get no-op stubs so the program links.
 - **Exit:** `firefight` builds and links on all three OSes. A `--headless` run gets through `Game::init_all` against `data/` and logs what it loaded.
+- **Outcome** (2026-10-03). Exit met on every CI preset (Windows/MSVC, Linux GCC and Clang, Debug and Release) and on macOS (AppleClang, local). The `headless_init` CTest checks the loaded sprite totals and a clean shutdown in the log. The `headless_init` CTest runs the exit check.
+  - **Stubs:** `compat/win32.h` replaces `<windows.h>`, `<ddraw.h>`, `<dsound.h>`, `<dplay.h>`, `<mmsystem.h>` and friends **on every platform, Windows included**, so all builds run the same stubs. Creation calls return inert dummy handles; DirectX is never loaded (`LoadLibrary` returns `NULL`); MCI, mixer, wave-out and joysticks report no device. The clocks, environment, temp files and `VirtualAlloc` (zero-filled) are real. The registry is in memory for the run, with a fallback for the two values the launcher always wrote and nothing else defaults (`spr/hires mode` and `spr/lores mode` = 1, RegData's defaults: 640×480 and 320×240).
+  - **CRT:** `compat/crt.h` maps the low-level I/O onto POSIX file descriptors rather than stdio. `_findfirst` handles are small integers, and the call sites now store `intptr_t`.
+  - **Asm:** the inline asm in `Color::distance`, `Screen::copy` and `Comm::assert_box` is now exact C++. `_pconv`, `_ptouch`, `_pcsum` and `_fast_xlat` are exact ports (`1sp_asm.cpp`). `_uniput` and the font glyph routines are no-op stubs until phase 3. `CHECK`'s `int 3` calls `DebugBreak()`.
+  - **Headless:** `--headless` adds the engine switches `headless=1 sos_none=1`. `Video` then skips DirectDraw and draws normal mode (no `upside_down`) into the memory device `VD_bitmap`. `WinMain` stops after `init_all` until phase 2.
+  - **Pulled forward from phase 2:**
+    - manifest paths resolve to lowercase with `/` (in `File::parse_label`), and the `<name>.dir` names are lowercased;
+    - the log path is no longer upper-cased;
+    - shutdown order: `#pragma init_seg(lib)` became a "nifty counter" (`Comm_init` in `1lg.h`), so the quit manager is still created before and shut down after every static. Apple's linker ignores `init_priority`, so that route is closed;
+    - `File::create` creates missing directories, because the sprite cache directories are not in the repository.
+  - **Other fixes:**
+    - the static `Listmanager::run` is renamed `run_all`, because C++ forbids it hiding the virtual `Object::run`;
+    - `friend class Weapon` needed a forward declaration;
+    - splinter sprites are detected by their `hires` entry, since the port data has no `lores` lines;
+    - `SysSet::init` writes one past `ranges`/`defaults`, so they have a spare slot. `data` keeps its size because it is saved with the pilot;
+    - the Xio hash table holds 64-bit pointers. Xio has to stay: **demo files are Xio-compressed**;
+    - `Heap::mcb` is 48 bytes and 16-byte aligned, and blocks are rounded to 16. `Sprite::Data` and `plane_buf` are no longer packed. `Phase` stays packed: its arrays follow a variable-length name in the same buffer;
+    - `Text` aligns its pointer arrays and value slots.
+  - **MSVC runtime:** `main` installs a no-op invalid-parameter handler and sends CRT reports to stderr. MSVC 4 returned an error for bad arguments; the modern debug CRT opens a modal dialog instead, which hung CI on the original double `_close` of `cwe.ini` in `Cwe::init`.
+  - **Not a problem:** `(short)(queue[i])++` is not a cast-as-lvalue. Postfix `++` binds tighter than the cast, so every compiler increments the whole `int`, MSVC 4 included.
+  - **Sizes on arm64:** largest `FastAlloc` object is `Splinters` at 960 bytes. `Player_state`, `DemoInfo` and `Demo_header` match the original.
+  - **Cross-platform check:** the 132 sprite caches rebuilt from the FLC masters are byte-identical between Linux/GCC and macOS/Clang.
+  - **For phase 5:** `MyCannon`'s constructor reads the member `type` before it is set (`Turn(0,(type==1)?…)`, `my.cpp:3458`). On MSVC 4 it read stale `FastAlloc` slot memory.
 
 ### Phase 2: core runtime on SDL (no video yet)
 - **Entry point and shutdown:** `SDL_main` replaces `WinMain`. Shutdown becomes an explicit call; today it relies on a static destructor ordered by `#pragma init_seg`, which GCC and Clang ignore.
@@ -106,7 +129,7 @@ Each phase ends with something runnable and an exit check. Phases 5–7 can over
   - data root: next to the executable, overridable with `--data`;
   - lowercase plus `/` path resolution;
   - the `.dir` manifest merge happens in memory, not through a temp file;
-  - drop `.vol` and Xio support (not needed for loose files).
+  - drop `.vol` support (not needed for loose files). Keep Xio's decompressor: the demo files use it.
 - **`1mm`:** back it with `malloc` (the existing `MMU_USE_WINDOWS_HEAP` path) using 16-byte alignment. Keep the owner-name diagnostics.
 - **`1ee` timer:**
   - ticks are generated **on the main thread** from `SDL_GetPerformanceCounter`, every 33 ms (the original period, 1000/30 rounded down, i.e. 30.3 Hz);

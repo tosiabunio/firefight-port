@@ -44,7 +44,8 @@ void Pilot::init(int _no_pilot)
     data.version=version;
     data.skill=!(RegData::GetPlayerSkill()==RegData::skill_Normal);
     int is_net=NoNet::is_network_mode();
-    for (int i=0;i<weap_num;i++)
+    int i;
+    for (i=0;i<weap_num;i++)
     {
       if (!is_net)
       {

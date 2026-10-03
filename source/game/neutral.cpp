@@ -204,7 +204,7 @@ void Boom::run(void)
 }
 
 //SPLINTERS
-const SPL_INITMAX=25;
+const int SPL_INITMAX=25;
 Splinters::Spl Splinters::init_table_down[MAX_INITSPL];
 Splinters::Spl Splinters::init_table_up[MAX_INITSPL];
 int   Splinters::initcounter(0);
@@ -224,7 +224,8 @@ Shadow(View::NEXPL)
 void Splinters::init(void)
 {
   initcounter=0;
-  for (int i=0;i<MAX_INITSPL;i++)
+  int i;
+  for (i=0;i<MAX_INITSPL;i++)
   {
     Spl* s=&init_table_up[i];
 
@@ -874,7 +875,8 @@ Visible(View::NEXPL)
   move=(Rain::Wkt*)Heap::alloc(sizeof(Wkt)*movesize,gobjects_mbn);
   color=Video::closest(Color(GameManager::weather_text.value("R"),GameManager::weather_text.value("G"),GameManager::weather_text.value("B")));
 
-  for (int i=0;i<dottsize;i++)
+  int i;
+  for (i=0;i<dottsize;i++)
   {
     dott[i].x=rnd[i].x=RAND%Mp::SX;
     dott[i].y=rnd[i].y=RAND%Mp::SY;//-movesize2;
@@ -1105,7 +1107,8 @@ Visible(View::NEXPL)
   move=(Snow::Wkt*)Heap::alloc(sizeof(Wkt)*movesize,gobjects_mbn);
   color=Video::closest(Color(GameManager::weather_text.value("R"),GameManager::weather_text.value("G"),GameManager::weather_text.value("B")));
 
-  for (int i=0;i<dottsize;i++)
+  int i;
+  for (i=0;i<dottsize;i++)
   {
     dott[i].x=rnd[i].x=RAND%Mp::SX;
     dott[i].y=rnd[i].y=RAND%Mp::SY;//-movesize2;
@@ -2637,7 +2640,8 @@ int Generator::generate(void)
   {
     initializing=1;
     int status=0;
-    for(int i=lobject->link;i!=level_num;i=world->get_level()[i].link)
+    int i;
+    for(i=lobject->link;i!=level_num;i=world->get_level()[i].link)
       if (world->get_level()[i].status<2) status++;
     if (!status) return 0;
     status=RAND%status+1;
