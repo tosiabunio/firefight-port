@@ -3,8 +3,8 @@
 
 //KLASA MYSPRITES
 //Klasa ta powinna byc wykorzystywana do ladowania zewnetrznych spritow.
-const MAX_SPRSPLINTER=15;
-const MAX_SZZZZ=3;
+const int MAX_SPRSPLINTER=15;
+const int MAX_SZZZZ=3;
 
 class Mysprites
 {

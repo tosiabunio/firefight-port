@@ -261,7 +261,8 @@ void Lsprite::rebuild(void)
         unsigned char pal[256][3];
         get_frame(frame.buf,pal);
 
-        for (int y=0; y<sy; y++)
+        int y;
+        for (y=0; y<sy; y++)
           for (int x=0; x<sx; x++)
             src[y][x]=frame[y+1][x+1];
 
@@ -292,7 +293,8 @@ void Lsprite::rebuild(void)
         }
 
         int ox=-1,oy=-1;
-        for (int i=1; i<sx+1; i++)
+        int i;
+        for (i=1; i<sx+1; i++)
           if ((unsigned)frame[sy+1][i]!=keyc)
             ox=i-1;
         for (i=1; i<sy+1; i++)

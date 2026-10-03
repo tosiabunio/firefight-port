@@ -275,7 +275,8 @@ void Mouse::get_event(int event)
 void Mouse::init_ref(void)
 //---------------------------------------------------------------------------
 {
-  for (int i=0; i<MOUSE_REF_SIZE; i++)
+  int i;
+  for (i=0; i<MOUSE_REF_SIZE; i++)
   {
     ref[i]=0;
     ref[i]=0;

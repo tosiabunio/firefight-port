@@ -111,12 +111,12 @@ void Sample::load(char const* long_name)
       if(res!=DS_OK) FAILURE2(SOS_ERROR,"static sound buffer creation failed");
       char* ptr1;
       char* ptr2;
-      unsigned long bytes1;
-      unsigned long bytes2;
-      res=buffer->Lock(0,size,&ptr1,&bytes1,&ptr2,&bytes2,0);
+      DWORD bytes1;
+      DWORD bytes2;
+      res=buffer->Lock(0,size,(LPVOID*)&ptr1,&bytes1,(LPVOID*)&ptr2,&bytes2,0);
       if(res==DSERR_BUFFERLOST) {
         buffer->Restore();
-        res=buffer->Lock(0,size,&ptr1,&bytes1,&ptr2,&bytes2,0);
+        res=buffer->Lock(0,size,(LPVOID*)&ptr1,&bytes1,(LPVOID*)&ptr2,&bytes2,0);
       }
       if(res!=DS_OK) FAILURE2(SOS_ERROR,"sound buffer lock failed");
       DBG_CHECK(ptr2==NULL);

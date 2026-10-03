@@ -84,8 +84,8 @@ public Visible
    virtual void draw_object(Screen& screen,int plane);
 };
 //CHGUN
-const MAX_CHGUNDOTT=20;
-const MAX_VDY=20;
+const int MAX_CHGUNDOTT=20;
+const int MAX_VDY=20;
 
 class ChGun:
 public virtual Object,
@@ -127,7 +127,7 @@ public LowColis
    virtual void run (void);
 };
 //KLASA LASER
-const MAX_LASEROFFSET=12;
+const int MAX_LASEROFFSET=12;
 class Laser :
 public virtual Object,
 public virtual Posit,

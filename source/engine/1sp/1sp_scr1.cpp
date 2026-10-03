@@ -14,7 +14,7 @@ unsigned char *cc_result;
 
 enum {UPsprite, UPshape, UPtool, UPshtool, UPshcopy, UPtr70, UPtr30, UPcoll};
 
-extern "C" void _uniput (int doit, int uses);
+extern "C" void _uniput (int doit, intptr_t uses);
 
 struct RLE
 {
@@ -37,7 +37,7 @@ static inline int minv (int a, int b) { return ((a)<(b))?(a):(b); }
 
 //----- uniwersalny put sprite -----------------------------------------------
 
-inline void uniput (Screen &scr, int doit, int uses, int x, int y, Sprite &s, int p, int m)
+inline void uniput (Screen &scr, int doit, intptr_t uses, int x, int y, Sprite &s, int p, int m)
 {
   Phase &phase=s[p];
   Phase::Type *t=NULL;
@@ -101,7 +101,7 @@ void Screen::put (int x, int y, Sprite &s, int p, int function, void *with)
   int f=function>>4;
   if((f>sizeof(put_functions)/sizeof(put_functions[1]))||((f=put_functions[f])==-1))
     FAILURE(F_invfunc,function,"put sprite");
-  uniput (*this, f, (int)with, x, y, s, p, m);
+  uniput (*this, f, (intptr_t)with, x, y, s, p, m);
   if(debug_origins)
   {
     plot(Color::white,x,y);
@@ -118,7 +118,7 @@ void Screen::shape (int x, int y, Sprite &s, int p, int function, void *with)
   int f=function>>4;
   if((f>sizeof(shape_functions)/sizeof(shape_functions[1]))||((f=shape_functions[f])==-1))
     FAILURE(F_invfunc,function,"put sprite shape");
-  uniput (*this, f, (int)with, x, y, s, p, m);
+  uniput (*this, f, (intptr_t)with, x, y, s, p, m);
   if(debug_origins)
   {
     plot(Color::white,x,y);
@@ -276,32 +276,7 @@ void Screen::copy (Screen &scr, int x, int y)
   unsigned char *dst=scr.adr+u*scr.real_llen+l;
   for (int i=0; i<h; i++)
   {
-    __asm
-    {
-      mov esi,[src]
-      mov edi,[dst]
-      mov ecx,[w]
-      shr ecx,3
-      jz skip
-      dec ecx
-
-      ALIGN 4
-rpt:  mov eax,[esi+ecx*8+0]
-      mov ebx,[esi+ecx*8+4]
-      mov [edi+ecx*8+0],eax
-      mov [edi+ecx*8+4],ebx
-      dec ecx
-      jns rpt
-
-      mov ecx,[w]
-      and ecx,0xfffffff8
-      lea esi,[esi+ecx]
-      lea edi,[edi+ecx]
-
-skip: mov ecx,[w]
-      and ecx,0x00000007
-      rep movsb
-    }
+    memcpy(dst,src,w);  // was x86 asm: 8-byte blocks, then the remaining bytes
     src+=real_llen;
     dst+=scr.real_llen;
   }

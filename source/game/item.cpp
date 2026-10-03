@@ -196,7 +196,8 @@ RButtItem::RButtItem(char* description,Text& descript_text)
   }
 #endif
   text=(char**)Heap::alloc(sizeof(char*)*size,item_mbn);
-  for (int i=0;i<size;i++)
+  int i;
+  for (i=0;i<size;i++)
   {
     text[i]=(char*)Heap::alloc(sizeof(char)*1024,item_mbn);
   }
@@ -414,7 +415,8 @@ void ZippItem::draw(Screen& screen,int x,int y,int active)
   }
   Print::print(screen,Print::TSPRITE,filter,x,y,text);
   int zipper_width(0);
-  for (int i=0;i<zipper_length;i++)
+  int i;
+  for (i=0;i<zipper_length;i++)
   {
     zipper_width+=Print::get_dx(Print::TSPRITE,"\xcc");
   }

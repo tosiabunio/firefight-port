@@ -1,5 +1,11 @@
 #include "1ee_hdrs.h"
 
+// Demo files and network packets hold raw structs in the byte order of the original x86 build.
+#if defined(__BYTE_ORDER__) && (__BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__)
+#error "Fire Fight data formats are little-endian; big-endian targets are not supported"
+#endif
+static_assert(sizeof(int)==4 && sizeof(short)==2, "Fire Fight data formats assume 32-bit int, 16-bit short");
+
 static const int rec_Initialized  = 0x00000001;
 static const int rec_Opened       = 0x00000002;
 

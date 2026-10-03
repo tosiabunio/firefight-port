@@ -14,8 +14,7 @@ if(NOT CMAKE_SIZEOF_VOID_P EQUAL 8)
   message(FATAL_ERROR "Fire Fight is built as 64-bit only (see docs/porting-plan.md).")
 endif()
 
-# The game targets switch on in phase 1, once the original sources compile.
-option(FF_BUILD_GAME "Build the game (cwengine, regdata, firefight)" OFF)
+option(FF_BUILD_GAME "Build the game (compat, cwengine, regdata, firefight)" ON)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 include(FFCompileOptions)

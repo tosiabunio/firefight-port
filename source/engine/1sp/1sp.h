@@ -166,7 +166,7 @@ private:
   friend class  Uniput;
   friend class  Spr;
 
-#pragma pack (push,spr_data,1)
+  // Was packed to 1, which misaligns the pointers on 64-bit; it is never stored in a file.
   struct Data
   {
     int           owners;
@@ -174,7 +174,6 @@ private:
     Phase         *phase;
     int           phases;
   };
-#pragma pack (pop,spr_data)
   Data *data;
   static Data first;
 
@@ -291,6 +290,7 @@ public:
   static int min_gamma, max_gamma, gamma;
   static int min_color, max_color;
   static int work_mode, upside_down, use_320x200, use_640x400;
+  static int headless;  // port: no DirectDraw; normal mode drawn into the memory device
   static Color palette [256], vpalette [10][256];
   static int vpalette_num;
   static HINSTANCE dd_hinstance;
@@ -301,6 +301,7 @@ public:
   static void update_palette (void) { update_palette(gamma); }
   static void select_vpalette (int num);
   static int  closest (Color &c);
+  static int  closest (Color &&c) {return closest(c);}  // MSVC 4 bound temporaries to Color&
   static int  closest (int r, int g, int b) {return closest(Color(r,g,b));}
   //----- metody wspolpracy z ekranami
   static Screen *get_screen (void);
@@ -516,7 +517,7 @@ public:
   void look_atno (int x, int y, int sx, int sy, char *gplanes="1123456789")
     { look_at(x,y,sx,sy,gplanes,1,0); } // nie daje obiektow, jedynie wola buildery
 
-#pragma pack (push,lev_plane_buf,1)
+  // Was packed to 1, which misaligns the pointer in arrays on 64-bit; never stored in a file.
   struct plane_buf
   {
     unsigned short *object;             // numery obiektow zakonczone przez 0
@@ -524,7 +525,6 @@ public:
     short orgy;                         // dodac do y aby putnac sprajta
     unsigned short &operator[] (int num) {return(object[num]);}
   };
-#pragma pack (pop,lev_plane_buf)
 
   plane_buf buf[max_buf_planes];        // pobrany bufor poziomu
 

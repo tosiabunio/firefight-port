@@ -244,7 +244,7 @@ void RegData::Init(void)
   Players.Quantity = 1;
 
   char uname[MAX_COMPUTERNAME_LENGTH];
-  unsigned long i=MAX_COMPUTERNAME_LENGTH;
+  DWORD i=MAX_COMPUTERNAME_LENGTH;
   if ( !GetUserName( uname, &i ))
     strncpy(NetPlayerName, "<unknown>", Net::player_name_len-1);
   else

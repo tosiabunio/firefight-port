@@ -30,6 +30,8 @@ template<class T> class NoQueue : public Heap_object
    T *see_next(void);
 };
 
+extern char *queue_mbn;
+
 template<class T> inline NoQueue<T>::NoQueue(int _size,char *t,int _ignore_usage)
 {
   DBG_CHECK(_size>0);

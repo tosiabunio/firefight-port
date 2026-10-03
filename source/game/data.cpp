@@ -102,12 +102,14 @@ void Mysprites::load_splinter(void)
 {
   splinter_num=0;
   char tmp[1024];
-  for(int i=0;i<MAX_SPRSPLINTER;i++)
+  int i;
+  for(i=0;i<MAX_SPRSPLINTER;i++)
   {
     sprintf(tmp,"odlamek%d",i);
     File::area(tmp);
 
-    int t=File::specified("lores");
+    // Was "lores": the hires-only port data has no lores lines; every splinter has both.
+    int t=File::specified("hires");
     File::endarea();
 
     if (t) splinter[i].load(tmp);
@@ -642,7 +644,8 @@ void Mysound::init(void)
   mine.load("object_mine_active");
   mineactive.load("object_mine_non_active");
 
-  for(int i=0;i<MAXSPLINTER;i++)
+  int i;
+  for(i=0;i<MAXSPLINTER;i++)
   {
     char tmp[1024];
     sprintf(tmp,"splinter%d",i+1);
@@ -808,7 +811,8 @@ void Mysound::quit(void)
   asplash.free();
   arocket.free();
   karabin.free();
-  for(int i=0;i<MAXTHUNDER;i++) storm[i].free();
+  int i;
+  for(i=0;i<MAXTHUNDER;i++) storm[i].free();
   for(i=0;i<MAXSPLINTER;i++)    splinter[i].free();
   for(i=0;i<MAXEXPLODE;i++)     explode[i].free();
   for(i=0;i<MAX_SZZZZ;i++)      

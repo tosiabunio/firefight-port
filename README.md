@@ -12,11 +12,12 @@ This is the subset of the original Fire Fight (Chaos Works, 1996) material neede
 | `music/` | CD-audio soundtrack, `track02.flac` … `track09.flac` (lossless rips of the CD tracks) |
 | `docs/porting-plan.md` | The port plan: SDL2 + CMake, phases, decisions |
 | `CMakeLists.txt`, `CMakePresets.json`, `vcpkg.json`, `cmake/` | Build system |
+| `source/compat/` | Port layer: MSVC CRT extensions and stand-ins for the Win32/DirectX APIs (inert stubs until the SDL2 drivers replace them) |
 | `tools/smoke/` | Dependency smoke test (SDL2 window and paletted present, SDL2_mixer FLAC/WAV, ENet loopback) |
 
 ## Building
 
-The port is in progress (see `docs/porting-plan.md`). The game targets are switched off (`FF_BUILD_GAME=OFF`) until phase 1, so the build currently produces only the smoke test.
+The port is in progress (see `docs/porting-plan.md`). Phase 1 is done: the original game compiles and links on all three platforms, but its video, sound, input and network drivers are still inert stubs. The build produces `firefight` and the smoke test. `firefight --headless --data data` loads the game data through `Game::init_all` and exits; the `headless_init` test runs exactly that.
 
 **Requirements:** CMake ≥ 3.25, Ninja, a C++17 compiler, and [vcpkg](https://github.com/microsoft/vcpkg) with the `VCPKG_ROOT` environment variable pointing at it. vcpkg builds SDL2, SDL2_mixer (with FLAC) and ENet from `vcpkg.json` on first configure.
 

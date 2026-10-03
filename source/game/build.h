@@ -31,8 +31,8 @@
    char morph;
  };
 
-const MAX_LANDPLACES=24;
-const GENERATOR_STUFF=8989;
+const int MAX_LANDPLACES=24;
+const int GENERATOR_STUFF=8989;
 
 class LevImp
 {

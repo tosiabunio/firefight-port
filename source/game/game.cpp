@@ -59,7 +59,9 @@ int WINAPI WinMain(HINSTANCE this_instance, HINSTANCE previous_instance,
   try
   {
     Game::init_all(this_instance,previous_instance,command_line,window_state);
-    Game::go();
+    // TODO(phase 2): a headless run stops here until the clock and event pump run on SDL.
+    if (!Cmd_line::get_int("headless",0))
+      Game::go();
   }
   catch (TerminateGame)    {}
   catch (Closed)           {DBG_MESSAGE("WinMain() - Closed caught.");}
@@ -640,7 +642,7 @@ void Game::run_service(void)
       NoNet::get_ship(ID)->go();
     }
     world->get_objects_from_level();
-    Listmanager::run();
+    Listmanager::run_all();
     Radar::compute();
     MManager::run();
     SManager::run();

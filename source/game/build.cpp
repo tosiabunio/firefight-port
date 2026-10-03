@@ -102,7 +102,8 @@ void LevImp::init(World *_world)
   memset(action,0,sizeof(action));
   land.size=1;
 
-  for (int i=0;i<parameters_indx;i++)
+  int i;
+  for (i=0;i<parameters_indx;i++)
   {
 
     DBG_MESSAGE("Obsluguje teraz typ '%s'.",world->get_level().type[i]);

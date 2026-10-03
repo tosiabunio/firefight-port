@@ -56,9 +56,9 @@ class Mp
    static int   LOADSAMPLE;
 };
 //KLASA OP
-const MAX_OBJTYPES=4;
-const MAX_CANNONTYPES=12;
-const MAX_WEAPON=6;
+const int MAX_OBJTYPES=4;
+const int MAX_CANNONTYPES=12;
+const int MAX_WEAPON=6;
 
 #define _SPLASH    Op::obj_weaponary[0]
 #define _SWARMERS  Op::obj_weaponary[1]

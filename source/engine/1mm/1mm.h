@@ -61,8 +61,10 @@ public:
   static void  check(char const* where);
 private:
   static void quit(void);
-#pragma pack (1)
-  struct mcb {
+  // Block header. Was packed to 32 bytes for 32-bit pointers; on 64-bit it is naturally
+  // aligned and padded so that every payload (header + block) stays 16-byte aligned.
+  enum { mcb_align = 16 };
+  struct alignas(16) mcb {
     unsigned       guard_1;     //4      
     unsigned       id;          //4
     char const*    owner;       //4
@@ -74,7 +76,6 @@ private:
     unsigned short alloc_counter; //2
     unsigned       guard_2;     //4=32
   };
-#pragma pack()
   static unsigned short alloc_counter;
   static int      active;
   static void*    memory;
@@ -148,7 +149,7 @@ class Fast_object
    static int initialized;
 #endif
    static Fast_heap my_heap;
-   static unsigned int objects_table[2];
+   static size_t objects_table[2];
   public:
    static void init(int size);
    static void register_type(int type_size);

@@ -58,7 +58,7 @@ void Lsprite::load_prepared(void)
     f.read((char*)phase,phases*sizeof(Phase));
 
     int i;
-    int offset=(int)(rledata+hdr.data_offset[0]);
+    intptr_t offset=(intptr_t)(rledata+hdr.data_offset[0]);
     for (i=0; i<phases; i++)
     {
       phase[i].def[0]+=offset;
@@ -66,7 +66,7 @@ void Lsprite::load_prepared(void)
     }
     if(mirrors)
     {
-      offset=(int)(rledata+hdr.data_offset[1]);
+      offset=(intptr_t)(rledata+hdr.data_offset[1]);
       for (i=0; i<phases; i++)
         phase[i].def[1]+=offset;
     }

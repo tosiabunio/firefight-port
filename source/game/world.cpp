@@ -68,7 +68,8 @@ void World::display(Screen& screen,int call_builders,int nine_plane)
   int beg_plane=1;
   if (!SysSet::get(SysSet::DETAIL_LEVEL)) beg_plane=3;
   View::run(screen,0);
-  for (int plane=beg_plane;plane<9;plane++)
+  int plane;
+  for (plane=beg_plane;plane<9;plane++)
   {
     sprintf(planes_str,"%d%d",gamemanager->get_sublevel(),plane);
     if (call_builders)
@@ -699,7 +700,8 @@ void Statistics::drawNet(Screen& screen,Tool& tool)
 
     int dd=Print::get_dy(Print::TSPRITE,"*LEVEL")+5;
     int cnsty=4;
-    for(int j=0;j<levels_numb;j++)
+    int j;
+    for(j=0;j<levels_numb;j++)
     {
       screen.rectangle(tools[5-(j%2)],Layout::netpanel[2].x+Layout::netpanel[2].mrw,Layout::netpanel[2].mr1+3+j*dd,Layout::netpanel[2].w-(Layout::netpanel[2].mrw*2),dd);
 
@@ -833,7 +835,7 @@ void Statistics::drawNet(Screen& screen,Tool& tool)
 }
 
 //single
-const __MINUSONE__=10000000;
+const int __MINUSONE__=10000000;
 
 int Statistics::Single(void)
 {
@@ -868,7 +870,8 @@ int Statistics::Single(void)
   Game::play_CD(GameManager::level_descript.value("headersong"),0);
 #endif
 
-  for (int i=0;i<levels_numb;i++)
+  int i;
+  for (i=0;i<levels_numb;i++)
   {
     if (Pilot::level_status(i))  posit[myposit]++;
     else
@@ -1382,7 +1385,8 @@ void Statistics::drawSingle(Screen &screen,Tool& light1,Tool& light2,Tool& dark)
     int pic_count=0;
 
 
-    for (int i=0;i<MAX_SINGLELEVEL;i++)
+    int i;
+    for (i=0;i<MAX_SINGLELEVEL;i++)
     {
       if (((!Pilot::level_status(i)&&prev)||Pilot::level_status(i))&&i<GameManager::level_descript.size("Missions_order"))
       {
@@ -1451,7 +1455,8 @@ void Chat::talk(int in_game,int caller_id)
   terminating=0;
   capt=0;
   int serv_id=NoNet::get_server_id();
-  for (int i=0;i<NoNet::max_users+1;i++)
+  int i;
+  for (i=0;i<NoNet::max_users+1;i++)
   {
     cursor_pos[i]=0;
     display_pos[i]=0;
@@ -2416,8 +2421,8 @@ void NetMsg::draw(Screen& screen)
       int sy=Op::DISPINFOINVSY;
       Tool& tool=Tools::tool[Tools::DISPINFO];
       screen.rectangle(tool,posx-2,posy-2,sx,sy);
-      Print::print(screen,Print::TFONT,Print::_FLAST,posx+1,posy,(disp_cursor<=10)?"%s_":"%s",buf);
-      Print::print(screen,Print::TFONT,Print::FINVOVR,posx,posy,(disp_cursor<=10)?"%s_":"%s",buf);
+      Print::print(screen,Print::TFONT,Print::_FLAST,posx+1,posy,(char*)((disp_cursor<=10)?"%s_":"%s"),buf);
+      Print::print(screen,Print::TFONT,Print::FINVOVR,posx,posy,(char*)((disp_cursor<=10)?"%s_":"%s"),buf);
     }
     screen.origin(orgx,orgy);
   }

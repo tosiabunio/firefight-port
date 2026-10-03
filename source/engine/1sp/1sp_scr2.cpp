@@ -9,6 +9,7 @@ static char F_maxman[]  = "cmanager '%s' error: buffer[%d] overflow";
 
 extern "C" char font_hi;
 extern "C" char font_lo;
+extern "C" void _font_put_char (void *font, int c, unsigned char *p, int llen, int color);
 
 //----- manager kolizji ------------------------------------------------------
 
@@ -98,7 +99,7 @@ void* Cmanager::check (int x, int y)
   return(check_result ?buf[check_result-1] :NULL);
 }
 
-static const maxresult=256;
+static const int maxresult=256;
 static void *cm_result[maxresult+1];
 static unsigned char *cm_pbuf;
 
@@ -110,11 +111,13 @@ static int qsort_compare (void const *a, void const *b)
 void** Cmanager::check (int x, int y, Sprite &s, int p, int m)
 {
   unsigned char *check_result=world->check(x,y,s,p,m);
-  for (int r=0; check_result[r]; r++);
+  int r;
+  for (r=0; check_result[r]; r++);
   cm_pbuf=pbuf;
   qsort(check_result,r,sizeof(char),qsort_compare);
 
-  for (int i=0; i<r; i++)
+  int i;
+  for (i=0; i<r; i++)
     cm_result[i]=buf[check_result[i]-1];
   cm_result[i]=NULL;
   return(cm_result);
@@ -124,17 +127,8 @@ void** Cmanager::check (int x, int y, Sprite &s, int p, int m)
 
 static void put_char (void *f, int c, unsigned char *p, int llen, int color)
 {
-  __asm
-  {
-    mov esi,[f]
-    mov ebx,[c]
-    mov edi,[p]
-    mov edx,[llen]
-    mov eax,[color]
-    push edi
-    call [esi+ebx*4]
-    pop edi
-  }
+  // Was x86 asm calling the glyph routine f[c] of the compiled TASM font (asm/font_*.asm).
+  _font_put_char(f,c,p,llen,color);
 }
 
 static int color_name (unsigned char *&c, char *name)

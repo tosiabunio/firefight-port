@@ -17,7 +17,7 @@
 #define HI_DEBUG 0
 #endif
 
-#define DATE_STAMP char Comm::date_stamp[]=__DATE__" "__TIME__
+#define DATE_STAMP char Comm::date_stamp[]=__DATE__ " " __TIME__
 
 #define LOG_INFO               if(Log::info(__FILE__,__LINE__)==NULL) (void)0; else
 #define LINEUNIQUE2(id,line)   lineunique_##id##_##line
@@ -36,7 +36,7 @@
 #define WARNING                   LOG_INFO Log::write_warning
 #define SYSINFO                   LOG_INFO Log::write_sysinfo
 #define ENGINFO                   LOG_INFO Log::write_enginfo
-#define CHECK(expr) if(!(expr))   {if(!Comm::assert_box(#expr,FILE_LINE)) __asm { int 0x3 }} else (void)0
+#define CHECK(expr) if(!(expr))   {if(!Comm::assert_box(#expr,FILE_LINE)) DebugBreak();} else (void)0
 #define CHECK_RANGE(v,rl,rh)      {if(((v)<(rl))||((v)>(rh))) FAILURE(Comm::m_outrange,#v,v,rl,rh);}
 #define RPTCNT                    LINEUNIQUE_LAST(id)
 #define REPEAT(count)             for(LINEUNIQUE_DECLARE(rptcnt); LINEUNIQUE(rptcnt)<(count); LINEUNIQUE(rptcnt)++)
@@ -119,7 +119,7 @@ public:
 
   static char      m_outrange[];
   static int       *lineunique;
-  static int       Comm::set_lineunique(int *adr) {lineunique=adr; return(0);}
+  static int       set_lineunique(int *adr) {lineunique=adr; return(0);}
 
   static void      begin_load_section();
   static void      end_load_section();
@@ -146,6 +146,17 @@ public:
 struct Failure {};
 struct Closed  {};
 extern int critical_error_occurred;
+
+// The quit manager (1lg_comm.cpp) must be created before and shut down after every static
+// object that uses the engine. MSVC did this with #pragma init_seg(lib), which GCC and Clang
+// ignore. Every translation unit that includes this header constructs a Comm_init before its
+// own statics (the iostream "nifty counter"), and the last one destroyed runs the final quits.
+struct Comm_init
+{
+  Comm_init();
+  ~Comm_init();
+};
+static Comm_init comm_init;
 
 //----- formatowanie komunikatow
 

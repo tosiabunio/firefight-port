@@ -9,7 +9,7 @@ struct ChType
   int type,what,count;
 };
 
-const MAX_FIELDTEXT =24;
+const int MAX_FIELDTEXT=24;
 
 class Field : public Heap_object
 {

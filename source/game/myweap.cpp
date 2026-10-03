@@ -312,7 +312,8 @@ Listmanager(OMWEAP)
   time=Op::MYBOMBLIFETIME;
   size=Op::MYBOMBSIZE;
   DBG_CHECK(size<70);
-  for (int i=0;i<NoNet::max_users+1;i++)
+  int i;
+  for (i=0;i<NoNet::max_users+1;i++)
   {
     flashing[i]=0;
   }
@@ -893,7 +894,7 @@ void Mymine::wall(void)
   int dx=0;
   int dy=0;
 
-  for (register int i=0;i<Mp::TURNQUALITY;i+=16)
+  for (int i=0;i<Mp::TURNQUALITY;i+=16)
   {
     _x=x+x_offset(i,5);
     _y=y+y_offset(i,5);
@@ -1108,7 +1109,8 @@ Visible(Mysprites::ship_tower,View::MYSHIP)
 {
   myuser=_user;
   id=_id;
-  for (int i=0;i<6;i++)
+  int i;
+  for (i=0;i<6;i++)
   {
     weap_freq[i]=Op::weaponary_frq[i];
   }

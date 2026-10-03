@@ -1,15 +1,13 @@
 #include <first.h>
 
 #include <stdio.h>
-#include <io.h>
+#include <compat/crt.h>
 
 #ifndef _MFC_VER
-#include <windows.h>
+#include <compat/win32.h>
 #endif
 
-#include <process.h>
 #include <errno.h>
-#include <dplay.h>
 
 #include <1lg.h>
 #include <1mm.h>
@@ -25,9 +23,7 @@
 #include "resource.h"		
 #endif
 
-#define EXCLUDE_LIBS
 #include "1regdata.h"
-#undef EXCLUDE_LIBS
 
 #ifdef _MFC_VER
 #include "tools.h"

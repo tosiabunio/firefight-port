@@ -173,7 +173,7 @@ void Eem::init_multi ()
     else
       FAILURE("Invalid net mode [Eem::init]"); 
     char uname[MAX_COMPUTERNAME_LENGTH];
-    unsigned long i=MAX_COMPUTERNAME_LENGTH;
+    DWORD i=MAX_COMPUTERNAME_LENGTH;
     if ( !GetUserName( uname, &i )) 
       strncpy( uname, "<unknown>", MAX_COMPUTERNAME_LENGTH-1);
     temp = Registry::get_string(sec_eem, key_eem_player_name, uname);

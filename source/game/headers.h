@@ -12,23 +12,17 @@ inline void *operator new(size_t)
 #define _INC_MATH
 
 #include <first.h>
-#include <windows.h>
-#include <windowsx.h>
-#include <sys\stat.h>
-#include <sys\types.h>
-#include <share.h>
+#include <compat/win32.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <compat/crt.h>
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
-#include <dos.h>
-#include <io.h>
 #include <fcntl.h>
-#include <conio.h>
 #include <string.h>
 #include <errno.h>
-#include <iostream.h>
-#include <fstream.h>
 #ifndef _CWE_H_INCLUDED
 #   include <1cw.h>
 #endif
@@ -64,7 +58,6 @@ extern GameManager *gamemanager;
 #include "neutral.h"
 #include "alien.h"
 #include "alienwea.h"
-#include "commctrl.h"
 #include "resource.h"
 
 class TerminateMission {};

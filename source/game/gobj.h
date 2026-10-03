@@ -55,7 +55,7 @@ class FastAlloc
   private:
    static int initialized;
    static Fast_heap my_heap;
-   static unsigned int objects_table[2];
+   static size_t objects_table[2];
    static unsigned int objects_number;
   public:
    static void init(void);
@@ -425,7 +425,7 @@ class Listmanager : public virtual Object
    virtual ~Listmanager(void);
   public:
    static void init(void);
-   static void run(void);
+   static void run_all(void);  // was run(); C++ forbids a static member hiding Object::run
    static void quit(void);
 };
 //KLASA IMPEXP
@@ -645,13 +645,14 @@ struct Wektor : public Heap_object
   int _x,_y;
 };
 
-const MAX_RADARCUR_TYPE=8;
+const int MAX_RADARCUR_TYPE=8;
 
 class Radar :
 public virtual Posit,
 public virtual Life
 {
    friend class GameManager;
+   friend class Myship;  // MSVC 4 let Myship read the private TargetX/TargetY
   private:
    static NoQueue<Radar*> *dott;
    static int R;

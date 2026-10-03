@@ -1,6 +1,8 @@
 #ifndef __LMYBOJECT__
 #define __LMYOBJECT__
 
+class Weapon;
+
 //KLASA DISPINFO
 class DispInfo:
 public virtual Object,
@@ -24,7 +26,7 @@ public Sound
    virtual void draw_object(Screen& screen,int plane);
 };
 //KLASA USER
-const MAX_USERLEVELS=20;
+const int MAX_USERLEVELS=20;
 
 class User:
 public Object

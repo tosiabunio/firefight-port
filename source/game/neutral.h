@@ -299,7 +299,7 @@ public Visible
 
 };
 //SNOW
-const MAX_SNOWTOOL=32;
+const int MAX_SNOWTOOL=32;
 
 class Snow:
 public virtual Object,
@@ -460,7 +460,7 @@ public Radar
    virtual void draw_object(Screen&,int plane);
 };
 
-const MAX_SMOKE=30;
+const int MAX_SMOKE=30;
 
 //KLASA  ALIENSMOKE
 const int MAX_ALIENWAVE=50;

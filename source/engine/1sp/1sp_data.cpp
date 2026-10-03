@@ -53,6 +53,7 @@ int Video::current_mode, Video::next_mode, Video::frame_rate;
 int Video::min_gamma=-32, Video::max_gamma=31, Video::gamma;
 int Video::min_color=10, Video::max_color=256-10;
 int Video::upside_down;
+int Video::headless;
 
 int ccpower_tab[256] =
 {

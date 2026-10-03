@@ -93,7 +93,7 @@ void Mixer::init(DWORD line)
   if(mixer_active) {
     mixer_parts=SOUND_VOLUME_ACTIVE|MUSIC_VOLUME_ACTIVE;
     // at least one is available, we will always use first one
-    result=mixerOpen(&mixer_handle,0,(DWORD)Comm::hwnd,0,CALLBACK_WINDOW|MIXER_OBJECTF_MIXER);
+    result=mixerOpen(&mixer_handle,0,(DWORD_PTR)Comm::hwnd,0,CALLBACK_WINDOW|MIXER_OBJECTF_MIXER);
     if(result!=MMSYSERR_NOERROR) mixer_parts=0;
     // retrieve information about music audio line
     music_line.cbStruct=sizeof(music_line);

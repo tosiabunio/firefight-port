@@ -2,8 +2,8 @@
 
 int SysSet::initialized=0;
 int SysSet::version=0x0006;
-SysSet::SetRange SysSet::ranges[SysSet::_LAST];
-int SysSet::defaults[SysSet::_LAST];
+SysSet::SetRange SysSet::ranges[SysSet::_LAST+1];
+int SysSet::defaults[SysSet::_LAST+1];
 int SysSet::data[SysSet::_LAST];
 
 void SysSet::init(char *_defaults_file)

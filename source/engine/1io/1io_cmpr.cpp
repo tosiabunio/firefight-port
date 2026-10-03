@@ -34,14 +34,14 @@ void __compress(unsigned char* p_wrk_mem,unsigned char* p_src_first,unsigned src
 /* Output : May write in OZ=Mem[p_dst_first..p_dst_first+src_len+288-1].*/
 /* Output : Upon completion guaranteed *p_dst_len<=src_len+FLAG_BYTES.  */
 {
-  register unsigned char *p_src=p_src_first,*p_dst=p_dst_first;
+  unsigned char *p_src=p_src_first,*p_dst=p_dst_first;
   unsigned char *p_src_post=p_src_first+src_len,*p_dst_post=p_dst_first+src_len;
   unsigned char *p_src_max1,*p_src_max16;
 
-  /* The following longword aligns the hash table in the working memory. */
-  register unsigned char **hash= (unsigned char **) (( ((unsigned) p_wrk_mem) +3) & 0xFFFFFFFC);
+  /* The following aligns the hash table of pointers in the working memory. */
+  unsigned char **hash= (unsigned char **) (( ((uintptr_t) p_wrk_mem) +(sizeof(unsigned char*)-1)) & ~(uintptr_t)(sizeof(unsigned char*)-1));
   unsigned char *p_control;
-  register unsigned control=TOPWORD;
+  unsigned control=TOPWORD;
 
   p_src_max1=p_src_post-ITEMMAX;
   p_src_max16=p_src_post-16*ITEMMAX;
@@ -56,9 +56,9 @@ void __compress(unsigned char* p_wrk_mem,unsigned char* p_src_first,unsigned src
   p_dst+=2;
   for(;;)
   {
-    register unsigned char *p,**p_entry;
-    register unsigned short unroll=16;
-    register unsigned offset;
+    unsigned char *p,**p_entry;
+    unsigned short unroll=16;
+    unsigned offset;
     if (p_dst>p_dst_post) goto overrun;
     if (p_src>p_src_max16)
     {
@@ -127,10 +127,10 @@ void __decompress(unsigned char* wrk_mem,unsigned char* p_src_first,unsigned src
 /* Output : Output block in Mem[p_dst_first..p_dst_first+*p_dst_len-1]. */
 /* Output : Writes only  in Mem[p_dst_first..p_dst_first+*p_dst_len-1]. */
 {
-  register unsigned char *p_src=p_src_first+FLAG_BYTES, *p_dst=p_dst_first;
+  unsigned char *p_src=p_src_first+FLAG_BYTES, *p_dst=p_dst_first;
   unsigned char *p_src_post=p_src_first+src_len;
   unsigned char *p_src_max16=p_src_first+src_len-(16*2);
-  register unsigned control=1;
+  unsigned control=1;
 
   if (*p_src_first==FLAG_COPY)
   {
@@ -140,7 +140,7 @@ void __decompress(unsigned char* wrk_mem,unsigned char* p_src_first,unsigned src
   }
   while (p_src!=p_src_post)
   {
-    register unsigned short unroll;
+    unsigned short unroll;
     if (control==1)
     {
       control=0x10000|*p_src++; control|=(*p_src++)<<8;
@@ -150,8 +150,8 @@ void __decompress(unsigned char* wrk_mem,unsigned char* p_src_first,unsigned src
     {
       if (control&1)
       {
-        register unsigned short lenmt;
-        register unsigned char *p;
+        unsigned short lenmt;
+        unsigned char *p;
         lenmt=*p_src++;
         p=p_dst-(((lenmt&0xF0)<<4)|*p_src++);
         *p_dst++=*p++;

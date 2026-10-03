@@ -1,4 +1,5 @@
 #include "1ee_hdrs.h"
+#include <algorithm>
 
 //----------------------------------------------------------------------------
 // Status flags
@@ -22,7 +23,7 @@ void Timer::init(int desired_accuracy, int critical_accuracy)
     TIMECAPS tc;
     if(timeGetDevCaps(&tc, sizeof(TIMECAPS)) != TIMERR_NOERROR)
       FAILURE2 (Eem_error::general, "cannot initialize timer");
-    accuracy = min(max(tc.wPeriodMin, (UINT)desired_accuracy), tc.wPeriodMax);
+    accuracy = std::min(std::max(tc.wPeriodMin, (UINT)desired_accuracy), tc.wPeriodMax);
     if (accuracy > desired_accuracy)
       WARNING("system timer slow. Accuracy: %d", accuracy);
     if (accuracy > critical_accuracy)
@@ -68,7 +69,7 @@ int Timer::add(int interval, Timer_function function, Timer_object *object,
     }
   if (found==-1)
     FAILURE("sorry no room for timer event '%s'  [Timer::add]", (char*)name?name:"unknown");
-  int id = timeSetEvent(interval, accuracy, callback_timer, (DWORD)found, TIME_PERIODIC);
+  int id = timeSetEvent(interval, accuracy, callback_timer, (DWORD_PTR)found, TIME_PERIODIC);
   if (id==0)
     FAILURE ("cannot set timer event '%s' [Timer::add]", (char*)name?name:"unknown"); 
   timers[found].id = id;
@@ -130,8 +131,8 @@ void Timer::kill(char *name)
   MESSAGE("timer event '%s' destructed", (char*)timers[found].name?timers[found].name:"unknown");
 }
 //---------------------------------------------------------------------------
-void CALLBACK Timer::callback_timer (UINT  IDEvent, UINT  uReserved, DWORD  dwUser,	
-                              DWORD  dwReserved1,	DWORD  dwReserved2)
+void CALLBACK Timer::callback_timer (UINT  IDEvent, UINT  uReserved, DWORD_PTR dwUser,	
+                              DWORD_PTR dwReserved1,	DWORD_PTR dwReserved2)
 {
   if (timers[dwUser].counter!=NULL)
     timers[dwUser].counter++;

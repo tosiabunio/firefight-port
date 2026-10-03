@@ -1,4 +1,6 @@
 #include "1lg_hdrs.h"
+#include <atomic>
+#include <new>
 #pragma init_seg(lib)
 #pragma comment(lib,"comctl32.lib")
 
@@ -136,7 +138,24 @@ struct Quit_man
 
     MESSAGE("%s initialized", quit_id, (char*)(prior ?" (%s quit priority)" :""));
   }
-} static quit_man;
+};
+
+// Constructed by the first Comm_init and destroyed by the last (see 1lg.h).
+static int comm_init_count;
+alignas(Quit_man) static unsigned char quit_man_storage[sizeof(Quit_man)];
+#define quit_man (*reinterpret_cast<Quit_man*>(quit_man_storage))
+
+Comm_init::Comm_init()
+{
+  if(comm_init_count++==0)
+    new (quit_man_storage) Quit_man;
+}
+
+Comm_init::~Comm_init()
+{
+  if(--comm_init_count==0)
+    quit_man.~Quit_man();
+}
 
 void Comm::quit_me (void (*quit_proc) (void), char *quit_id, char *ids_required)
 {
@@ -275,19 +294,14 @@ void Comm::terminate (char *message, ...)
   _exit(3);
 }
 
-static int assert_busy=0;
+static std::atomic<int> assert_busy(0);
 
 enum {a_debug, a_cont, a_fail};
 
 int Comm::assert_box (char *expression, char *fileline)
 {
   int busy,result=a_debug;
-  __asm
-  {
-    mov eax,1
-    xchg [assert_busy],eax
-    mov [busy],eax
-  }
+  busy=assert_busy.exchange(1);  // was x86 asm: xchg
 
   if(busy)
   {
@@ -324,11 +338,7 @@ int Comm::assert_box (char *expression, char *fileline)
     }
   }
 
-  __asm
-  {
-    mov eax,[busy]
-    xchg [assert_busy],eax
-  }
+  assert_busy.exchange(busy);  // was x86 asm: xchg
 
   if(result==a_fail)
     FAILURE(assert_message,expression,fileline);

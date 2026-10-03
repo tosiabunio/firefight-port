@@ -603,9 +603,9 @@ void HashArray<T>::alloc(int size_, char *name_, short prc_grow)
     p=(T*)Heap::alloc(sizeof(T)*size, name_?name_:"[bas] HashArray<T>");
     name=name_;
     memset(p, 0, sizeof(T)*size);
-    labels.alloc(size, name_?name_:"[bas] HashArray<T>");
+    labels.alloc(size, (char*)(name_?name_:"[bas] HashArray<T>"));
     labels.fillbyte(0);
-    diag_flag.alloc(size, name_?name_:"[bas] HashArray<T>");
+    diag_flag.alloc(size, (char*)(name_?name_:"[bas] HashArray<T>"));
     diag_flag.fillbyte(0);
   }
   catch (Failure)
@@ -621,7 +621,8 @@ int HashArray<T>::first_prime(int num)
     num++;
   while(1)
   {
-    for (int i=3; i<num; i+=2)
+    int i;
+    for (i=3; i<num; i+=2)
       if (num%i==0)
       {
         num+=2;
@@ -717,7 +718,7 @@ void HashArray<T>::add(char *label)
   else if (labels[last_found]!=NULL)
     FAILURE (bas_str(8), name, label);
   if (counter==init_size)
-    Log::warning (bas_str(10), name, label);
+    Log::write_warning (bas_str(10), name, label);
   counter++;
   if (max_counter<counter)
     max_counter=counter;

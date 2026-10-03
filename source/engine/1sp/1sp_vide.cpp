@@ -22,7 +22,7 @@ extern char *gamma_tables [64];
 static char *gamma_tab;
 
 static unsigned char *closest_colors=NULL;
-static const cc_size=64*64*64;
+static const int cc_size=64*64*64;
 struct pal_rebuild {};
 
 static int FrameRate;
@@ -67,7 +67,8 @@ void Video::load_palette (char *fname, int update_tsp)
 
   if(fname==NULL)
   {
-    for(int z=0;z<20;z++)
+    int z;
+    for(z=0;z<20;z++)
       palette[10+z]=Color(z*64/20,z*64/20,z*64/20);
     for(z=0;z<6;z++)
       for(int y=0;y<6;y++)
@@ -248,7 +249,7 @@ Screen *Video::get_screen (void)
     int real_sy=Screen::convert(screen_sy,mode_flag);
     screen_rsx=real_sx; screen_rsy=real_sy;
 
-    if(work_mode==Spr::work_normal)
+    if((work_mode==Spr::work_normal)&&!headless)
       video_device=&vd_ddraw;
     else
       video_device=&vd_bitmap;
@@ -491,7 +492,7 @@ static Comm::wpp old_wp;
 void Video::init(void)
 {
   initialized=1;
-  if(work_mode==Spr::work_normal)
+  if((work_mode==Spr::work_normal)&&!headless)
   {
     DBG_MESSAGE("loading DDRAW.DLL");
     dd_hinstance = LoadLibrary("ddraw.dll");

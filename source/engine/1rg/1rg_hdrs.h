@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <first.h>
-#include <windows.h>
+#include <compat/win32.h>
 
 #ifndef _1LG_H_INCLUDED
 #include <1lg.h>
@@ -19,9 +19,7 @@
 #endif
 
 #ifndef _1RG_H_INCLUDED
-#define EXCLUDE_LIBS
 #  include "1rg.h"
-#undef EXCLUDE_LIBS
 #endif
 
 #endif

@@ -1,6 +1,13 @@
-# Game targets. Enabled with -DFF_BUILD_GAME=ON once the original sources compile (phase 1).
-# The original code is pre-standard MSVC 4 C++, so these targets use ff_common_options only;
-# phase 1 adds the legacy-compatibility flags and fixes it needs.
+# Game targets. The original code is pre-standard MSVC 4 C++, so these targets use
+# ff_legacy_options; new code (compat) uses ff_modern_options.
+
+# --- compat: CRT shims and the Win32/DirectX stand-ins (see compat/win32.h) --------------
+add_library(compat STATIC
+  compat/crt.cpp
+  compat/win32.cpp)
+# Sources include these as <compat/crt.h> and <compat/win32.h>.
+target_include_directories(compat PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+ff_modern_options(compat)
 
 set(FF_ENGINE_MODULES 1ba 1cw 1ee 1io 1lg 1mm 1rg 1sp 1ss)
 
@@ -23,6 +30,7 @@ add_library(cwengine STATIC
   engine/1lg/1lg_main.cpp
   engine/1mm/1mm.cpp
   engine/1rg/1rg.cpp
+  engine/1sp/1sp_asm.cpp
   engine/1sp/1sp_data.cpp
   engine/1sp/1sp_flic.cpp
   engine/1sp/1sp_ldsa.cpp
@@ -47,17 +55,18 @@ target_include_directories(cwengine PUBLIC engine/common)
 # EXCLUDE_LIBS disables the `#pragma comment(lib, ...)` auto-linking in the module headers.
 target_compile_definitions(cwengine PUBLIC EXCLUDE_LIBS
   $<$<AND:$<CONFIG:Debug>,$<NOT:$<CXX_COMPILER_ID:MSVC>>>:_DEBUG>)
-target_link_libraries(cwengine PUBLIC ff::sdl2 ff::mixer ff::enet)
-ff_common_options(cwengine)
+target_link_libraries(cwengine PUBLIC compat ff::sdl2 ff::mixer ff::enet)
+ff_legacy_options(cwengine)
 
 # --- regdata: settings model shared with the original launcher ----------------------------
 add_library(regdata STATIC regdata/1regdata.cpp)
 target_include_directories(regdata PUBLIC regdata)
 target_link_libraries(regdata PUBLIC cwengine)
-ff_common_options(regdata)
+ff_legacy_options(regdata)
 
 # --- firefight: the game ------------------------------------------------------------------
 add_executable(firefight
+  game/main.cpp
   game/alien.cpp
   game/alienwea.cpp
   game/build.cpp
@@ -88,4 +97,11 @@ target_include_directories(firefight PRIVATE game)
 # UNPROTECT: no CD-ROM check (the original retail builds except "Production" defined it too).
 target_compile_definitions(firefight PRIVATE UNPROTECT)
 target_link_libraries(firefight PRIVATE regdata cwengine)
-ff_common_options(firefight)
+ff_legacy_options(firefight)
+
+# Phase 1 exit check: boot headless against data/ through Game::init_all, then shut down
+# cleanly. Rebuilds missing sprite caches in data/ (git-ignored); the log goes to TEMP.
+add_test(NAME headless_init COMMAND firefight --data "${FF_DATA_DIR}" --headless)
+set_tests_properties(headless_init PROPERTIES
+  ENVIRONMENT "TEMP=${CMAKE_CURRENT_BINARY_DIR}"
+  TIMEOUT 600)

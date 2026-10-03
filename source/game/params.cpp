@@ -794,7 +794,8 @@ void Op::init(char* filename)
   INVENTMAXGOLDENEYE=  text.value("MAXGOLDENEYE");
   int inv_size=text.size("DESCRIPT");
   DBG_CHECK(inv_size>0&&inv_size<24);
-  for (int inv_i=0;inv_i<24;inv_i++)
+  int inv_i;
+  for (inv_i=0;inv_i<24;inv_i++)
   {
     INVENTDESCRIPT[inv_i]=NULL;
   }

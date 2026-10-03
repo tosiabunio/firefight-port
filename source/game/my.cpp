@@ -703,7 +703,7 @@ void Myship::dump_debug(void)
     {
       if (queue[i]!=NULL)
       {
-        MESSAGE((i==NoNet::get_this_id())?"SHIP %d (LOCAL ONE) DEBUGINFO DUMP:":"SHIP %d DEBUGINFO DUMP:",i);
+        MESSAGE((char*)((i==NoNet::get_this_id())?"SHIP %d (LOCAL ONE) DEBUGINFO DUMP:":"SHIP %d DEBUGINFO DUMP:"),i);
         MESSAGE("f:frame,x:posx,y:posy,a:angle,l:life,s:frags/base,msg:message");
         while (!queue[i]->empty())
         {

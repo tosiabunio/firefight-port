@@ -431,7 +431,7 @@ void Net::game_connect (DWORD game_id, char *player_name, unsigned timeout)
   status.set(net_InGame);
   unsigned char info_buf[game_info_len+1];
   unsigned size = game_info_len+1;
-  unsigned long from;
+  DWORD from;
   unsigned time_start = timeGetTime();
   BOOL info_received = FALSE;
   int last_reported = 0;
@@ -537,7 +537,7 @@ Net::Game *Net::list_games (unsigned *count, int *result, int timeout, int retri
   enum_error = res_OK;
   enum_timeout = timeout;
   enum_retries = retries;
-  HRESULT hr = driver->EnumSessions(&sd, (DWORD)timeout, enum_games, function, DPENUMSESSIONS_AVAILABLE);
+  HRESULT hr = driver->EnumSessions(&sd, (DWORD)timeout, enum_games, (LPVOID)function, DPENUMSESSIONS_AVAILABLE);
   if (result)
   { 
     if ((hr==DP_OK)||(hr==DPERR_NOSESSIONS))
@@ -616,7 +616,8 @@ Net::Player *Net::list_players   (unsigned *count, int *result)
   }
   if (count)
     *count = players_qty;
-  for (int i=0; i<max_enum_players; i++)         // delete players which no longer exist
+  int i;
+  for (i=0; i<max_enum_players; i++)         // delete players which no longer exist
     if ((*msgbuf)[i].player!=0)
     {
       int pos = get_player_pos((*msgbuf)[i].player);
