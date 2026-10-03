@@ -1,4 +1,30 @@
 #include "headers.h"
+#include <string>
+
+// Port: the pilot record keeps its original layout and scrambling, but lives in its own file in
+// the preferences directory (was a registry value: section "Player:<name>", key easy/hard/ntrk).
+// Characters other than letters, digits and '_' are written as %XX in the file name.
+static std::string file_name_part(const char *text)
+{
+  std::string result;
+  for (const char *c = text; *c; c++)
+  {
+    if (isalnum((unsigned char)*c) || *c == '_')
+      result += *c;
+    else
+    {
+      char hex[4];
+      sprintf(hex, "%%%02X", (unsigned char)*c);
+      result += hex;
+    }
+  }
+  return result;
+}
+
+static std::string pilot_file(const char *section, const char *key)
+{
+  return std::string(Comm::pref_path) + "pilot-" + file_name_part(section) + "-" + file_name_part(key) + ".dat";
+}
 
 int  Pilot::version=0x0006;
 int  Pilot::initialized=0;
@@ -79,15 +105,29 @@ void Pilot::dump_to_registry(Data& d)
   memcpy((void*)to_code.sysset_data,(void*)SysSet::dump_buffer(),sizeof(to_code.sysset_data));
   to_code.csum=count_csum(to_code);
   code(to_code);
-  Registry::set_binary(reg_section,reg_key,(char*)&to_code,sizeof(Data));
+  std::string name = pilot_file(reg_section, reg_key);
+  FILE *file = fopen(name.c_str(), "wb");
+  if ((file == NULL) || (fwrite(&to_code, sizeof(Data), 1, file) != 1))
+    WARNING("cannot write pilot file %s", (char*)name.c_str());
+  if (file != NULL)
+    fclose(file);
 }
 
 int Pilot::try_registry(void)
 {
   DBG_CHECK(initialized);
 
-  unsigned data_size=sizeof(Data);
-  if (!Registry::get_binary(reg_section,reg_key,(char*)&data,&data_size))
+  std::string name = pilot_file(reg_section, reg_key);
+  FILE *file = fopen(name.c_str(), "rb");
+  unsigned data_size = 0;
+  if (file != NULL)
+  {
+    data_size = (unsigned)fread(&data, 1, sizeof(Data), file);
+    if (fgetc(file) != EOF)
+      data_size++;  // longer than a pilot record
+    fclose(file);
+  }
+  if (data_size==0)
   {
 //    MESSAGE("Reading pilot data from registry failed.");
     return 0;

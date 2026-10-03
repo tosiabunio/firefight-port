@@ -242,6 +242,11 @@ void Screen::print (const char *c, ...)
 
 //----- screen capture -------------------------------------------------------
 
+static inline void fwrite_all (FILE *fh, const void *data, size_t size)
+{
+  fwrite (data, 1, size, fh);
+}
+
 static inline char bconv (int val)
 {
   return ((unsigned char)(((unsigned char)(val)*0x410)/0x100));
@@ -258,41 +263,40 @@ void Screen::capture (void)
     0x0000FE36,0x00000000,0x00000436,0x00000028,0x00000140,0x000000C8,
     0x00080001,0x00000000,0x0000FA00,0x00002E23,0x00002E23,0x00000000,0x00000000
   };
-  int i,lpos,lnum,fh;
-  char name [32];
+  int i,lpos,lnum;
+  FILE *fh;
+  char name [_MAX_PATH+16];  // was [32], which the temp path alone could overflow
 
   bmph [hlinelen]    = real_sx;
   bmph [hlinesnum]   = real_sy;
   bmph [hpiclen]     = (((real_sx%4)?((real_sx|3)+1):real_sx)*real_sy);
 
-  char tmppath[_MAX_PATH];
-  if(GetTempPath(sizeof(tmppath),tmppath)==0)
-    sprintf(tmppath,"c:");
+  // Port: screenshots go to the preferences directory (was TEMP) through stdio.
   i = -1;
   do
   {
     i++;
-    sprintf (name, "%s\\scrn_%03d.bmp", tmppath, i);
-    fh = open(name, O_RDONLY);
-    close (fh);
+    sprintf (name, "%sscrn_%03d.bmp", Comm::pref_path, i);
+    fh = fopen(name, "rb");
+    if (fh) fclose (fh);
   }
-  while ((i<1000) && (fh!=-1));
+  while ((i<1000) && (fh!=NULL));
 
   if (i<1000)
   {
-    if ((fh = open(name, O_WRONLY | O_BINARY | O_CREAT | O_TRUNC, _S_IREAD | _S_IWRITE)) != -1)
+    if ((fh = fopen(name, "wb")) != NULL)
     {
-      write (fh, &bmpname, sizeof(bmpname));
-      write (fh, bmph, sizeof(bmph));
+      fwrite_all (fh, &bmpname, sizeof(bmpname));
+      fwrite_all (fh, bmph, sizeof(bmph));
       for (i=0; i<256; i++)
       {
         Color col;
         unsigned char b;
         col = Video::vpalette[Video::vpalette_num][i];
-        b = bconv (col.bval()); write (fh, &b, 1);
-        b = bconv (col.gval()); write (fh, &b, 1);
-        b = bconv (col.rval()); write (fh, &b, 1);
-        b = 0; write (fh, &b, 1);
+        b = bconv (col.bval()); fwrite_all (fh, &b, 1);
+        b = bconv (col.gval()); fwrite_all (fh, &b, 1);
+        b = bconv (col.rval()); fwrite_all (fh, &b, 1);
+        b = 0; fwrite_all (fh, &b, 1);
       }
       if(Video::upside_down)
       {
@@ -301,7 +305,7 @@ void Screen::capture (void)
           unsigned char buf [1024*8];
           for (lpos=0; lpos<real_sx; lpos++)
             buf [lpos] = *(unsigned char*)(adr+lnum*real_llen+lpos);
-          write (fh, buf, (real_sx%4)?((real_sx|3)+1):real_sx);
+          fwrite_all (fh, buf, (real_sx%4)?((real_sx|3)+1):real_sx);
         }
       }
       else
@@ -311,10 +315,10 @@ void Screen::capture (void)
           unsigned char buf [1024*8];
           for (lpos=0; lpos<real_sx; lpos++)
             buf [lpos] = *(unsigned char*)(adr+lnum*real_llen+lpos);
-          write (fh, buf, (real_sx%4)?((real_sx|3)+1):real_sx);
+          fwrite_all (fh, buf, (real_sx%4)?((real_sx|3)+1):real_sx);
         }
       }
-      close (fh);
+      fclose (fh);
     }
   }
 }

@@ -7,9 +7,8 @@
 // stubs. The definitions live in win32.cpp:
 //   - window, GDI, DirectX, MCI, mixer, wave-out and joystick calls are inert and report
 //     failure or "nothing there" (LoadLibrary returns NULL, so DirectX is never created);
-//   - the registry lives in memory for the length of the run;
 //   - a few calls with an obvious portable meaning are implemented for real: the clocks
-//     (GetTickCount, timeGetTime), GetEnvironmentVariable, GetCommandLine and GetTempPath.
+//     (GetTickCount, timeGetTime), GetUserName, SleepEx and VirtualAlloc.
 // Only what the original sources use is declared. Layouts follow the Win32 SDK where the code
 // depends on them; integer types have their Win32 widths (DWORD and LONG are 32-bit everywhere).
 // Each driver that is rewritten on SDL stops including this header; it goes away with the last.
@@ -285,23 +284,7 @@ struct MEMORYSTATUS
 #define WAIT_FAILED    0xFFFFFFFFL
 #define INFINITE       0xFFFFFFFF
 
-// --- registry -----------------------------------------------------------------------------------
-#define HKEY_CURRENT_USER  ((HKEY)(uintptr_t)0x80000001)
-#define HKEY_LOCAL_MACHINE ((HKEY)(uintptr_t)0x80000002)
-#define KEY_READ  0x20019
-#define KEY_WRITE 0x20006
-#define REG_OPTION_NON_VOLATILE 0
-#define REG_NONE   0
-#define REG_SZ     1
-#define REG_BINARY 3
-#define REG_DWORD  4
-typedef DWORD REGSAM;
-
 // --- multimedia: timer, wave out, mixer, joystick, MCI -------------------------------------------
-struct TIMECAPS { UINT wPeriodMin, wPeriodMax; };
-typedef void (CALLBACK *LPTIMECALLBACK)(UINT uTimerID, UINT uMsg, DWORD_PTR dwUser, DWORD_PTR dw1, DWORD_PTR dw2);
-#define TIMERR_NOERROR   0
-#define TIME_PERIODIC    0x0001
 #define MMSYSERR_NOERROR 0
 #define JOYERR_NOERROR   0
 #define CALLBACK_NULL    0x00000000L
@@ -731,33 +714,19 @@ typedef IDirectPlay *LPDIRECTPLAY;
 #define DPSYS_SESSIONLOST        0x0031
 
 // --- functions (stubs, see win32.cpp) -----------------------------------------------------------
-// Sets what GetCommandLine returns: the program name followed by the arguments, as on Windows.
-void ff_set_command_line(const char *line);
 // kernel
 DWORD   GetTickCount();
 DWORD   GetLastError();
-DWORD   GetVersion();
 DWORD   GetCurrentThreadId();
-LPSTR   GetCommandLine();
-DWORD   GetEnvironmentVariable(LPCSTR name, LPSTR buffer, DWORD size);
-DWORD   GetTempPath(DWORD size, LPSTR buffer);
-UINT    GetTempFileName(LPCSTR path, LPCSTR prefix, UINT unique, LPSTR name);
-DWORD   GetCurrentDirectory(DWORD size, LPSTR buffer);
 UINT    GetDriveType(LPCSTR root);
 BOOL    GetUserName(LPSTR buffer, LPDWORD size);
-void    GlobalMemoryStatus(MEMORYSTATUS *status);
 LPVOID  VirtualAlloc(LPVOID address, size_t size, DWORD type, DWORD protect);
 BOOL    VirtualFree(LPVOID address, size_t size, DWORD type);
 HMODULE LoadLibrary(LPCSTR name);
 BOOL    FreeLibrary(HMODULE module);
 FARPROC GetProcAddress(HMODULE module, LPCSTR name);
-HANDLE  CreateMutex(LPVOID attributes, BOOL owner, LPCSTR name);
-HANDLE  OpenMutex(DWORD access, BOOL inherit, LPCSTR name);
-BOOL    CloseHandle(HANDLE handle);
 DWORD   WaitForSingleObject(HANDLE handle, DWORD milliseconds);
 DWORD   SleepEx(DWORD milliseconds, BOOL alertable);
-void    OutputDebugString(LPCSTR text);
-void    DebugBreak();
 // windows and messages
 BOOL    RegisterClass(const WNDCLASS *wc);
 HWND    CreateWindow(LPCSTR class_name, LPCSTR window_name, DWORD style, int x, int y, int w, int h,
@@ -783,11 +752,6 @@ HICON   LoadIcon(HINSTANCE instance, LPCSTR name);
 HCURSOR LoadCursor(HINSTANCE instance, LPCSTR name);
 int     ShowCursor(BOOL show);
 BOOL    SetCursorPos(int x, int y);
-int     MessageBox(HWND hwnd, LPCSTR text, LPCSTR caption, UINT type);
-BOOL    GetMessage(MSG *msg, HWND hwnd, UINT first, UINT last);
-BOOL    PeekMessage(MSG *msg, HWND hwnd, UINT first, UINT last, UINT remove);
-BOOL    TranslateMessage(const MSG *msg);
-LRESULT DispatchMessage(const MSG *msg);
 BOOL    PostMessage(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
 LRESULT SendMessage(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
 void    PostQuitMessage(int exit_code);
@@ -815,22 +779,8 @@ HPALETTE SelectPalette(HDC hdc, HPALETTE palette, BOOL background);
 UINT     RealizePalette(HDC hdc);
 int      StretchDIBits(HDC hdc, int x, int y, int w, int h, int src_x, int src_y, int src_w, int src_h,
                        const void *bits, const BITMAPINFO *info, UINT usage, DWORD rop);
-// registry
-LONG    RegOpenKeyEx(HKEY key, LPCSTR sub_key, DWORD options, REGSAM sam, HKEY *result);
-LONG    RegCreateKeyEx(HKEY key, LPCSTR sub_key, DWORD reserved, LPSTR cls, DWORD options, REGSAM sam,
-                       LPVOID security, HKEY *result, LPDWORD disposition);
-LONG    RegCloseKey(HKEY key);
-LONG    RegDeleteKey(HKEY key, LPCSTR sub_key);
-LONG    RegDeleteValue(HKEY key, LPCSTR value_name);
-LONG    RegQueryValueEx(HKEY key, LPCSTR value_name, LPDWORD reserved, LPDWORD type, LPBYTE data, LPDWORD size);
-LONG    RegSetValueEx(HKEY key, LPCSTR value_name, DWORD reserved, DWORD type, const BYTE *data, DWORD size);
 // multimedia
 DWORD    timeGetTime();
-MMRESULT timeGetDevCaps(TIMECAPS *caps, UINT size);
-MMRESULT timeBeginPeriod(UINT period);
-MMRESULT timeEndPeriod(UINT period);
-MMRESULT timeSetEvent(UINT delay, UINT resolution, LPTIMECALLBACK callback, DWORD_PTR user, UINT flags);
-MMRESULT timeKillEvent(UINT id);
 MMRESULT waveOutOpen(LPHWAVEOUT handle, UINT device, const WAVEFORMATEX *format, DWORD_PTR callback,
                      DWORD_PTR instance, DWORD flags);
 MMRESULT waveOutClose(HWAVEOUT handle);

@@ -25,7 +25,6 @@ class Registry
   static char       s_application_key[REG_APP_NAME_LEN];
   static char       s_application_sub_key[REG_APP_NAME_LEN];
   static Bitflag    status;
-  static HKEY       base_key;
 
   static void quit (void);
 public:
@@ -36,8 +35,6 @@ public:
   };
   static void      init (char *application_name, char *application_sub_name=NULL, 
                          int mode=mode_User, int version=0);
-  static HKEY      lock_key (char *section=NULL);
-  static void      unlock_key(HKEY hkey);
   static void      set_mode (int mode, int version=0);
 
   static unsigned    get_int    (char *section, char *entry,	unsigned def);

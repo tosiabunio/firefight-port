@@ -1,5 +1,8 @@
 #include "1lg_hdrs.h"
 #include <SDL.h>
+#include <filesystem>
+#include <string>
+#include <system_error>
 #pragma init_seg(lib)
 
 char formated_message[1024];
@@ -58,7 +61,9 @@ void Log::init (char *_name)
   FILE *log=fopen(name,"w");  // was _creat
   if(log) fclose(log);
 
-  if ( !GetCurrentDirectory( MAX_PATH, path )) strcpy( path, unknown);
+  std::error_code ec;  // port: was GetCurrentDirectory
+  std::string cwd=std::filesystem::current_path(ec).u8string();
+  if (ec||(cwd.size()>=sizeof(path))) strcpy( path, unknown); else strcpy( path, cwd.c_str());
   write_string("Exec info:       working in '");
   write_string(path);
   write_string("'\n");

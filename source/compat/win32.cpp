@@ -34,22 +34,12 @@ H dummy_handle(char &object)
   return reinterpret_cast<H>(&object);
 }
 
-std::string command_line = "firefight";
-
 // Initialised on first use: the engine reads the clock from its own static constructors.
 DWORD milliseconds_since_start()
 {
   static const auto start_time = std::chrono::steady_clock::now();
   const auto elapsed = std::chrono::steady_clock::now() - start_time;
   return (DWORD)std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count();
-}
-
-DWORD copy_out(const std::string &value, LPSTR buffer, DWORD size)
-{
-  if (value.size() + 1 > size)
-    return (DWORD)value.size() + 1;
-  memcpy(buffer, value.c_str(), value.size() + 1);
-  return (DWORD)value.size();
 }
 
 const MMRESULT MMSYSERR_INVALHANDLE = 5;
@@ -59,64 +49,10 @@ const MCIERROR MCIERR_DEVICE_NOT_INSTALLED = 256 + 50;
 
 } // namespace
 
-void ff_set_command_line(const char *line)
-{
-  command_line = line;
-}
-
 // --- kernel -----------------------------------------------------------------------------------
 DWORD GetTickCount() { return milliseconds_since_start(); }
 DWORD GetLastError() { return 0; }
-DWORD GetVersion() { return 0x00000004; }  // reports Windows 4.0
 DWORD GetCurrentThreadId() { return 1; }
-LPSTR GetCommandLine() { return &command_line[0]; }
-
-DWORD GetEnvironmentVariable(LPCSTR name, LPSTR buffer, DWORD size)
-{
-  const char *value = getenv(name);
-  return value ? copy_out(value, buffer, size) : 0;
-}
-
-DWORD GetTempPath(DWORD size, LPSTR buffer)
-{
-  const char *dir = getenv("TMPDIR");
-  if (!dir || !*dir)
-    dir = getenv("TEMP");
-  if (!dir || !*dir)
-    dir = getenv("TMP");
-  std::string path = (dir && *dir) ? dir : ".";
-  if (path.back() != '/' && path.back() != '\\')
-    path += '/';
-  return copy_out(path, buffer, size);
-}
-
-UINT GetTempFileName(LPCSTR path, LPCSTR prefix, UINT unique, LPSTR name)
-{
-  static UINT counter = 0;
-  for (int attempt = 0; attempt < 65536; attempt++)
-  {
-    const UINT number = unique ? unique : ((++counter + (UINT)milliseconds_since_start()) & 0xffff);
-    snprintf(name, MAX_PATH, "%s%.3s%04X.tmp", path, prefix, number);
-    if (unique)
-      return number;
-    const int fd = _open(name, _O_CREAT | _O_EXCL | _O_WRONLY | _O_BINARY, _S_IREAD | _S_IWRITE);
-    if (fd != -1)
-    {
-      _close(fd);
-      return number;
-    }
-  }
-  return 0;
-}
-
-DWORD GetCurrentDirectory(DWORD size, LPSTR buffer)
-{
-  char cwd[4096];
-  if (!getcwd(cwd, sizeof(cwd)))
-    return 0;
-  return copy_out(cwd, buffer, size);
-}
-
 UINT GetDriveType(LPCSTR) { return 3; }  // DRIVE_FIXED
 
 BOOL GetUserName(LPSTR buffer, LPDWORD size)
@@ -130,14 +66,6 @@ BOOL GetUserName(LPSTR buffer, LPDWORD size)
   memcpy(buffer, value.c_str(), value.size() + 1);
   *size = (DWORD)value.size() + 1;
   return TRUE;
-}
-
-void GlobalMemoryStatus(MEMORYSTATUS *status)
-{
-  memset(status, 0, sizeof(*status));
-  status->dwLength = sizeof(*status);
-  status->dwTotalPhys = status->dwTotalPageFile = status->dwTotalVirtual = 0x40000000;
-  status->dwAvailPhys = status->dwAvailPageFile = status->dwAvailVirtual = 0x20000000;
 }
 
 // Committed memory is zero-filled, as on Windows. A reservation is backed straight away, so a
@@ -159,9 +87,6 @@ BOOL VirtualFree(LPVOID address, size_t, DWORD type)
 HMODULE LoadLibrary(LPCSTR) { return nullptr; }
 BOOL    FreeLibrary(HMODULE) { return TRUE; }
 FARPROC GetProcAddress(HMODULE, LPCSTR) { return nullptr; }
-HANDLE  CreateMutex(LPVOID, BOOL, LPCSTR) { return dummy_handle<HANDLE>(dummy_mutex); }
-HANDLE  OpenMutex(DWORD, BOOL, LPCSTR) { return nullptr; }
-BOOL    CloseHandle(HANDLE) { return TRUE; }
 DWORD   WaitForSingleObject(HANDLE, DWORD) { return WAIT_OBJECT_0; }
 
 DWORD SleepEx(DWORD milliseconds, BOOL)
@@ -170,16 +95,6 @@ DWORD SleepEx(DWORD milliseconds, BOOL)
   return 0;
 }
 
-void OutputDebugString(LPCSTR text) { fputs(text, stderr); }
-
-void DebugBreak()
-{
-#ifdef _MSC_VER
-  __debugbreak();
-#else
-  raise(SIGTRAP);
-#endif
-}
 
 // --- windows and messages -----------------------------------------------------------------------
 BOOL RegisterClass(const WNDCLASS *) { return TRUE; }
@@ -238,16 +153,6 @@ HCURSOR LoadCursor(HINSTANCE, LPCSTR) { return nullptr; }
 int  ShowCursor(BOOL) { return 0; }
 BOOL SetCursorPos(int, int) { return TRUE; }
 
-int MessageBox(HWND, LPCSTR text, LPCSTR caption, UINT)
-{
-  fprintf(stderr, "[%s] %s\n", caption ? caption : "", text ? text : "");
-  return IDOK;
-}
-
-BOOL    GetMessage(MSG *, HWND, UINT, UINT) { return FALSE; }
-BOOL    PeekMessage(MSG *, HWND, UINT, UINT, UINT) { return FALSE; }
-BOOL    TranslateMessage(const MSG *) { return FALSE; }
-LRESULT DispatchMessage(const MSG *) { return 0; }
 BOOL    PostMessage(HWND, UINT, WPARAM, LPARAM) { return TRUE; }
 LRESULT SendMessage(HWND, UINT, WPARAM, LPARAM) { return 0; }
 void    PostQuitMessage(int) {}
@@ -281,158 +186,10 @@ HPALETTE SelectPalette(HDC, HPALETTE, BOOL) { return nullptr; }
 UINT     RealizePalette(HDC) { return 0; }
 int      StretchDIBits(HDC, int, int, int, int h, int, int, int, int, const void *, const BITMAPINFO *, UINT, DWORD) { return h; }
 
-// --- registry: in memory, for the length of the run ---------------------------------------------
-// Keys are case-insensitive paths below a root key. A value that was never written falls back to
-// launcher_defaults: values the original launcher (LOADER.EXE) always wrote before starting the
-// game and for which neither the code nor cwe.ini has a default. They match RegData's defaults.
-// Phase 2 replaces this with a settings file.
-namespace {
-
-struct Reg_value
-{
-  DWORD type;
-  std::string data;
-};
-
-struct Launcher_default
-{
-  const char *section;
-  const char *name;
-  DWORD value;
-};
-
-const Launcher_default launcher_defaults[] = {
-  {"spr", "hires mode", 1},  // RegData::hires_Def (640x480)
-  {"spr", "lores mode", 1},  // RegData::lores_Def (320x240)
-};
-
-std::vector<std::string> reg_keys;        // handle - 0x1000 indexes this
-std::map<std::string, Reg_value> reg_values;  // "<key path>\<value name>", lowercase
-
-std::string lower(std::string s)
-{
-  for (char &c : s)
-    c = (char)tolower((unsigned char)c);
-  return s;
-}
-
-std::string reg_path(HKEY key)
-{
-  const uintptr_t k = reinterpret_cast<uintptr_t>(key);
-  if (k >= 0x1000 && k - 0x1000 < reg_keys.size())
-    return reg_keys[k - 0x1000];
-  return k == reinterpret_cast<uintptr_t>(HKEY_LOCAL_MACHINE) ? "hklm" : "hkcu";
-}
-
-HKEY reg_handle(const std::string &path)
-{
-  for (size_t i = 0; i < reg_keys.size(); i++)
-    if (reg_keys[i] == path)
-      return reinterpret_cast<HKEY>(0x1000 + i);
-  reg_keys.push_back(path);
-  return reinterpret_cast<HKEY>(0x1000 + reg_keys.size() - 1);
-}
-
-const Reg_value *reg_find(const std::string &path, const std::string &name)
-{
-  auto it = reg_values.find(path + "\\" + name);
-  if (it != reg_values.end())
-    return &it->second;
-  static Reg_value fallback;
-  const std::string section = path.substr(path.rfind('\\') + 1);
-  for (const Launcher_default &d : launcher_defaults)
-    if (section == d.section && name == d.name)
-    {
-      fallback.type = REG_DWORD;
-      fallback.data.assign(reinterpret_cast<const char *>(&d.value), sizeof(d.value));
-      return &fallback;
-    }
-  return nullptr;
-}
-
-const LONG ERROR_MORE_DATA = 234;
-
-} // namespace
-
-LONG RegOpenKeyEx(HKEY key, LPCSTR sub_key, DWORD, REGSAM, HKEY *result)
-{
-  *result = reg_handle(reg_path(key) + "\\" + lower(sub_key));
-  return ERROR_SUCCESS;
-}
-
-LONG RegCreateKeyEx(HKEY key, LPCSTR sub_key, DWORD, LPSTR, DWORD, REGSAM, LPVOID, HKEY *result, LPDWORD)
-{
-  *result = reg_handle(reg_path(key) + "\\" + lower(sub_key));
-  return ERROR_SUCCESS;
-}
-
-LONG RegCloseKey(HKEY) { return ERROR_SUCCESS; }
-
-LONG RegDeleteKey(HKEY key, LPCSTR sub_key)
-{
-  const std::string prefix = reg_path(key) + "\\" + lower(sub_key) + "\\";
-  for (auto it = reg_values.begin(); it != reg_values.end();)
-    it = (it->first.compare(0, prefix.size(), prefix) == 0) ? reg_values.erase(it) : std::next(it);
-  return ERROR_SUCCESS;
-}
-
-LONG RegDeleteValue(HKEY key, LPCSTR value_name)
-{
-  return reg_values.erase(reg_path(key) + "\\" + lower(value_name)) ? ERROR_SUCCESS : ERROR_FILE_NOT_FOUND;
-}
-
-LONG RegQueryValueEx(HKEY key, LPCSTR value_name, LPDWORD, LPDWORD type, LPBYTE data, LPDWORD size)
-{
-  const Reg_value *value = reg_find(reg_path(key), lower(value_name ? value_name : ""));
-  if (!value)
-    return ERROR_FILE_NOT_FOUND;
-  if (type)
-    *type = value->type;
-  const DWORD needed = (DWORD)value->data.size();
-  if (data)
-  {
-    if (!size || *size < needed)
-    {
-      if (size)
-        *size = needed;
-      return ERROR_MORE_DATA;
-    }
-    memcpy(data, value->data.data(), needed);
-  }
-  if (size)
-    *size = needed;
-  return ERROR_SUCCESS;
-}
-
-LONG RegSetValueEx(HKEY key, LPCSTR value_name, DWORD, DWORD type, const BYTE *data, DWORD size)
-{
-  Reg_value &value = reg_values[reg_path(key) + "\\" + lower(value_name ? value_name : "")];
-  value.type = type;
-  value.data.assign(reinterpret_cast<const char *>(data), size);
-  return ERROR_SUCCESS;
-}
-
 // --- multimedia -----------------------------------------------------------------------------------
 DWORD timeGetTime() { return milliseconds_since_start(); }
 
-MMRESULT timeGetDevCaps(TIMECAPS *caps, UINT)
-{
-  caps->wPeriodMin = 1;
-  caps->wPeriodMax = 1000000;
-  return TIMERR_NOERROR;
-}
 
-MMRESULT timeBeginPeriod(UINT) { return TIMERR_NOERROR; }
-MMRESULT timeEndPeriod(UINT) { return TIMERR_NOERROR; }
-
-// Timer events are registered but never fire; phase 2 drives the clock from the main thread.
-MMRESULT timeSetEvent(UINT, UINT, LPTIMECALLBACK, DWORD_PTR, UINT)
-{
-  static MMRESULT next_id = 0;
-  return ++next_id;
-}
-
-MMRESULT timeKillEvent(UINT) { return TIMERR_NOERROR; }
 
 MMRESULT waveOutOpen(LPHWAVEOUT handle, UINT, const WAVEFORMATEX *, DWORD_PTR, DWORD_PTR, DWORD)
 {

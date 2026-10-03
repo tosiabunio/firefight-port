@@ -43,6 +43,8 @@ class Pilot
      char chat_text[chat_text_num][chat_text_len];
      int sysset_data[SysSet::_LAST];
    };
+   // Saved as raw bytes (port: in a pilot file, was a registry value).
+   static_assert(sizeof(Data)==3388, "pilot record layout differs from the original");
    static Data data;
    static Data freezed_data;
    static char reg_section[section_len];

@@ -1132,10 +1132,8 @@ void Counter::run(Level* level)
   if (Mp::BUILDSPRITESMODE)
   {
     FILE* file;
-    char temp_path[1024];
-    GetTempPath(1024,temp_path);
     char temp_name[1024];
-    sprintf(temp_name,"%s\\firefght.rap",temp_path);
+    sprintf(temp_name,"%sfirefght.rap",Comm::pref_path);  // port: was in TEMP
 
     static int first_time=1;
     if(first_time)

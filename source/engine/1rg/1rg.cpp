@@ -1,4 +1,8 @@
 #include "1rg_hdrs.h"
+#include <filesystem>
+#include <map>
+#include <string>
+#include <system_error>
 
 
 //=============================================================================
@@ -34,12 +38,205 @@ Bitflag Registry::status(0);
 char    Registry::s_application_key[REG_APP_NAME_LEN];
 char    Registry::s_application_sub_key[REG_APP_NAME_LEN];
 char    Registry::buffer[REG_BUFFER_LEN];
-HKEY    Registry::base_key = HKEY_CURRENT_USER;
 //=============================================================================
 // Registry methods
 //=============================================================================
+// Port: the registry is a settings file, <preferences>/settings.ini, read at init and written
+// back at quit. Each registry key below the application key is an INI section and each value an
+// entry, tagged with its registry type:
+//
+//   [spr]
+//   hires mode=dword:1
+//   [Player:default]
+//   easy=hex:0b1a...
+//
+// Section and entry names are case-insensitive, as in the registry. The machine-wide part
+// (mode_Machine, used only for the patch directory) is always empty. Values the original
+// launcher always wrote, and for which neither the code nor cwe.ini has a default, are built in
+// (launcher_defaults).
+namespace {
+
+// Value types, as in the registry.
+enum { type_dword, type_string, type_binary };
+
+struct Reg_value
+{
+  std::string name;
+  DWORD       type;
+  std::string data;
+};
+
+struct Reg_section
+{
+  std::string name;
+  std::map<std::string, Reg_value> values;  // by lowercase name
+};
+
+typedef std::map<std::string, Reg_section> Reg_store;  // by lowercase name
+
+// Never destroyed: Registry::quit runs among the final quits, after static destructors (see
+// Comm_init in 1lg.h).
+Reg_store &user_store = *new Reg_store;
+Reg_store &machine_store = *new Reg_store;
+bool      machine_mode = false;
+bool      dirty        = false;
+
+struct Launcher_default
+{
+  const char *section;
+  const char *entry;
+  unsigned    value;
+};
+
+// Matches RegData's defaults: 640x480 hires and 320x240 lores.
+const Launcher_default launcher_defaults[] = {
+  {"spr", "hires mode", 1},
+  {"spr", "lores mode", 1},
+};
+
+std::string lower(const char *s)
+{
+  std::string result(s ? s : "");
+  for (char &c : result)
+    c = (char)tolower((unsigned char)c);
+  return result;
+}
+
+Reg_store &store()
+{
+  return machine_mode ? machine_store : user_store;
+}
+
+std::string settings_file()
+{
+  return std::string(Comm::pref_path) + "settings.ini";
+}
+
+const Reg_value *find_value(const char *section, const char *entry)
+{
+  Reg_store &s = store();
+  auto sec = s.find(lower(section));
+  if (sec == s.end())
+    return nullptr;
+  auto val = sec->second.values.find(lower(entry));
+  return (val == sec->second.values.end()) ? nullptr : &val->second;
+}
+
+void put_value(const char *section, const char *entry, DWORD type, const void *data, size_t size)
+{
+  Reg_section &sec = store()[lower(section)];
+  if (sec.name.empty())
+    sec.name = section ? section : "";
+  Reg_value &val = sec.values[lower(entry)];
+  if (val.name.empty())
+    val.name = entry;
+  val.type = type;
+  val.data.assign((const char *)data, size);
+  if (!machine_mode)
+    dirty = true;
+}
+
+void load_settings()
+{
+  user_store.clear();
+  FILE *file = fopen(settings_file().c_str(), "rb");
+  if (!file)
+    return;
+  char line[4096];
+  std::string section;
+  bool have_section = false;
+  while (fgets(line, sizeof(line), file))
+  {
+    size_t len = strlen(line);
+    while (len > 0 && (line[len-1] == '\n' || line[len-1] == '\r'))
+      line[--len] = 0;
+    if (len == 0 || line[0] == ';')
+      continue;
+    if (line[0] == '[' && line[len-1] == ']')
+    {
+      section.assign(line + 1, len - 2);
+      have_section = true;
+      continue;
+    }
+    char *eq = strchr(line, '=');
+    if (!have_section || !eq)
+      continue;
+    *eq = 0;
+    const char *entry = line;
+    const char *value = eq + 1;
+    if (strncmp(value, "dword:", 6) == 0)
+    {
+      DWORD v = (DWORD)strtoul(value + 6, NULL, 10);
+      put_value(section.c_str(), entry, type_dword, &v, sizeof(v));
+    }
+    else if (strncmp(value, "str:", 4) == 0)
+      put_value(section.c_str(), entry, type_string, value + 4, strlen(value + 4) + 1);
+    else if (strncmp(value, "hex:", 4) == 0)
+    {
+      std::string bytes;
+      for (const char *h = value + 4; h[0] && h[1]; h += 2)
+      {
+        char pair[3] = {h[0], h[1], 0};
+        bytes += (char)strtoul(pair, NULL, 16);
+      }
+      put_value(section.c_str(), entry, type_binary, bytes.data(), bytes.size());
+    }
+  }
+  fclose(file);
+  dirty = false;
+}
+
+void save_settings()
+{
+  if (!dirty)
+    return;
+  std::string path = settings_file();
+  std::string temp = path + ".new";
+  FILE *file = fopen(temp.c_str(), "wb");
+  if (!file)
+  {
+    WARNING("cannot write settings file %s", (char*)path.c_str());
+    return;
+  }
+  fputs("; Fire Fight settings (the original kept these in the Windows registry)\n", file);
+  for (auto &sec : user_store)
+  {
+    fprintf(file, "[%s]\n", sec.second.name.c_str());
+    for (auto &v : sec.second.values)
+    {
+      const Reg_value &val = v.second;
+      if (val.type == type_dword && val.data.size() == sizeof(DWORD))
+      {
+        DWORD d;
+        memcpy(&d, val.data.data(), sizeof(d));
+        fprintf(file, "%s=dword:%u\n", val.name.c_str(), (unsigned)d);
+      }
+      else if (val.type == type_string)
+        fprintf(file, "%s=str:%s\n", val.name.c_str(), val.data.c_str());
+      else
+      {
+        fprintf(file, "%s=hex:", val.name.c_str());
+        for (unsigned char c : val.data)
+          fprintf(file, "%02x", c);
+        fputs("\n", file);
+      }
+    }
+  }
+  bool ok = (fclose(file) == 0);
+  std::error_code ec;
+  if (ok)
+    std::filesystem::rename(temp, path, ec);
+  if (!ok || ec)
+    WARNING("cannot write settings file %s", (char*)path.c_str());
+  else
+    dirty = false;
+}
+
+} // namespace
+//-----------------------------------------------------------------------------
 void Registry::quit (void)
 {
+  save_settings();
   status.reset(reg_Initialized);
 }
 //-----------------------------------------------------------------------------
@@ -49,22 +246,16 @@ void Registry::init (char *application_name, char *application_sub_name, int mod
   DBG_CHECK(application_name!=NULL);
   DBG_CHECK(strlen(application_name)<(REG_APP_NAME_LEN-1));
   DBG_CHECK((application_sub_name==NULL)||(strlen(application_sub_name)<(REG_APP_NAME_LEN-1)));
-#if HI_DEBUG
-  for (unsigned i=0; i<strlen(application_name); i++)
-    if ((application_name[i]<32)||(application_name[i]>127))
-       FAILURE("Registry::init - invalid application name \"%s\"", application_name);
-#endif  
   strcpy(s_application_key, application_name);
   if (application_sub_name!=NULL)
     strcpy(s_application_sub_key, application_sub_name);
   else
     s_application_sub_key[0] = 0; 
-  if (mode == mode_User)
-    base_key = HKEY_CURRENT_USER;
-  else if (mode == mode_Machine)
-    base_key = HKEY_LOCAL_MACHINE;
-  else
+  load_settings();
+  MESSAGE("settings: %s", (char*)settings_file().c_str());
+  if ((mode != mode_User)&&(mode != mode_Machine))
     FAILURE("Registry::init - invalid mode");
+  machine_mode = (mode == mode_Machine);
   status.set(reg_Initialized);
   if (version!=0)
   {
@@ -78,12 +269,9 @@ void Registry::init (char *application_name, char *application_sub_name, int mod
 //-----------------------------------------------------------------------------
 void Registry::set_mode (int mode, int version)
 {
-  if (mode == mode_User)
-    base_key = HKEY_CURRENT_USER;
-  else if (mode == mode_Machine)
-    base_key = HKEY_LOCAL_MACHINE;
-  else
+  if ((mode != mode_User)&&(mode != mode_Machine))
     FAILURE("Registry::set_mode - invalid mode");
+  machine_mode = (mode == mode_Machine);
   if (version!=0)
   {
     unsigned ver = get_int (NULL, (char *)s_version_key, 0);
@@ -93,116 +281,35 @@ void Registry::set_mode (int mode, int version)
   }
 }
 //-----------------------------------------------------------------------------
-HKEY Registry::lock_key (char *section)
-{
-  DBG_CHECK(status.is(reg_Initialized));
-  HKEY h_soft_key    = NULL;
-  HKEY h_company_key = NULL;
-  HKEY h_app_key     = NULL;
-  HKEY h_sub_app_key = NULL;
-  HKEY h_section_key = NULL;
-  DWORD dw;
-  LONG res;
-	res = RegOpenKeyEx(base_key, s_software_key, 0, KEY_WRITE|KEY_READ, &h_soft_key);
-  if (res != ERROR_SUCCESS) 
-    return(NULL);
-  res = RegCreateKeyEx(h_soft_key, s_company_key, 0, REG_NONE, REG_OPTION_NON_VOLATILE, 
-                       KEY_WRITE|KEY_READ, NULL,	&h_company_key, &dw);
-  RegCloseKey(h_soft_key);
-  if (res != ERROR_SUCCESS) 
-    return(NULL);
-  res = RegCreateKeyEx(h_company_key, s_application_key, 0, REG_NONE, 	REG_OPTION_NON_VOLATILE, 
-                         KEY_WRITE|KEY_READ, NULL, &h_app_key, &dw);
-  RegCloseKey(h_company_key);
-  if (res != ERROR_SUCCESS) 
-    return(NULL);
-
-  if (strlen(s_application_sub_key)>0)
-  {
-    res = RegCreateKeyEx(h_app_key, s_application_sub_key, 0, REG_NONE, 	REG_OPTION_NON_VOLATILE, 
-                         KEY_WRITE|KEY_READ, NULL, &h_sub_app_key, &dw);
-    RegCloseKey(h_app_key);
-    if (res != ERROR_SUCCESS) 
-      return(NULL);
-    if (section)
-    {
-      res = RegCreateKeyEx(h_sub_app_key, section, 0, REG_NONE, REG_OPTION_NON_VOLATILE, KEY_WRITE|KEY_READ, 
-                     NULL, &h_section_key, &dw);
-      RegCloseKey(h_sub_app_key);
-      if (res != ERROR_SUCCESS) 
-        return(NULL);
-      else
-        return(h_section_key);
-    }
-    else
-      return(h_sub_app_key);
-  }
-  else
-  {
-    if (section)
-    {
-      res = RegCreateKeyEx(h_app_key, section, 0, REG_NONE, REG_OPTION_NON_VOLATILE, KEY_WRITE|KEY_READ, 
-                           NULL, &h_section_key, &dw);
-      RegCloseKey(h_app_key);
-      if (res != ERROR_SUCCESS) 
-        return(NULL);
-      else
-        return(h_section_key);
-    }
-    else
-      return (h_app_key);
-  }
-}
-//-----------------------------------------------------------------------------
-void Registry::unlock_key(HKEY hkey)
-{
-  DBG_CHECK(status.is(reg_Initialized));
-  DBG_CHECK(hkey!=NULL);
-  RegCloseKey(hkey);
-}
-//-----------------------------------------------------------------------------
 unsigned Registry::get_int    (char *section, char *entry,	unsigned def)
 {
   DBG_CHECK(status.is(reg_Initialized));
-	DBG_CHECK(entry!=NULL);
-	HKEY h_sec_key = lock_key(section);
-	if (!h_sec_key)
-		return def;
-	DWORD dw_value;
-	DWORD dw_type;
-	DWORD dw_count = sizeof(DWORD);
-	LONG res = RegQueryValueEx(h_sec_key, entry, NULL, &dw_type, (LPBYTE)&dw_value, &dw_count);
-	unlock_key(h_sec_key);
-	if (res == ERROR_SUCCESS)
-	{
-		DBG_CHECK(dw_type == REG_DWORD);
-		DBG_CHECK(dw_count == sizeof(dw_value));
-		return (UINT)dw_value;
-	}
-	return def;
+  DBG_CHECK(entry!=NULL);
+  const Reg_value *val = find_value(section, entry);
+  if (val && val->type == type_dword && val->data.size() == sizeof(DWORD))
+  {
+    DWORD d;
+    memcpy(&d, val->data.data(), sizeof(d));
+    return (unsigned)d;
+  }
+  if (!val && !machine_mode)
+    for (const Launcher_default &d : launcher_defaults)
+      if ((lower(section) == d.section) && (lower(entry) == d.entry))
+        return d.value;
+  return def;
 }
 //-----------------------------------------------------------------------------
 const char *Registry::get_string (char *section, char *entry,	char *def)
 {
   DBG_CHECK(status.is(reg_Initialized));
-	DBG_CHECK(entry!=NULL);
-	HKEY h_sec_key = lock_key(section);
-	if (!h_sec_key)
-		return def;
-	DWORD dw_type;
-  DWORD dw_count;
-	LONG res = RegQueryValueEx(h_sec_key, entry, NULL, &dw_type, NULL, &dw_count);
-	if (res == ERROR_SUCCESS)
-	{
-		DBG_CHECK(dw_type == REG_SZ);
-		res = RegQueryValueEx(h_sec_key, entry, NULL, &dw_type,	(LPBYTE)buffer, &dw_count);
-	}
-	unlock_key(h_sec_key);
-	if (res == ERROR_SUCCESS)
-	{
-		DBG_CHECK(dw_type == REG_SZ);
-		return buffer;
-	}
+  DBG_CHECK(entry!=NULL);
+  const Reg_value *val = find_value(section, entry);
+  if (val && val->type == type_string && val->data.size() <= REG_BUFFER_LEN)
+  {
+    memcpy(buffer, val->data.data(), val->data.size());
+    buffer[REG_BUFFER_LEN-1] = 0;
+    return buffer;
+  }
   return def;
 }
 //-----------------------------------------------------------------------------
@@ -227,137 +334,82 @@ BOOL Registry::get_string (char *section, char *entry,	char *def, char *destinat
 BOOL Registry::get_binary (char *section, char *entry,	char* data, unsigned* size)
 {
   DBG_CHECK(status.is(reg_Initialized));
-	DBG_CHECK(entry!=NULL);
-	DBG_CHECK(size!=NULL);
+  DBG_CHECK(entry!=NULL);
+  DBG_CHECK(size!=NULL);
   unsigned req_size = *size;
-	*size = 0;
-	LPBYTE ptr = NULL;
-	HKEY h_sec_key = lock_key(section);
-	if (!h_sec_key)
-		return FALSE;
-	DWORD dw_type;
-  DWORD dw_count;
-  BOOL return_value = TRUE;
-	LONG res = RegQueryValueEx(h_sec_key, entry, NULL, &dw_type, NULL, &dw_count);
-	if (res == ERROR_SUCCESS)
-	{
-  	*size = dw_count;
-		DBG_CHECK(dw_type == REG_BINARY);
-    if (data)
-    {
-      if (req_size>=dw_count)
-      {
-		    res = RegQueryValueEx(h_sec_key, entry, NULL, &dw_type, (LPBYTE)data, &dw_count);
-	      if (res != ERROR_SUCCESS)
-		      return_value =  FALSE;
-      }
-      else
-        return_value = FALSE;
-    } 
-	}
-  else
-    return_value = FALSE;
-	unlock_key (h_sec_key);
-	return (return_value);
+  *size = 0;
+  const Reg_value *val = find_value(section, entry);
+  if (!val || val->type != type_binary)
+    return FALSE;
+  *size = (unsigned)val->data.size();
+  if (data)
+  {
+    if (req_size < val->data.size())
+      return FALSE;
+    memcpy(data, val->data.data(), val->data.size());
+  }
+  return TRUE;
 }
 //-----------------------------------------------------------------------------
 BOOL Registry::set_int    (char *section, char *entry,	unsigned value)
 {
   DBG_CHECK(status.is(reg_Initialized));
-	DBG_CHECK(entry!=NULL);
-	HKEY h_sec_key = lock_key(section);
-	if (!h_sec_key)
-		return FALSE;
-	LONG res = RegSetValueEx(h_sec_key, entry, NULL, REG_DWORD, (LPBYTE)&value, sizeof(value));
-	unlock_key(h_sec_key);
-	return (res == ERROR_SUCCESS);
+  DBG_CHECK(entry!=NULL);
+  DWORD d = value;
+  put_value(section, entry, type_dword, &d, sizeof(d));
+  return TRUE;
 }
 //-----------------------------------------------------------------------------
 BOOL Registry::set_string (char *section, char *entry,	char *value)
 {
   DBG_CHECK(status.is(reg_Initialized));
-	DBG_CHECK(entry!=NULL);
-	DBG_CHECK(value!=NULL);
-	HKEY h_sec_key = lock_key(section);
-	if (!h_sec_key)
-		return FALSE;
-	LONG res = RegSetValueEx(h_sec_key, entry, NULL, REG_SZ, (LPBYTE)value, strlen(value)+1);
-	unlock_key(h_sec_key);
-	return (res == ERROR_SUCCESS);
+  DBG_CHECK(entry!=NULL);
+  DBG_CHECK(value!=NULL);
+  put_value(section, entry, type_string, value, strlen(value)+1);
+  return TRUE;
 }
 //-----------------------------------------------------------------------------
 BOOL Registry::set_binary (char *section, char *entry,	char* data, unsigned size)
 {
   DBG_CHECK(status.is(reg_Initialized));
-	DBG_CHECK(entry!=NULL);
-	DBG_CHECK(data!=NULL);
-	DBG_CHECK(size);
-	HKEY h_sec_key = lock_key(section);
-	if (!h_sec_key)
-		return FALSE;
-	LONG res = RegSetValueEx(h_sec_key, entry, NULL, REG_BINARY, (LPBYTE)data, size);
-	unlock_key(h_sec_key);
-	return (res == ERROR_SUCCESS);
+  DBG_CHECK(entry!=NULL);
+  DBG_CHECK(data!=NULL);
+  DBG_CHECK(size);
+  put_value(section, entry, type_binary, data, size);
+  return TRUE;
 }
 //-----------------------------------------------------------------------------
 BOOL Registry::delete_entry   (char *section, char *entry)
 {
   DBG_CHECK(status.is(reg_Initialized));
-	DBG_CHECK(entry!=NULL);
-	HKEY h_sec_key = lock_key(section);
-	if (!h_sec_key)
-		return FALSE;
-	LONG res = RegDeleteValue(h_sec_key, entry);
-	unlock_key(h_sec_key);
-	return (res == ERROR_SUCCESS);
+  DBG_CHECK(entry!=NULL);
+  Reg_store &s = store();
+  auto sec = s.find(lower(section));
+  if (sec == s.end() || sec->second.values.erase(lower(entry)) == 0)
+    return FALSE;
+  if (!machine_mode)
+    dirty = true;
+  return TRUE;
 }
 //-----------------------------------------------------------------------------
 BOOL Registry::delete_section (char *section)
 {
   DBG_CHECK(status.is(reg_Initialized));
-	DBG_CHECK(section!=NULL);
-	HKEY h_app_key = lock_key();
-	if (!h_app_key)
-		return FALSE;
-	LONG res = RegDeleteKey(h_app_key, section);
-	unlock_key(h_app_key);
-	return (res == ERROR_SUCCESS);
+  DBG_CHECK(section!=NULL);
+  if (store().erase(lower(section)) == 0)
+    return FALSE;
+  if (!machine_mode)
+    dirty = true;
+  return TRUE;
 }
 //-----------------------------------------------------------------------------
 BOOL Registry::delete_application_key(void)
 {
   DBG_CHECK(status.is(reg_Initialized));
-  HKEY h_soft_key    = NULL;
-  HKEY h_company_key = NULL;
-  HKEY h_app_key     = NULL;
-  HKEY h_sub_app_key = NULL;
-  DWORD dw;
-  LONG res;
-	res = RegOpenKeyEx(base_key, s_software_key, 0, KEY_WRITE|KEY_READ, &h_soft_key);
-  if (res != ERROR_SUCCESS) 
-    return(FALSE);
-  res = RegCreateKeyEx(h_soft_key, s_company_key, 0, REG_NONE, REG_OPTION_NON_VOLATILE, 
-                       KEY_WRITE|KEY_READ, NULL,	&h_company_key, &dw);
-  RegCloseKey(h_soft_key);
-  if (res != ERROR_SUCCESS) 
-    return(FALSE);
-  if (strlen(s_application_sub_key)>0)
-  {
-    res = RegCreateKeyEx(h_company_key, s_application_key, 0, REG_NONE, 	REG_OPTION_NON_VOLATILE, 
-                           KEY_WRITE|KEY_READ, NULL, &h_app_key, &dw);
-    RegCloseKey(h_company_key);
-    if (res != ERROR_SUCCESS) 
-      return(FALSE);
-    RegDeleteKey(h_app_key, s_application_sub_key); 
-  	RegCloseKey(h_app_key);
-    return(TRUE);
-  }
-  else 
-  {
-    RegDeleteKey(h_company_key, s_application_key); 
-  	RegCloseKey(h_company_key);
-    return(TRUE);
-  }
+  store().clear();
+  if (!machine_mode)
+    dirty = true;
+  return TRUE;
 }
 //-----------------------------------------------------------------------------
 void  Cmd_line::init (char *cmd_line)
