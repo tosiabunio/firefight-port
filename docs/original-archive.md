@@ -158,6 +158,24 @@ The original counted lores, because the launcher always wrote `spr/load mode` 3 
 
   Phase 5 brought `level4c` into sync too: its desync came from `ACannon`'s uninitialised timer, which the port now reads as the original's memory held it (`Stale_memory`, see [porting-plan.md](porting-plan.md#phase-5-determinism-and-the-demo-regression-suite)). With the MSVC 4 `rand` and `qsort` clones, all 8 demos replay in sync on every platform.
 
+### `ACannon::global_time` at offset 232: confirmed
+`Stale_memory` (phase 5) assumes `ACannon::global_time` is at offset 232 (0xE8) of the original's `ACannon`, as clang's MSVC layout says. The Release exe agrees (checked 2026-10-04):
+- **Constructor** (`0x40acc0`, the only user of the `"ACannon"` string at `0x49d54c`). `this` is the complete object. It stores `order`, `spx`, `spy`, `time`, `shtime`, `fr_shoot`, `shoot`, `plane`, `startangle`, `ship`, `smoke`, `param` and `smoketime` at 0xB4–0xE4, each at clang's offset. Nothing writes 0xE8: the `==` was compiled away.
+- **Virtual bases:** the vbtable at `0x495308` puts `Object` at 0xF0 and `Posit` at 0xF4; `Object`'s vtordisp is at 0xEC.
+- **`ACannon::run`** (`0x40bb20`, reached through the vtordisp thunk at `0x40e210` in `Object`'s vftable). `this` is the `Object` base at 0xF0, so `global_time` is `[esi-8]`:
+
+```
+0040bb42  mov eax, [esi-8]        ; global_time
+0040bb45  mov ecx, [0x49f9dc]     ;   -= KbdStat::time()
+0040bb4b  sub eax, ecx
+0040bb4d  mov [esi-8], eax
+0040bb50  jns 0x40bc46            ; < 0: the cannon is removed
+0040bc3e  mov eax, [0x5126e0]     ; else global_time = Mp::BEYONDTIME
+0040bc43  mov [esi-8], eax
+```
+
+This checks `ACannon` only. What the other classes hold at offset 232 (`stale_gen.cpp`) still rests on clang's layouts and on the 8 demos replaying in sync.
+
 ### The demos and 1.0 → 1.1
 - **Recording:** the 8 demos were recorded on 20 May 1996, 11:45–12:02, so with a build from before 1.0 shipped. The same files are on the CD and in the shareware tree.
 - **Data:** every gameplay `.tdf` predates them. Only `TITLE.TDF` (26 Aug) and `TEXT.TXT` (23 May) are later.
@@ -214,4 +232,5 @@ The disassembly above used Capstone and pefile on `FF/C/GAME/RELEASE/FIREFGHT.EX
 These tasks are for the Windows PC:
 - **Reference screenshots** from the original 1.1 game, for the phase 3 exit (see [Executables](#executables)).
 - **New demos** recorded with the original 1.1 exe: an exact 1.1 oracle.
-- **Confirm offset 232:** `Stale_memory` (phase 5) assumes `ACannon::global_time` is at offset 232 (0xE8) of the 1.1 exe's `ACannon`, as clang's MSVC layout says. All 8 demos replaying in sync is strong evidence; `ACannon::run`'s `sub [reg+0E8h], …` in the Release exe would confirm it.
+
+Both need the 1.1 game running, which nobody has tried yet.
