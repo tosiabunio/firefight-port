@@ -413,7 +413,8 @@ void RegData::FromRegistry(int loader_load)
     if (((Controls.Controls[Controls.CurrentSet][i])&scan_Kbd)!=0)
       Controls.VKeys[i] = Vkey::set(Vkey::dev_Kbd,
 				       (unsigned char)(Controls.Controls[Controls.CurrentSet][i]),
-				       (char*)ControlsStr[i]);
+				       (char*)ControlsStr[i],
+				       ParallelKey((unsigned char)(Controls.Controls[Controls.CurrentSet][i])));
     else if (((Controls.Controls[Controls.CurrentSet][i])&scan_Mouse)!=0)
       Controls.VKeys[i] = Vkey::set(Vkey::dev_Mouse,
 				       (unsigned char)(Controls.Controls[Controls.CurrentSet][i]),
@@ -626,6 +627,21 @@ void RegData::DefaultGameInfo(void)
   RespawnDM = DefRespawnDM;
 }
 //-----------------------------------------------------------------------------
+// Port: W, S, A and D work alongside the cursor keys, as a second key for whatever control a
+// cursor key is bound to. Vkey matches a key with or without the E0 prefix, so a binding to the
+// cursor keys and one to the keypad arrows are the same here.
+unsigned char RegData::ParallelKey(unsigned char scan)
+{
+  switch (scan&0x7F)
+  {
+    case 72: return Kbd::get_scan(Kbd::keyw);  // up
+    case 80: return Kbd::get_scan(Kbd::keys);  // down
+    case 75: return Kbd::get_scan(Kbd::keya);  // left
+    case 77: return Kbd::get_scan(Kbd::keyd);  // right
+  }
+  return 0;
+}
+//-----------------------------------------------------------------------------
 void RegData::SetCurrentControlSet(int cset)
 {
   Controls.CurrentSet = cset;
@@ -635,7 +651,8 @@ void RegData::SetCurrentControlSet(int cset)
     if (((Controls.Controls[Controls.CurrentSet][i])&scan_Kbd)!=0)
       Controls.VKeys[i] = Vkey::set(Vkey::dev_Kbd,
 				       (unsigned char)(Controls.Controls[Controls.CurrentSet][i]),
-				       (char*)ControlsStr[i]);
+				       (char*)ControlsStr[i],
+				       ParallelKey((unsigned char)(Controls.Controls[Controls.CurrentSet][i])));
     else if (((Controls.Controls[Controls.CurrentSet][i])&scan_Mouse)!=0)
       Controls.VKeys[i] = Vkey::set(Vkey::dev_Mouse,
 				       (unsigned char)(Controls.Controls[Controls.CurrentSet][i]),

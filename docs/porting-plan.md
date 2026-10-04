@@ -219,6 +219,8 @@ Each phase ends with something runnable and an exit check. Phases 5–7 can over
     - A table maps SDL scancodes to PC set-1 codes (E0 keys +128), so the stored bindings and the demos keep their codes. Pause is 45 and Num Lock E0 45, as Windows reported them.
     - Auto-repeats are dropped; `last_key` filtered them in the original.
     - The text in the player state comes from a fixed US table, which is what `MapVirtualKey` gave, plus the original shift table with its gaps (Shift+Space gives no character).
+    - **WASD** (port addition, 2026-10-04): W, S, A and D work alongside the cursor keys, as a second key for whatever control a cursor key is bound to, in the keyboard and mouse control sets. `RegData::ParallelKey` picks it and `Vkey` checks it. Menus still take only the cursor keys, so names can be typed.
+    - A virtual key matches its key with or without the E0 prefix (`Vkey::complete`). So the Left Ctrl binding (Fire2) also fires on Right Ctrl, and the cursor-key bindings answer to the keypad arrows, in the original as in the port.
   - **Mouse:**
     - Coordinates are window coordinates (were screen coordinates). The clip rectangle is the picture's area in the window, which `VD_sdl::present` reports when it changes, so the original scaling to 320×200 is unchanged. Headless, it is the framebuffer.
     - Moves are coalesced as Windows did. The position is pushed once per message pump and before each button.
@@ -295,7 +297,7 @@ Each phase ends with something runnable and an exit check. Phases 5–7 can over
   - Found so far: with sound off, the original already counts a sample's length by the wall clock (`GetTickCount`), so the messages advance in real time ([original-archive.md](original-archive.md#reference-screenshots-phase-3)).
   - The callers seen so far only change which message shows, volumes and one sound effect. `MManager::run` draws `RAND` twice every step whatever the messages do.
 - **Exit:** audio matches the original by ear: positioning, priorities, speech ducking and music per mission.
-- **Outcome** (2026-10-04). `1ss` runs on SDL2_mixer; the check by ear is still to do.
+- **Outcome** (2026-10-04). Exit met: `1ss` runs on SDL2_mixer, and by ear on Windows the sound plays correctly.
   - **Samples:** the voice model is the original's, line for line: `total_channels` channels (8 by default), one voice per `Sample`, a replay restarting it unless the new volume is lower, and stealing the first channel with the same or a lower priority when all are busy.
     - SDL_mixer channels take the place of the DirectSound buffers.
     - The `logvol` volume and the pan are DirectSound attenuations in hundredths of a dB. They become linear gains for `Mix_Volume` and `Mix_SetPanning`; a positive pan attenuates the left channel.

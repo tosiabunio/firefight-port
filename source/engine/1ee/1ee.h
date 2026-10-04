@@ -509,6 +509,7 @@ private:
     int device;
     unsigned char scan;
     char *name;
+    unsigned char parallel_scan;  // port: a second keyboard key with the same meaning, or 0
   };
   static Bitflag status;
   static Array<Item> *array;
@@ -520,7 +521,7 @@ public:
   static void init ();
   static void quit (void);
   static void reset_content(void);
-  static int  set(int device, unsigned char scan, char *name);
+  static int  set(int device, unsigned char scan, char *name, unsigned char parallel_scan=0);
   static int  is (int code);
   static int  struck (int code);
   static int  press  (int code);

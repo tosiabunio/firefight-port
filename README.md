@@ -21,7 +21,7 @@ This is the subset of the original Fire Fight (Chaos Works, 1996) material neede
 
 ## Building
 
-The port is in progress (see `docs/porting-plan.md`). Phases 1–6 are in place: the original game compiles on all three platforms, its runtime runs on SDL2, it draws in an SDL window, it takes keyboard, mouse and game controller input, and it plays its sounds and the CD soundtrack (from `music/`) through SDL2_mixer. Network play is still an inert stub, so for now the game is single player. The simulation reproduces the original's: the 8 original attract demos replay in sync on every platform. F11 cycles the control sets (keyboard, mouse steering, game controller); with mouse steering the window captures the mouse while it has focus. Useful options (all in `source/game/main.cpp`):
+The port is in progress (see `docs/porting-plan.md`). Phases 1–6 are in place: the original game compiles on all three platforms, its runtime runs on SDL2, it draws in an SDL window, it takes keyboard, mouse and game controller input, and it plays its sounds and the CD soundtrack (from `music/`) through SDL2_mixer. Network play is still an inert stub, so for now the game is single player. The simulation reproduces the original's: the 8 original attract demos replay in sync on every platform. F11 cycles the control sets (keyboard, mouse steering, game controller); with mouse steering the window captures the mouse while it has focus. W, A, S and D steer alongside the cursor keys. Useful options (all in `source/game/main.cpp`):
 
 - `--fullscreen`: desktop full screen.
 - `--stretch`: 4:3 like a CRT; the default is square pixels.

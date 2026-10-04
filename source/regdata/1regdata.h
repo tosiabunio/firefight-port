@@ -289,6 +289,7 @@ public:
   static int  GetPlayerSkill(void);
   static int  GetCurrentControlSet(void);
   static void SetCurrentControlSet(int cset);
+  static unsigned char ParallelKey(unsigned char scan);  // port: WASD for the cursor keys
 };
 
 #endif

@@ -35,11 +35,12 @@ void Vkey::quit (void)
   status.reset(vkey_Initialized);
 }
 //-----------------------------------------------------------------------------
-int  Vkey::set(int device, unsigned char scan, char *name)
+int  Vkey::set(int device, unsigned char scan, char *name, unsigned char parallel_scan)
 {
   (*array)[quantity].device = device;
   (*array)[quantity].scan   = scan;
   (*array)[quantity].name   = name;
+  (*array)[quantity].parallel_scan = parallel_scan;  // port
   quantity++;
   return (quantity-1);
 }
@@ -156,6 +157,15 @@ void Vkey::complete (void)
           if (Bit::is(stk->arr_struck, (*array)[i].scan+128))
             Bit::set(stv->arr_struck, i);
           if (Bit::is(stk->arr_release, (*array)[i].scan+128))
+            Bit::set(stv->arr_release, i);
+        }
+        if ((*array)[i].parallel_scan)  // port: the second key (RegData: WASD for the cursor keys)
+        {
+          if (Bit::is(stk->arr_state, (*array)[i].parallel_scan))
+            Bit::set(stv->arr_state, i);
+          if (Bit::is(stk->arr_struck, (*array)[i].parallel_scan))
+            Bit::set(stv->arr_struck, i);
+          if (Bit::is(stk->arr_release, (*array)[i].parallel_scan))
             Bit::set(stv->arr_release, i);
         }
         break;

@@ -82,7 +82,7 @@ What to expect:
 - **Screenshots:** Ctrl+F12 writes `%TEMP%\scrn_NNN.bmp`, the 640×400 frame as an 8-bit BMP, without view plane 9, the info layer (HUD, messages, the ring around the ship). Alt+F12 keeps it. The blinking "DEMO MODE" label is drawn after the capture (`Game::display_service`), so no screenshot has it.
   - The BMP's palette is the 6-bit VGA palette expanded with the low bits filled, and the port's frame dumps use `v<<2`. Compare in 6-bit values (`>>2`).
   - The title doesn't capture. There any key ends the title once its logo is complete (about 3 s after it appears) and opens the mission screen; otherwise the title times out after 20 s into an attract demo.
-  - In one run the ship moved and fired while screenshots were taken with Right Ctrl+F12, though Right Ctrl and F12 are unbound. For input-free frames, grab the window instead: its client area is the frame at 1:1.
+  - Keys pressed during a mission reach the game. Right Ctrl is Fire2 too: a virtual key matches its key with or without the E0 prefix (`Vkey::complete`), so the Left Ctrl binding fires on Right Ctrl, in the original as in the port. That explains the shots during the Right Ctrl+F12 screenshots. For input-free frames, grab the window instead: its client area is the frame at 1:1.
 - **Esc** in a mission ends it and returns to the mission screen.
 - **Chosen by wall clock:** the mission screen's background (one of the 4 frames of `title_h2.flc`, `timeGetTime()%4` in `Mysprites::init`) and the attract demo (`Game::play_demo`).
 - **DirectPlay** isn't installed on Windows 11 (`dplay failed` in the log). Single player doesn't need it.
@@ -275,4 +275,3 @@ These tasks are for the Windows PC ([Running 1.1](#running-11) has the setup):
 - **New demos** recorded with the original 1.1 exe: an exact 1.1 oracle.
 - **The snowflakes** that differ in the first `level4c` screenshot ([Reference screenshots](#reference-screenshots-phase-3)).
 - **Menus** other than the mission screen, against the original.
-- **Right Ctrl:** find out what moved the ship during the Right Ctrl+F12 screenshots. If 1.1 treats Right Ctrl as Left Ctrl (Fire2), the port's input differs: it keeps the two apart.
