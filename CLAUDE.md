@@ -20,7 +20,7 @@ Everything was selected by rule from the original archive. `README.md` documents
   - `tools/archive/ffarchive.py` and `crt_vectors.py` produce and check those files.
 - **On the Mac:** `docs/macos.md` covers checking a branch, what a failing test means there, and what must wait for the Windows PC.
 - **Port plan:** SDL2 + CMake, in phases with exit criteria, in `docs/porting-plan.md`. Follow its phase order and its determinism rules.
-- **Status: phases 1–4 done and phase 5 mostly done; the game is playable on keyboard, mouse and game controller, without sound.** The original sources build on every platform. Runtime (phase 2), video (phase 3) and input (phase 4) are on SDL2. A full mission played by hand on each device is still to be confirmed. **All 8 original demos replay in sync to the end on Windows, Linux and macOS** (phase 5); golden demos recorded with the port are still to come. Sound and network still go through `source/compat/`, whose inert Win32/DirectX stand-ins phases 6–7 replace; sound is inactive until phase 6.
+- **Status: phases 1–5 done; the game is playable on keyboard, mouse and game controller, without sound.** The original sources build on every platform. Runtime (phase 2), video (phase 3) and input (phase 4) are on SDL2. A full mission played by hand on each device is still to be confirmed. **All 8 original demos replay in sync to the end on Windows, Linux and macOS**, and so do four golden demos recorded with the port (phase 5). Sound and network still go through `source/compat/`, whose inert Win32/DirectX stand-ins phases 6–7 replace; sound is inactive until phase 6.
 
 ## Build
 
