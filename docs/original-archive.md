@@ -58,11 +58,52 @@ All checked file by file:
 
 - **Compiler:** MSVC 4.x (linker 3.10), `/G5 /ML /O2 /GX`. `/ML` links the single-threaded CRT statically, so the CRT code the game ran is in the exe. There are no `.pdb` or `.map` files.
 - **Addresses:** those below are in `RELEASE/FIREFGHT.EXE` (image base `0x400000`).
-- **Running 1.1:** `FF/WORK.RTL` is a complete loose-file installation (exe, loader, manifests, caches, FLC masters). Nobody has run it yet. Notes:
-  - Copy it elsewhere first, keeping file dates. In loose-file mode the engine writes its log there and rebuilds any cache whose master's date no longer matches the date recorded in the cache.
-  - The `WORK.RTL` exe is the Production build and checks for the CD; the `RELEASE` exe doesn't.
-  - Start it through `LOADER.EXE`: the game needs the registry values the launcher writes.
-  - The CD's `Instructions.txt` covers Windows Vista–8 (Windows 98 compatibility, 640×480, "Do not use Direct Draw"); Windows 11 is untested.
+- **Running 1.1:** it runs on Windows 11 from a patched copy of the Release exe; see [Running 1.1](#running-11).
+
+## Running 1.1
+
+The 1.1 game runs on Windows 11, windowed and without sound (first run 2026-10-04). Set it up outside the archive:
+
+1. **Copy** `FF/WORK.RTL`, keeping file dates (`robocopy <WORK.RTL> <dir> /E /COPY:DAT /DCOPY:T`). It is a complete loose-file installation: exe, loader, manifests, caches and FLC masters.
+2. **Exe:** copy `FF/C/GAME/RELEASE/FIREFGHT.EXE` over `<dir>/FIREFGHT.EXE`. The `WORK.RTL` exe is the Production build and checks for the CD; the Release exe doesn't.
+3. **Patch** the copy: `python tools/archive/patch_hooks.py <dir>/FIREFGHT.EXE` (the hook bug below).
+4. **Registry:** under `HKCU\Software\chaos works\Fire Fight\Retail\spr`, set the DWORDs `hires mode` = 1 (640×480; 2 is 640×400), `lores mode` = 1 and `load data mode` = 3. The launcher writes these.
+   - Without the first two, `Cwe::init` falls back to a `cwe.ini` label that the retail `cwe.ini` lacks, and stops: `'cwe.ini:/spr/use_640x400' no such label`.
+   - Every other setting has a default in `RegData`, so `LOADER.EXE` isn't needed.
+5. **Run** `FIREFGHT.EXE debug=1 sos_none=1` in `<dir>`. `debug=1` gives a 640×400 window drawn with GDI (`spr_safe=1` would cover the whole screen); `sos_none=1` turns sound off.
+
+What to expect:
+- **The hook bug.** `Eem::init` (`1ee_main.cpp`) calls `Kbd::init` and `Mouse::init` before it sets `Eem::thread`. Both `SetWindowsHookEx` calls get thread 0 and no module, which asks for a system-wide hook: Windows 95 accepted that, NT refuses it. Unpatched, the game stops with `unable to hook keyboard [Kbd::init]`.
+  - `patch_hooks.py` turns `mov eax,[Eem::thread]` (`0x47d9a1` in `Kbd::init`, `0x47fe15` in `Mouse::init`) into a call to a 12-byte stub in int3 padding at `0x403872`. The stub sets `Eem::thread` to `GetCurrentThreadId()` and returns it. `Eem::init` stores the same value a few lines later.
+  - Windows' Windows 95 compatibility layer doesn't help: the game then crashes in `winmmbase.dll` during input init.
+  - The CD's `Instructions.txt` (Windows Vista–8: Windows 98 compatibility, 640×480, "Do not use Direct Draw") is for the 1.2 exe. Whether 1.2 fixed the hook bug is unchecked.
+- **Log:** `%TEMP%\FIREFGHT.LOG` (`Cwe::init` puts it in `TEMP`), not the game folder.
+- **Cache rebuilds:** the first start rebuilds every cache whose master's date is an hour off from the date recorded in it, a daylight-saving shift (34 caches by mission 1). The rebuilt caches equal the shipped ones apart from that date, so the 1.1 sprite builder reproduces what shipped.
+- **Screenshots:** Ctrl+F12 writes `%TEMP%\scrn_NNN.bmp`, the 640×400 frame as an 8-bit BMP, without view plane 9, the info layer (HUD, messages, the ring around the ship). Alt+F12 keeps it. The blinking "DEMO MODE" label is drawn after the capture (`Game::display_service`), so no screenshot has it.
+  - The BMP's palette is the 6-bit VGA palette expanded with the low bits filled, and the port's frame dumps use `v<<2`. Compare in 6-bit values (`>>2`).
+  - The title doesn't capture. There any key ends the title once its logo is complete (about 3 s after it appears) and opens the mission screen; otherwise the title times out after 20 s into an attract demo.
+  - In one run the ship moved and fired while screenshots were taken with Right Ctrl+F12, though Right Ctrl and F12 are unbound. For input-free frames, grab the window instead: its client area is the frame at 1:1.
+- **Esc** in a mission ends it and returns to the mission screen.
+- **Chosen by wall clock:** the mission screen's background (one of the 4 frames of `title_h2.flc`, `timeGetTime()%4` in `Mysprites::init`) and the attract demo (`Game::play_demo`).
+- **DirectPlay** isn't installed on Windows 11 (`dplay failed` in the log). Single player doesn't need it.
+
+## Reference screenshots (phase 3)
+
+Checked on 2026-10-04: the original's screenshots and window grabs against the port's per-frame dumps (`--headless --fast --shot-every 1`, with `--input` for the same keys), in 6-bit colour values. `--fast` renders every simulation step, so an animated screen matches the port frame of the same step.
+
+| Screen | From the original | Result |
+|---|---|---|
+| Title | 16 window grabs over 8 s | Each equals one port frame (frames 2–185; from 185 the title holds still), apart from the window's rounded bottom corners (Windows 11) |
+| Mission screen | Ctrl+F12 | Identical, once the port shows the same of the 4 random backgrounds |
+| Mission 1 (`green6`), no input | 16 window grabs over the first 8 s | 15 equal a port frame (frames 414–463), apart from the corners. The 16th shows the reply "AFFIRMATIVE", which the `--fast` run hadn't reached (see below) |
+| Attract demo `level4c` (`white1`, hard) | 3 × Ctrl+F12 | Port frames 48, 139 and 266: identical apart from the info overlays the capture leaves out. In the first, 33 snowflakes (2×2 dots) sit about 16 px from the port's |
+
+- **Speech timing follows the wall clock.** With sound off (`SOS_NONE`, which the port also runs until phase 6), `Sounds::playing` counts a sample as playing until its length has passed by `GetTickCount`, and `msg.cpp` moves to the next message when it ends.
+  - The original ran in real time: "LOCATE AND DESTROY …" (`g6_1_1.wav`, 3.5 s) showed until about 4.5 s, then "AFFIRMATIVE" (`g6_1_2.wav`, 0.7 s) at about 5 s.
+  - `--fast` runs 250 steps in a second or two, so the port's first message was still up at frame 700.
+  - The random sequence doesn't depend on it: `MManager::run` draws `RAND` twice every step either way.
+- **Not explained yet:** the snowflakes in the first demo screenshot. The snow is drawn by `Background`, a simulation object, and the two later screenshots have no flake differences.
+- **Not compared:** menus other than the mission screen.
 
 ## Findings for phase 5 (determinism)
 
@@ -189,7 +230,7 @@ This checks `ACannon` only. What the other classes hold at offset 232 (`stale_ge
 | Jul | `Game.h` (4 Jul); `Data.h`, `Kbdsta.*`, `Menu.h`, `1ss_song.cpp`, `1lg.h` (9 Jul); `Gman.cpp`, `World.*` (15 Jul) |
 | Aug | `1lg_main.cpp` (8 Aug); `1cw.cpp`, `1lg_comm.cpp` (14 Aug); `Menu.cpp` (23 Aug); `Headers.h`, `Data.cpp` (25 Aug); `Game.cpp`, `1rg.cpp`, `1io_io.cpp`, `1sp.h` (26 Aug) |
 
-- **An exact 1.1 oracle:** the original 1.1 exe can record new demos, with no 1.0 ambiguity. That needs only a working run (see [Executables](#executables)).
+- **An exact 1.1 oracle:** the original 1.1 exe can record new demos, with no 1.0 ambiguity. It runs now ([Running 1.1](#running-11)); no demo has been recorded with it yet.
 
 ## Oracles for checking the port
 
@@ -207,11 +248,11 @@ This checks `ACannon` only. What the other classes hold at offset 232 (`stale_ge
     - all three tables of the 7 palettes: the palettes, the closest-colour table and the transparency table.
 
     The `sprite_build` test keeps these against the golden files.
-- **The 1.1 exe**, for reference screenshots (phase 3 exit) and new demos (phase 5).
+- **The 1.1 exe** ([Running 1.1](#running-11)): reference screenshots ([phase 3](#reference-screenshots-phase-3)) and new demos.
 
 ## Tools
 
-`tools/archive/ffarchive.py` (Python 3.8+, no dependencies) and `tools/archive/crt_vectors.py` (also needs pefile and Unicorn). Run them on the Windows PC from the repository root:
+`tools/archive/ffarchive.py` and `patch_hooks.py` (Python 3.8+, no dependencies), and `tools/archive/crt_vectors.py` (also needs pefile and Unicorn). Run them on the Windows PC from the repository root:
 
 ```sh
 python tools/archive/ffarchive.py provenance --write tests/golden/data_files.sha256   # data/ and music/ vs the archive
@@ -223,14 +264,15 @@ python tools/archive/ffarchive.py bin2iso "<cd>.bin" ff12.iso      # then extrac
 python tools/archive/ffarchive.py compare-cd <dir>                 # every CD volume entry vs data/ and WORK.RTL
 python tools/archive/ffarchive.py unpack <dir>/PARAMS.VOL [outdir]
 python tools/archive/ffarchive.py cache <archive>/FF/WORK.RTL/!GLOBAL/SPRITES/BOHATER2.SPL
+python tools/archive/patch_hooks.py <dir>/FIREFGHT.EXE             # a copy of the Release exe (Running 1.1)
 ```
 
 The disassembly above used Capstone and pefile on `FF/C/GAME/RELEASE/FIREFGHT.EXE`.
 
 ## Still needs the archive
 
-These tasks are for the Windows PC:
-- **Reference screenshots** from the original 1.1 game, for the phase 3 exit (see [Executables](#executables)).
+These tasks are for the Windows PC ([Running 1.1](#running-11) has the setup):
 - **New demos** recorded with the original 1.1 exe: an exact 1.1 oracle.
-
-Both need the 1.1 game running, which nobody has tried yet.
+- **The snowflakes** that differ in the first `level4c` screenshot ([Reference screenshots](#reference-screenshots-phase-3)).
+- **Menus** other than the mission screen, against the original.
+- **Right Ctrl:** find out what moved the ship during the Right Ctrl+F12 screenshots. If 1.1 treats Right Ctrl as Left Ctrl (Fire2), the port's input differs: it keeps the two apart.

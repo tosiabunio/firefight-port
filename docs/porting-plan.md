@@ -182,8 +182,11 @@ Each phase ends with something runnable and an exit check. Phases 5–7 can over
 - **Other changes:**
   - drop the Win32 progress dialog;
   - screenshots go to the pref path.
-- **Exit:** the title, menus, mission briefing and missions render and match reference screenshots from the original game. Capture those from the retail CD image, set up as described in the archive's `Instructions.txt`, or from the 1.1 build in the archive ([original-archive.md](original-archive.md#executables)). Those instructions cover Windows Vista–8; Windows 11 is untested.
-- **Outcome** (2026-10-04). Everything above is in place except the comparison with the original game, which needs reference screenshots captured from the retail CD image (`--shot-every`/`--shots` dump the port's frames for the comparison).
+- **Exit:** the title, menus, mission briefing and missions render and match reference screenshots from the original game. Capture those from the retail CD image, set up as described in the archive's `Instructions.txt`, or from the 1.1 build in the archive, which runs on Windows 11 once patched ([original-archive.md](original-archive.md#running-11)).
+- **Outcome** (2026-10-04). Everything above is in place.
+  - **Compared with the original 1.1 game** the same day ([original-archive.md](original-archive.md#reference-screenshots-phase-3)). The title, the mission screen, mission 1 and the attract demo `level4c` render pixel for pixel like the port's frame of the same simulation step.
+  - **Explained differences:** the window's rounded corners in grabs of the original; the mission screen's background and the speech timing, which follow the wall clock; the overlays the original's screenshot key leaves out.
+  - **Still open:** 33 snowflakes that differ in one demo frame, and the menus beyond the mission screen.
   - **Rendering is bit-identical across platforms.** The `golden_title` test runs the title sequence in `--fast` mode, whose logo flight uses float arithmetic. Every 20th of its first 200 frames is identical on Windows/MSVC x64, Linux GCC and Clang x86-64 and macOS arm64.
   - **Floats:** that needed `-ffp-contract=off` on GCC/Clang. Clang on arm64 otherwise fuses `a*b+c` into one multiply-add, which rounds differently from x86. This matters for the simulation too.
   - **Blitter:** `_uniput` is one row walker with a run operation per mode (`1sp_asm.cpp`). It follows the assembly's clipping, including its edge cases, and is commented in place. The collision scan keeps the right-to-left run order and the LIFO result order.
@@ -257,7 +260,7 @@ Each phase ends with something runnable and an exit check. Phases 5–7 can over
   5. the uninitialised `ACannon::global_time` read (`alien.cpp:1726`, `==` instead of `=`): emulated, see the outcome below;
   6. finally, a real 1.0 → 1.1 gameplay change. The demos were recorded on 20 May 1996; this source is August 1996. Every gameplay `.tdf` predates the demos, so only code changed; the archive's file dates list the candidate files ([original-archive.md](original-archive.md#the-demos-and-10--11)).
 - **Golden demos:** record a further set with the port across several missions and skill levels. CI replays them on all three OSes; this is the cross-platform determinism gate.
-- **1.1 demos:** the archive holds the original 1.1 executables, built from this source. If they run, demos they record are an exact 1.1 oracle without the 1.0 question.
+- **1.1 demos:** the archive holds the original 1.1 executables, built from this source. The Release exe runs on Windows 11 once patched ([original-archive.md](original-archive.md#running-11)), so demos it records would be an exact 1.1 oracle without the 1.0 question. None has been recorded yet.
 - **Exit:** the original demos replay in sync, or any divergence is explained and documented, and the golden demos pass on Windows, Linux and macOS.
 - **Outcome** (2026-10-04). Exit met: **all 8 original demos replay in sync to the end of their recordings** on Windows/MSVC x64, Linux GCC and Clang x86-64 and macOS arm64, in Debug and Release. The `demo_<name>` tests replay each one. Four golden demos recorded with the port on macOS cover other worlds and both skills, and the `golden_<name>` tests replay them in sync on all four CI configurations too.
   - **Clones:** `compat/msvc4.*` has MSVC 4's `rand`/`srand` and `qsort`. `Rand::init`, the collision results, the visible level objects and the text labels use them on every platform; the CRT's are no longer called. The `crt_vectors` test checks both against the vectors from the 1.1 exe.
@@ -289,6 +292,8 @@ Each phase ends with something runnable and an exit check. Phases 5–7 can over
 - **Music:** CD audio becomes `Mix_PlayMusic` on `music/track{N+1:02}.flac`, looped, paused when focus is lost.
 - **Removed:** the system-wide `Mixer` (it changed OS volumes and never restored them). The MIDI `Song` path is shareware-only, so stub it.
 - **To check:** `Sample::playing()` is polled inside the simulation step (`msg.cpp`). Confirm it can't affect simulation state; otherwise drive it by sample length in ticks so results don't depend on audio timing.
+  - Found so far: with sound off, the original already counts a sample's length by the wall clock (`GetTickCount`), so the messages advance in real time ([original-archive.md](original-archive.md#reference-screenshots-phase-3)).
+  - The callers seen so far only change which message shows, volumes and one sound effect. `MManager::run` draws `RAND` twice every step whatever the messages do.
 - **Exit:** audio matches the original by ear: positioning, priorities, speech ducking and music per mission.
 
 ### Phase 7: network play over LAN and the internet (`1ee_netw`)

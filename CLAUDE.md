@@ -14,6 +14,7 @@ Everything was selected by rule from the original archive. `README.md` documents
 - **Version 1.1 only.** This source is v1.1 (Aug 1996). The retail CD is 1.2, but it differs only in the executables (its `PARAMS.VOL` repacks the same files), and no 1.2 source exists. Don't try to reproduce 1.2 behaviour.
 - **Original archive:** `docs/original-archive.md` covers what the original archive (outside this repo) offers the port.
   - It has the 1.1 executables built from this source, which confirm the MSVC `rand`/`qsort` and the x87 precision.
+  - The 1.1 Release exe runs on Windows 11 from a copy patched with `tools/archive/patch_hooks.py` ("Running 1.1" in that doc). Its title, mission screen, mission 1 and an attract demo match the port's frames pixel for pixel.
   - It has the shipped sprite caches. The port's sprite build matches them for every sprite and palette loaded: bounds, pixel data and tables.
   - The archive is never committed and exists only on the Windows PC (`D:\_Projects\FireFight`). What it proves is committed as golden files and test vectors, so other machines work from the repo alone.
   - Without the archive, don't guess its contents. A task that needs it (a new comparison, disassembly, running the original game) belongs on the Windows PC. See "Working without the archive" in `docs/original-archive.md`.
