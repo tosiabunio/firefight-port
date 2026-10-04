@@ -112,6 +112,14 @@ void Video::load_palette (char *fname, int update_tsp)
       else
         memset((char*)&tsp.conv[0], 0, 256*256);
       closest_colors=tmp;
+      if(Spr::dump)  // port: see Spr::dump_printf
+      {
+        File::get_flags("target");
+        Spr::dump_printf(1,"%s palettes %d %08x closest %d %08x tsp %d %08x\n",File::info.real_name,
+          (int)sizeof(vpalette),Spr::crc32(vpalette,sizeof(vpalette)),
+          (int)cc_size,Spr::crc32(tmp,cc_size),
+          256*256,Spr::crc32(&tsp.conv[0],256*256));
+      }
       File::endarea();
     }
     catch (Failure)

@@ -127,13 +127,22 @@ add_test(NAME golden_title
           -P ${CMAKE_SOURCE_DIR}/tests/check_frames.cmake)
 set_tests_properties(golden_title PROPERTIES TIMEOUT 300)
 
-# Sprite bounds check: check mode loads the level of every mission, and the phase bounds of every
-# sprite loaded must match the golden file, which matches the original's prebuilt caches. The
-# bounds decide which level objects look_at sees and builds, so they are simulation state.
-add_test(NAME sprite_bounds
+# Sprite build check: check mode loads the level of every mission. The phase bounds, pixel data
+# and palette tables of everything it builds must match the golden files, which match the
+# original's prebuilt caches. The phase bounds decide which level objects look_at sees and builds,
+# so they are simulation state.
+add_test(NAME sprite_build
   COMMAND ${CMAKE_COMMAND}
           -DFIREFIGHT=$<TARGET_FILE:firefight> -DDATA=${FF_DATA_DIR}
-          -DPREF=${CMAKE_CURRENT_BINARY_DIR}/sprite_bounds
-          -DEXPECTED=${CMAKE_SOURCE_DIR}/tests/golden/sprite_bounds.txt
-          -P ${CMAKE_SOURCE_DIR}/tests/check_sprite_bounds.cmake)
-set_tests_properties(sprite_bounds PROPERTIES TIMEOUT 300)
+          -DPREF=${CMAKE_CURRENT_BINARY_DIR}/sprite_build
+          -DGOLDEN=${CMAKE_SOURCE_DIR}/tests/golden
+          -P ${CMAKE_SOURCE_DIR}/tests/check_sprites.cmake)
+set_tests_properties(sprite_build PROPERTIES TIMEOUT 300)
+
+# Data check: every file in data/ and music/ must have the SHA-256 listed in the golden file,
+# which was checked against the original archive, and no file may be missing or extra.
+add_test(NAME data_files
+  COMMAND ${CMAKE_COMMAND}
+          -DROOT=${CMAKE_SOURCE_DIR}
+          -DEXPECTED=${CMAKE_SOURCE_DIR}/tests/golden/data_files.sha256
+          -P ${CMAKE_SOURCE_DIR}/tests/check_data.cmake)

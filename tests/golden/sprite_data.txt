@@ -1,0 +1,389 @@
+!global/sprites/_wrog.sph hires 128601 8fcaa70c collis 1841 6a7fb88b
+!global/sprites/active.sph hires 2656 b080982b
+!global/sprites/badpic.sph hires 1073 342ba346 collis 137 6449b315
+!global/sprites/beamupx.sph hires 62188 de1c7e28
+!global/sprites/biletter.sph hires 37182 19d87cad
+!global/sprites/bletter.sph hires 36593 6187a570
+!global/sprites/blow3.sph hires 189818 038399db
+!global/sprites/bohasup2.sph hires 95309 0150159d
+!global/sprites/bohater2.sph hires 69961 b27b864b collis 2055 3be83ee9
+!global/sprites/bohborh.sph hires 29261 cc790cce
+!global/sprites/bohbosh.sph hires 36307 e5b593f4
+!global/sprites/bohtow2.sph hires 88803 f1174e46
+!global/sprites/bohtowp2.sph hires 3584 b2d7c375
+!global/sprites/bolt.sph hires 4572 7da3b27f collis 697 5f40992c
+!global/sprites/bomb.sph hires 14390 d2de5a63 collis 380 0809c456
+!global/sprites/bronie.sph hires 29133 55727e2f collis 1088 dd5d2915
+!global/sprites/buc.sph hires 95070 74e10a38 collis 2568 f873dc8d
+!global/sprites/bug.sph hires 119727 b7994bda collis 2574 225964a0
+!global/sprites/cel.sph hires 472 3a12d5d6
+!global/sprites/cloud.sph hires 188493 07d02a98
+!global/sprites/damage.sph hires 3892 65b1c253
+!global/sprites/damagee.sph hires 2036 08cb8bff
+!global/sprites/defmine.sph hires 26173 75d2182c collis 1554 a6949db5
+!global/sprites/direkt.sph hires 15271 719e5a96
+!global/sprites/dym2.sph hires 2713 5429436c collis 300 8c66640f
+!global/sprites/dymek.sph hires 10124 a798b617
+!global/sprites/dzialo1z.sph hires 4147 1c742ca3 collis 87 6d7dc320
+!global/sprites/dzialo2z.sph hires 3948 7db3214d collis 82 d6e7fbea
+!global/sprites/elipsy.sph hires 30440 d1c5cf79
+!global/sprites/explode.sph hires 23950 2c61db94 collis 728 28059cb5
+!global/sprites/fire.sph hires 238 83efbd1e
+!global/sprites/gexpl.sph hires 322206 6478b49f
+!global/sprites/gexplp.sph hires 321924 aeefd418
+!global/sprites/grzesdym.sph hires 2832 ec6d4ba5
+!global/sprites/gunsht.sph hires 15652 5cfd70d1 collis 2119 578d0f66
+!global/sprites/homeexpl.sph hires 3714 632a9b7e
+!global/sprites/intro.sph hires 694304 081ffb90
+!global/sprites/jet_b.sph hires 15957 f28b69a3
+!global/sprites/jet_s.sph hires 11210 85490cea
+!global/sprites/kapusta3.sph hires 10397 1d45b98b collis 831 480ddc1e
+!global/sprites/lanpoint.sph hires 1744 d601f594
+!global/sprites/laser2.sph hires 455 32091cfe collis 60 34ece5ba
+!global/sprites/laserbar.sph hires 12223 3a50dbf9 collis 1095 4d7827c2
+!global/sprites/level.sph hires 101216 efe687e1
+!global/sprites/light.sph hires 18924 e864ba1a
+!global/sprites/lsrexpl.sph hires 1244 cdf33803
+!global/sprites/mboss1.sph hires 130955 246346b2 collis 2102 d5a22f82
+!global/sprites/mboss2.sph hires 123775 fe75f4de collis 2293 381f0f65
+!global/sprites/mboss3.sph hires 136816 cfaf6d05 collis 2039 d9b3a786
+!global/sprites/mboss3l.sph hires 5960 bc6b72c2 collis 789 46386fd7
+!global/sprites/mboss3r.sph hires 6093 ff1bc35e collis 824 154b771e
+!global/sprites/mboss4.sph hires 152386 3f7bb703 collis 2330 52f5bfee
+!global/sprites/menu_in.sph hires 46048 a6b0ee2f
+!global/sprites/menu_out.sph hires 179099 008ea265
+!global/sprites/mine.sph hires 26105 8ba8ff6f collis 1544 6c1ecab5
+!global/sprites/mine2.sph hires 26170 91cbcd01 collis 1539 d1b1e05f
+!global/sprites/mine3.sph hires 26161 9d37abbc collis 1544 186de1b8
+!global/sprites/mine4.sph hires 26186 7e6fe397 collis 1574 ac6d710f
+!global/sprites/mineexp.sph hires 26667 94af0ac4
+!global/sprites/missile2.sph hires 4500 ce75d92d collis 352 fe6f5883
+!global/sprites/mucha.sph hires 72258 a5d528dc collis 1837 33b77a46
+!global/sprites/noc.sph hires 73085 baf9b4d8
+!global/sprites/num_big.sph hires 8653 5c4f7fe4
+!global/sprites/num_sml.sph hires 1360 95b1a823
+!global/sprites/odboss.sph hires 4741 9c13ab30 collis 415 b64d326d
+!global/sprites/odd1.sph hires 4978 19e4fe30
+!global/sprites/odd2.sph hires 5244 0e837481
+!global/sprites/odd3.sph hires 6368 4196d140
+!global/sprites/odd4.sph hires 9617 caec84c9
+!global/sprites/odd5.sph hires 2634 4008b042
+!global/sprites/odd6.sph hires 4928 faa9f2ad
+!global/sprites/odd7.sph hires 6185 942c07fd
+!global/sprites/odlamek2.sph hires 1206 a7b5263c
+!global/sprites/odlamek3.sph hires 876 1aa66340
+!global/sprites/palette.spp palettes 10240 4148b6e8 closest 262144 1951dc7d tsp 65536 326509bf
+!global/sprites/persons.sph hires 64080 15b7a296
+!global/sprites/pointer.sph hires 1420 e13f7aba
+!global/sprites/prgdrk.sph hires 319238 898c3bca
+!global/sprites/prgnor.sph hires 319238 f10645c7
+!global/sprites/raaa2.sph hires 13129 b279db7e
+!global/sprites/radpoint.sph hires 1840 06fa9e6a
+!global/sprites/ramka.sph hires 1442 ea64f056
+!global/sprites/sbomb.sph hires 3615 5bf2fff6 collis 4400 68b73ffc
+!global/sprites/shipgene.sph hires 55313 77090cb6
+!global/sprites/siletter.sph hires 19439 4e6f383d
+!global/sprites/skorka.sph hires 4391 670004a1 collis 357 2e5cf581
+!global/sprites/sletter.sph hires 19268 82873e25
+!global/sprites/slimak.sph hires 46285 84181385
+!global/sprites/spider.sph hires 114048 0c740fd5 collis 2554 59ce7ff8
+!global/sprites/strzal.sph hires 12084 90defc89 collis 1931 f2d6d17d
+!global/sprites/swarmsmk.sph hires 1250 9ff29361
+!global/sprites/swrmexpl.sph hires 2626 13e264c2
+!global/sprites/teleport.sph hires 35874 81d4809d collis 278 f9333754
+!global/sprites/teportd.sph hires 35072 c5427ac7
+!global/sprites/teportu.sph hires 57280 16f12f1a
+!global/sprites/title_hi.sph hires 1036808 1e926af7
+!global/sprites/upgrade.sph hires 221243 8a69bdce collis 11520 b599c8f6
+!global/sprites/w1fire.sph hires 49603 5b8a5504
+!global/sprites/w5shoot.sph hires 19257 80e9091f
+!global/sprites/wkapusta.sph hires 29424 f4fe66cf collis 1216 175c2356
+brown/sprites/01.sph hires 15537 8c7917cc collis 83 971ee727
+brown/sprites/02.sph hires 428892 546d64aa
+brown/sprites/03.sph hires 14328 844de15d
+brown/sprites/back.sph hires 211916 88c06581
+brown/sprites/bar.sph hires 6309 b71b18be collis 159 ff56a8a0
+brown/sprites/barani2.sph hires 158534 f4c2ceac
+brown/sprites/bardest.sph hires 25602 9ddfccbc collis 704 969c105d
+brown/sprites/blow1.sph hires 31994 69ad8056 collis 116 d87b1040
+brown/sprites/blow1d.sph hires 30661 2d8fc512
+brown/sprites/border.sph hires 495791 c8cdead0
+brown/sprites/bridge.sph hires 13689 35276f76
+brown/sprites/buoy.sph hires 96241 ed44bedf collis 3215 77c39f7e
+brown/sprites/cannon2p.sph hires 6592 b0a086f1
+brown/sprites/cannong.sph hires 165716 3c9d1b09 collis 3190 98c9853d
+brown/sprites/cannong2.sph hires 181999 7231360a collis 3310 9c8d1a80
+brown/sprites/cannongp.sph hires 6272 c8e6b83e
+brown/sprites/col.sph hires 6723 9fa843a9 collis 846 fffc57c0
+brown/sprites/cooler.sph hires 65608 69074121
+brown/sprites/cyfry.sph hires 7208 37fa2e4d
+brown/sprites/destdwn.sph hires 51265 95860464 collis 181 7a688617
+brown/sprites/destup.sph hires 38712 1568ac21 collis 211 1c4c704b
+brown/sprites/elektr.sph hires 26602 b54c7acb collis 107 73d7fb65
+brown/sprites/elektrd.sph hires 24910 f33caa21
+brown/sprites/fence.sph hires 193472 c4ecab90 collis 1329 73c21deb
+brown/sprites/kopula.sph hires 36531 a9143887
+brown/sprites/kopulad.sph hires 6053 1ef4bc41
+brown/sprites/kopulap.sph hires 6158 0f44fd5b collis 76 38ed80fb
+brown/sprites/landani.sph hires 133940 99bc6c40
+brown/sprites/landplac.sph hires 491 b383c511 collis 105 1571d7aa
+brown/sprites/litery.sph hires 26096 9f724a75
+brown/sprites/ludek.sph hires 14492 388a8e8d collis 640 00074eed
+brown/sprites/mur.sph hires 297193 166849d6 collis 486 65a69a41
+brown/sprites/palette.spp palettes 10240 1a2f06ea closest 262144 1951dc7d tsp 65536 326509bf
+brown/sprites/pipes.sph hires 146803 3b3ccd4e
+brown/sprites/pipesk.sph hires 10312 1a11deeb collis 1332 a0724e8e
+brown/sprites/pluton.sph hires 3406 300d895a collis 76 370f27a7
+brown/sprites/podest.sph hires 23086 85b228f2
+brown/sprites/pompa.sph hires 109290 4c90e9cd collis 1120 e6e25611
+brown/sprites/pompad.sph hires 110415 706dc5f2 collis 1275 672df17b
+brown/sprites/poziom3.sph hires 601707 d0e9c7a3
+brown/sprites/river.sph hires 156004 f0f3754a
+brown/sprites/roads.sph hires 12828 3fc4f3c0
+brown/sprites/rura.sph hires 18018 4f57dff9
+brown/sprites/secgrnd.sph hires 27728 f2eee2b1
+brown/sprites/secret.sph hires 3490 4759d845 collis 65 8c260ca0
+brown/sprites/servo.sph hires 19469 e80b3c9d
+brown/sprites/shadow2.sph hires 7442 a2998b7f
+brown/sprites/skaly.sph hires 131863 46aadbeb
+brown/sprites/tratwa.sph hires 232832 e5d3b133 collis 3480 94b865e5
+brown/sprites/trees.sph hires 73736 d2ce0e75 collis 633 1c936aa5
+brown/sprites/unblock.sph hires 6440 69bafbe3 collis 811 c221e6fd
+brown/sprites/walldoor.sph hires 62938 a7dcb0fe collis 496 81339010
+brown/sprites/water2.sph hires 23968 9f4130fa collis 92 7c933418
+brown/sprites/watera.sph hires 299148 572b9377 collis 460 1f0142ee
+brown/sprites/wiatrak.sph hires 51861 515a6842 collis 319 84b76541
+brown/sprites/wiatraka.sph hires 14708 d920a4be collis 224 e0028553
+brown/sprites/wiatrakd.sph hires 10504 4d885d23 collis 119 7bfeeaf2
+brown/sprites/zbiornik.sph hires 59919 1698720d
+gray/sprites/2gen1.sph hires 32868 59ce45b9 collis 255 8fd797b9
+gray/sprites/2gen2.sph hires 66777 de0c8a9c collis 361 153484d9
+gray/sprites/2gen3.sph hires 12077 9b09e055 collis 156 f46204ac
+gray/sprites/2gen3z.sph hires 135676 8444616d
+gray/sprites/2gen4.sph hires 75624 2e869f37 collis 425 62886185
+gray/sprites/2gen4z.sph hires 70583 c6897c95
+gray/sprites/2tun1.sph hires 17755 3aa3404b collis 209 c44176b8
+gray/sprites/2tun2.sph hires 18187 8b25dd2e collis 197 29812d1a
+gray/sprites/2tun3.sph hires 16980 5f0fae3a collis 197 f7d2f49b
+gray/sprites/2tun4.sph hires 18405 d1e2de4a collis 200 6828cd3e
+gray/sprites/2tun5.sph hires 39537 2bdcc31a collis 305 4e01a7c7
+gray/sprites/2tun6.sph hires 9967 fecd84b0 collis 151 e04e3fcc
+gray/sprites/2tun7.sph hires 9931 7d8f899b collis 151 65df231d
+gray/sprites/2tun8.sph hires 8866 3eb2290d collis 151 3a07d5d6
+gray/sprites/2tun9.sph hires 9308 7655f8aa collis 151 610baea8
+gray/sprites/2tunc.sph hires 12068 5ba50be6
+gray/sprites/3rdplan.sph hires 73476 9c2471f4
+gray/sprites/b_flame.sph hires 127686 376e7ba6 collis 2788 16e22b9b
+gray/sprites/back2.sph hires 86416 11294371 collis 880 afe2e8b1
+gray/sprites/bun1.sph hires 39299 87081178 collis 180 829710ff
+gray/sprites/bun1z.sph hires 39302 139041fd collis 271 4e546e05
+gray/sprites/bun2.sph hires 38950 e510f787 collis 157 983dca5c
+gray/sprites/bun2z.sph hires 38950 267082ac collis 262 6da396d1
+gray/sprites/cienie.sph hires 77390 70137f12 collis 1846 f1b09f5a
+gray/sprites/cienie2.sph hires 9011 0419eb9d
+gray/sprites/dom.sph hires 58423 98214b01 collis 245 934bb672
+gray/sprites/droga2.sph hires 260114 21797439
+gray/sprites/drzwi1.sph hires 246826 b467e387 collis 2230 eefed75f
+gray/sprites/drzwi1_l.sph hires 10892 bb1adb13
+gray/sprites/drzwi1gk.sph hires 2192 c5d0307e collis 279 7c1a537e
+gray/sprites/drzwi2.sph hires 233373 c9e6ba36 collis 2180 b241d258
+gray/sprites/drzwi2_l.sph hires 16569 bbc3c1c4
+gray/sprites/drzwi2gk.sph hires 2185 67f65206 collis 281 ed9442b0
+gray/sprites/dzialo.sph hires 165140 0a5fe457 collis 3127 8b5f8f23
+gray/sprites/fl_b.sph hires 1505 42ab43d5 collis 97 5c54b0eb
+gray/sprites/fl_m.sph hires 1325 f8b05f2a collis 97 5c54b0eb
+gray/sprites/fl_s.sph hires 1321 952b144d collis 97 5c54b0eb
+gray/sprites/hangar.sph hires 123518 b2a9f9d9
+gray/sprites/kladka.sph hires 32956 97730459
+gray/sprites/kolizje.sph hires 2967 17455004 collis 372 d6190c60
+gray/sprites/konce.sph hires 172605 1c6d3f0a
+gray/sprites/kop2en.sph hires 13427 5d3d137c
+gray/sprites/lampa.sph hires 38135 1facb21b
+gray/sprites/lampa_c.sph hires 3987 9a221e7f
+gray/sprites/landplac.sph hires 15618 1f1382ad collis 128 cd238582
+gray/sprites/lplace.sph hires 25227 37ace555 collis 193 7185ce02
+gray/sprites/ludek.sph hires 14492 388a8e8d collis 640 00074eed
+gray/sprites/m_flame.sph hires 62179 87855c1f collis 1600 f9edd1e9
+gray/sprites/marker.sph hires 2561 571f31d7 collis 65 0a058e5f
+gray/sprites/ongre.sph hires 31498 88a0b069 collis 799 2eb0488e
+gray/sprites/onneu.sph hires 31514 209fb4cc collis 799 2eb0488e
+gray/sprites/onred.sph hires 31491 da2f8477 collis 799 2eb0488e
+gray/sprites/onyel.sph hires 31508 557b4566 collis 799 2eb0488e
+gray/sprites/palette.spp palettes 10240 d8f97454 closest 262144 1951dc7d tsp 65536 326509bf
+gray/sprites/polka.sph hires 233143 bbdd754e
+gray/sprites/rad2_z.sph hires 72616 7ff1a4c9 collis 1664 5f5f5bf7
+gray/sprites/rocker.sph hires 181999 7231360a collis 3310 9c8d1a80
+gray/sprites/s_flame.sph hires 12751 88244410 collis 646 74f12470
+gray/sprites/sb2.sph hires 12948 5f2a1761 collis 99 fb5abbf2
+gray/sprites/sb2_z.sph hires 251946 2fb925be collis 3489 4010ad9f
+gray/sprites/sb4.sph hires 20549 b8968f23 collis 101 cb2864e9
+gray/sprites/sb4_z.sph hires 312052 d5df9ff6 collis 2965 1121a75d
+gray/sprites/sciany_b.sph hires 39914 405f19a5
+gray/sprites/scianyd.sph hires 34722 f1c97c00 collis 203 2ecae93b
+gray/sprites/scianyz.sph hires 28312 023575bd collis 147 97d7239d
+gray/sprites/sekret.sph hires 2257 5a2b4492 collis 65 0a058e5f
+gray/sprites/telep.sph hires 13518 80339707
+gray/sprites/test.sph hires 144702 1fd93c53
+gray/sprites/test1.sph hires 218677 6fcd4801
+gray/sprites/unlock.sph hires 515 325d115c collis 65 0a058e5f
+gray/sprites/wieza1.sph hires 78094 5e2cd6bf collis 394 e83512f2
+green/sprites/3rdplane.sph hires 89888 ec10cfcf collis 2110 5278c621
+green/sprites/ant1.sph hires 268229 694376a8 collis 1857 adcb3b0d
+green/sprites/ant1e.sph hires 30726 6f81ebfd collis 50 a1a16ee1
+green/sprites/ant1s.sph hires 29907 c618a246 collis 50 a1a16ee1
+green/sprites/ant2.sph hires 274057 0610ea5e collis 3532 3848d118
+green/sprites/back.sph hires 138328 5315f407
+green/sprites/beczka.sph hires 14106 bd0eb565 collis 107 31bacb5d
+green/sprites/beczki_z.sph hires 208915 a1c08324 collis 3315 e75ff9ef
+green/sprites/cqx421.sph hires 17176 87d4470f
+green/sprites/dzialko1.sph hires 165140 0a5fe457 collis 3127 8b5f8f23
+green/sprites/firez.sph hires 177295 1afb1346 collis 3738 373bd35c
+green/sprites/kadlub.sph hires 30678 0f7c6bc0
+green/sprites/kamien.sph hires 89254 ceaea7cc
+green/sprites/kop1ani.sph hires 75660 ef51d152 collis 920 200cb4c4
+green/sprites/kop1en.sph hires 9162 19385aa4 collis 110 4c368e38
+green/sprites/kop1st.sph hires 8135 b91b7ee7 collis 96 e44ec7fc
+green/sprites/lad.sph hires 6443 55d2b25b collis 320 0f7c5e7e
+green/sprites/landani.sph hires 133940 99bc6c40 collis 1190 5aab4796
+green/sprites/liscie.sph hires 32900 63bc51a6 collis 706 219a5c2a
+green/sprites/liscie1.sph hires 75962 fed23188 collis 2123 97650844
+green/sprites/liscie2.sph hires 54444 b072fae6
+green/sprites/liscie3.sph hires 56205 8c470fee
+green/sprites/liscie4.sph hires 155120 ef539f4e
+green/sprites/liscie4c.sph hires 22325 51edb634 collis 1770 13263c79
+green/sprites/load1.sph hires 5250 cf84f4e1 collis 203 edfeee30
+green/sprites/load2.sph hires 4895 633508a1 collis 157 df004ab2
+green/sprites/load3.sph hires 16234 9aba72db collis 752 af71d9b0
+green/sprites/loadz.sph hires 79798 6d887d36 collis 1492 ed8338e0
+green/sprites/marker.sph hires 2561 571f31d7 collis 65 0a058e5f
+green/sprites/mur1.sph hires 167393 fad59ca9 collis 1488 6b1bf5a3
+green/sprites/mur2.sph hires 171953 08c53319 collis 1232 1c628d3d
+green/sprites/mur3.sph hires 167369 ca02232f collis 1488 6594cd43
+green/sprites/mur4.sph hires 168003 9ad7d105 collis 1280 b4e0cd2c
+green/sprites/mur5.sph hires 92858 2ee41c7e collis 884 e4e128ca
+green/sprites/mur6.sph hires 92749 7d10208d collis 884 dfd3da8c
+green/sprites/palette.spp palettes 10240 df1b7351 closest 262144 1951dc7d tsp 65536 326509bf
+green/sprites/palma.sph hires 11981 1eccf88f collis 274 33edab48
+green/sprites/palma_z.sph hires 177523 5620f706 collis 3236 d7204f52
+green/sprites/plk_5.sph hires 340120 7b1e0602
+green/sprites/plk_51.sph hires 57224 9a8759bc
+green/sprites/rocker.sph hires 181999 7231360a collis 3310 9c8d1a80
+green/sprites/ruiny.sph hires 75419 7f88526b collis 463 1e692150
+green/sprites/ruiny1.sph hires 48097 a9d42d6a
+green/sprites/ruiny1a.sph hires 3511 fb5308d5 collis 97 e9f680b1
+green/sprites/ruiny1z.sph hires 3571 16623d4f collis 97 29afeb2b
+green/sprites/ruiny2d.sph hires 31618 25f6fbb6
+green/sprites/ruiny2g.sph hires 9641 4add783c collis 118 58987ea0
+green/sprites/ruiny2gz.sph hires 184829 4fd6d80f collis 1923 6f93617c
+green/sprites/sekret.sph hires 2257 5a2b4492 collis 65 0a058e5f
+green/sprites/skala.sph hires 480113 a310ec6a collis 2268 4bdd5106
+green/sprites/skala1.sph hires 45383 4a1ca588
+green/sprites/smoke.sph hires 4631 b5953b18 collis 195 4e5e666f
+green/sprites/sw_on.sph hires 9595 0476b624
+green/sprites/sw_on.sph hires 9595 0476b624 collis 128 00c31316
+green/sprites/telep.sph hires 13518 80339707 collis 124 33854646
+green/sprites/unlock.sph hires 515 325d115c collis 65 0a058e5f
+green/sprites/z.sph hires 4467 5aa22399 collis 159 cdb4e088
+net/sprites/0d.sph hires 413490 b3711fef
+net/sprites/0dd.sph hires 23712 426e69f4 collis 665 0e00cc54
+net/sprites/0ddx.sph hires 16517 f0ae2e16 collis 104 693910d0
+net/sprites/0g.sph hires 148516 d2129918
+net/sprites/0gd.sph hires 818 65a8447e collis 104 693910d0
+net/sprites/0gdx.sph hires 21137 f7332118 collis 237 e9dd5892
+net/sprites/3rdplane.sph hires 52253 fcc84f6e
+net/sprites/b_flame.sph hires 151615 e9c0949c collis 3012 b634e281
+net/sprites/back.sph hires 104962 5e0e2524 collis 362 0ad50232
+net/sprites/boki.sph hires 285381 8cc7290c
+net/sprites/brick.sph hires 13797 af431252 collis 1184 d3392882
+net/sprites/dzialk1p.sph hires 27661 50078631 collis 246 d7610372
+net/sprites/fl_b.sph hires 1505 42ab43d5 collis 97 5c54b0eb
+net/sprites/fl_m.sph hires 1325 f8b05f2a collis 97 5c54b0eb
+net/sprites/fl_s.sph hires 1321 952b144d collis 97 5c54b0eb
+net/sprites/kop1ani.sph hires 75660 ef51d152 collis 234 3975ad16
+net/sprites/kop1en.sph hires 9162 19385aa4 collis 26 11caaccd
+net/sprites/kop1st.sph hires 8135 b91b7ee7 collis 26 11caaccd
+net/sprites/l1.sph hires 25065 002e801d
+net/sprites/lampa.sph hires 38135 1facb21b
+net/sprites/lampac.sph hires 3987 9a221e7f
+net/sprites/lasergn.sph hires 165140 0a5fe457 collis 3127 8b5f8f23
+net/sprites/link.sph hires 2188 1f9b0669 collis 87 9decfbb6
+net/sprites/m_flame.sph hires 40643 cf2481c2 collis 1452 6495dc90
+net/sprites/mosts.sph hires 254558 2d26e511 collis 1063 88443381
+net/sprites/mostsc.sph hires 12965 57ddd871
+net/sprites/mosty.sph hires 222983 b7821d82
+net/sprites/mostyc.sph hires 9036 5b7d0969
+net/sprites/palette.spp palettes 10240 85529c98 closest 262144 1951dc7d tsp 65536 326509bf
+net/sprites/paski.sph hires 37434 05680501 collis 96 6c52244a
+net/sprites/polka.sph hires 448581 b87af695
+net/sprites/rocketgn.sph hires 181999 7231360a collis 3310 9c8d1a80
+net/sprites/rury.sph hires 177008 c11b9616 collis 1249 81fe2e78
+net/sprites/ruryc.sph hires 3090 593fb83e
+net/sprites/s_flame.sph hires 23462 9090078b collis 875 e8be6fb1
+net/sprites/scianal.sph hires 90306 c183554f collis 377 6bffa2ca
+net/sprites/sciany1.sph hires 440008 5768dae8 collis 1710 b3241fd4
+net/sprites/sekret.sph hires 2257 5a2b4492 collis 65 0a058e5f
+net/sprites/smieci1.sph hires 123239 01e08309
+net/sprites/smieci1c.sph hires 7366 d2dfe4d3
+net/sprites/tb303.sph hires 135735 acc42f67
+net/sprites/tb304.sph hires 94721 9d55d5e5
+net/sprites/unlock.sph hires 515 325d115c collis 65 0a058e5f
+net/sprites/unlock1.sph hires 2500 e190ee96 collis 65 0a058e5f
+net/sprites/unlock2.sph hires 2168 870d8349 collis 65 0a058e5f
+net/sprites/zlodziej.sph hires 148208 1fb3f19d collis 2642 16d4e5e3
+white/sprites/3rdplane.sph hires 150222 0804b2cc
+white/sprites/backg.sph hires 76715 c5d6f04a
+white/sprites/baza1.sph hires 51708 bfb6cec1 collis 487 bb208526
+white/sprites/baza2.sph hires 12429 a3f45ea8 collis 209 e7c391cc
+white/sprites/baza3a.sph hires 7871 f6dfd256 collis 110 df047767
+white/sprites/baza3b.sph hires 8729 2bb0fcb2 collis 157 2e68bbef
+white/sprites/baza3c.sph hires 7856 476ea7bb collis 103 4a1e5a4c
+white/sprites/beczka.sph hires 26614 73107f99 collis 145 08ca10f2
+white/sprites/beczkaz.sph hires 275352 640850c0
+white/sprites/bel_z.sph hires 156423 014f5668 collis 1839 d32bba56
+white/sprites/belkot.sph hires 130329 0171a525 collis 1152 d5e6de81
+white/sprites/belkot2.sph hires 144875 9bc3bbb3 collis 1152 90697258
+white/sprites/bunk1.sph hires 46559 ba12c210 collis 194 70a03e23
+white/sprites/bunk1z.sph hires 46550 9834e3da
+white/sprites/bunk2.sph hires 46909 16dc0f8b collis 207 16868fcd
+white/sprites/bunk2z.sph hires 46907 4bb53bc1
+white/sprites/cien.sph hires 18201 5b8beec7
+white/sprites/cpx421.sph hires 43595 822b6790
+white/sprites/cpx421a.sph hires 13874 13a8638c collis 128 67d89434
+white/sprites/cpx421c.sph hires 12076 55113af7 collis 128 67d89434
+white/sprites/droga.sph hires 76373 415977f0
+white/sprites/dzialo2_.sph hires 105977 b9f50c99
+white/sprites/dzialo_u.sph hires 165140 0a5fe457 collis 3127 8b5f8f23
+white/sprites/flamer.sph hires 181999 7231360a collis 3310 9c8d1a80
+white/sprites/generac.sph hires 3219 7784c94b
+white/sprites/kolumna.sph hires 24127 234a8af6 collis 234 2b486699
+white/sprites/kopani.sph hires 100726 5b926ef8 collis 252 c7f55bdf
+white/sprites/kopend.sph hires 11412 35dea98d collis 28 3e566516
+white/sprites/kopst.sph hires 11152 3db3dfd9 collis 28 3e566516
+white/sprites/kwiat_z.sph hires 50257 445e8875 collis 951 9bb514cc
+white/sprites/kwiatek.sph hires 98816 3481f3e2 collis 2530 d48cfbb7
+white/sprites/kwiatek1.sph hires 98659 39bf5ab8 collis 2637 09b9f0e1
+white/sprites/kwiatek2.sph hires 119999 1ec6404c collis 2106 f24eef4a
+white/sprites/landpl.sph hires 12403 055baced
+white/sprites/load1.sph hires 10715 7f722645 collis 464 79d8b152
+white/sprites/load2.sph hires 10713 74633e20 collis 464 79d8b152
+white/sprites/ludek.sph hires 14492 388a8e8d collis 640 00074eed
+white/sprites/macki.sph hires 56620 2590f08e collis 219 81eaaa22
+white/sprites/macki_z.sph hires 185763 54d0ade9 collis 642 aa0206b5
+white/sprites/macki_z1.sph hires 43089 79e7b961
+white/sprites/marker.sph hires 2561 571f31d7 collis 65 0a058e5f
+white/sprites/palette.spp palettes 10240 6d75f4e2 closest 262144 1951dc7d tsp 65536 326509bf
+white/sprites/polka1.sph hires 107891 d2836309
+white/sprites/polka3.sph hires 687070 7949c54e
+white/sprites/rocker.sph hires 181999 7231360a collis 3310 9c8d1a80
+white/sprites/sciany1.sph hires 62240 185bbdde collis 1258 13f86fe8
+white/sprites/sciany2.sph hires 183048 b1b63716
+white/sprites/skaly.sph hires 55010 849eb0b5
+white/sprites/skaly_sn.sph hires 72296 7bd2cb9f
+white/sprites/sople.sph hires 220275 00c04e4a collis 2504 4731cf8c
+white/sprites/sople1_.sph hires 16982 11ee96aa
+white/sprites/sople_.sph hires 51342 e74fb0ad
+white/sprites/telep.sph hires 13518 80339707 collis 124 33854646
+white/sprites/unlock.sph hires 515 325d115c collis 65 0a058e5f
+white/sprites/wiez1_u.sph hires 55606 0d328fc6
+white/sprites/wiez1_u1.sph hires 17977 826f2ed7 collis 177 99b4f818
+white/sprites/wiez1_zu.sph hires 182625 b2fcf6e0 collis 1674 4292838e

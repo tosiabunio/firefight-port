@@ -2,34 +2,27 @@
 
 This repository was cut from the original Fire Fight archive: the developers' tree with source, tools, data, built executables and the retail 1.2 CD image. The archive is not in this repository and is not a git repo. This document records what it holds that matters to the port, and what was checked against it on 2026-10-04.
 
-Paths below are relative to the archive root, the directory holding `FF/`, `LIB/` and `BIN/`. The root's location differs per machine. The archive's own `CLAUDE.md` describes its layout and how the original was built. `tools/archive/ffarchive.py` reproduces every check here (see [Tools](#tools)).
+Paths below are relative to the archive root, the directory holding `FF/`, `LIB/` and `BIN/`. The archive's own `CLAUDE.md` describes its layout and how the original was built. Its claim that the port lives in its `Port/` folder is out of date: `Port/` is an old clone, and the port is this repository.
 
-## Getting the archive
+## Working without the archive
 
-The archive is private material and is never committed. Each machine needs its own copy.
+The archive is private and is never committed. It lives on the Windows development PC only, at `D:\_Projects\FireFight`. **Everything that reads it runs there, and its results are committed**, so other machines and CI need only this repository:
 
-- **What to copy:** the archive root without `Port/` and `CDAudio/`, about 620 MB.
-  - `Port/` is an old clone of this repository.
-  - `CDAudio/` holds rips whose FLACs are already in `music/`.
-  - Without the CD image the rest is about 205 MB: `FF/` 194 MB, `LIB/` 7 MB, `BIN/` 5 MB and the root `CLAUDE.md`. The CD image is needed only for `bin2iso`/`compare-cd`.
+| File | What it holds | Made by | Checked by |
+|---|---|---|---|
+| `tests/golden/data_files.sha256` | SHA-256 of every file in `data/` and `music/`. Each one was found byte-identical to its archive original (`FF/WORK.RTL`, `CDAudio`) | `ffarchive.py provenance --write` | test `data_files` |
+| `tests/golden/sprite_bounds.txt` | Phase bounds of every sprite the game loads, equal to the shipped caches | a `sprite_dump=1` run, checked with `ffarchive.py sprites` | test `sprite_build` |
+| `tests/golden/sprite_data.txt` | Size and CRC-32 of every sprite's hires and collision pixel data, and of every palette's three tables, equal to the shipped caches | same | test `sprite_build` |
+| `tests/golden/crt_qsort.txt` | 435 runs of the original `qsort`, by element width, keys and resulting order | `crt_vectors.py`, which runs the 1.1 exe's code in an emulator | the phase 5 clone (no test yet) |
+| `tests/golden/crt_rand.txt` | The original `rand` after `srand(0)`: the 1024 values of the `Rand` table | same | the phase 5 clone (no test yet) |
 
-  From the directory that holds `FireFight/` on the Windows PC (`D:\_Projects`), in Git Bash:
+On a machine without the archive, don't guess what it holds. Use this document and the files above. Anything that needs the archive itself is a task for the Windows PC. That covers a new comparison, disassembly, and running the original game.
 
-  ```sh
-  tar -czf firefight-archive.tgz --exclude=FireFight/Port --exclude=FireFight/CDAudio FireFight
-  ```
-
-- **Where to put it:** next to the clone of this repository, as `FireFight/`. For example `~/Projects/FireFight` beside `~/Projects/firefight-port`; there `tar -xzf firefight-archive.tgz -C ~/Projects` unpacks it. Elsewhere, set `FF_ARCHIVE` to its root.
-  - `ffarchive.py` looks in this order: `--archive`, `$FF_ARCHIVE`, the repository's parent if it holds `FF/WORK.RTL`, then `../FireFight`.
-  - File names are mixed-case 8.3 names. The tools ignore case, so a case-sensitive file system is fine.
-- **Giving Claude Code access:** the archive is outside the repository, so add it to the session with `/add-dir <path>`. To make that stick on one machine, put it in `.claude/settings.local.json`:
-
-  ```json
-  { "permissions": { "additionalDirectories": ["../FireFight"] } }
-  ```
-- **Check it:** `python3 tools/archive/ffarchive.py bounds tests/golden/sprite_bounds.txt` must report `382 sprites checked, 0 differ from the shipped caches`.
-- **Disassembly** needs Capstone and pefile. Install them in a throwaway virtual environment: `python3 -m venv /tmp/ffvenv && /tmp/ffvenv/bin/pip install capstone pefile`. Don't name a script `dis.py`: it shadows the standard module Capstone imports.
-- **The archive's own `CLAUDE.md`** still says the port lives in its `Port/` folder. That is out of date: the port is this repository.
+**On the Windows PC:**
+- Add the archive to a Claude Code session with `/add-dir D:/_Projects/FireFight`.
+- `ffarchive.py` finds the archive through `--archive`, then `$FF_ARCHIVE`, then the repository's parent if it holds `FF/WORK.RTL`, then `../FireFight`.
+- Disassembly and `crt_vectors.py` need Capstone, pefile and Unicorn. Install them into a throwaway virtual environment: `python -m venv <dir> && <dir>/Scripts/pip install capstone pefile unicorn`.
+- Don't name a script `dis.py`: it shadows the standard module Capstone imports.
 
 ## Where things are
 
@@ -74,7 +67,7 @@ All checked file by file:
 ## Findings for phase 5 (determinism)
 
 ### MSVC `rand`: confirmed
-`0x488d50`: `holdrand = holdrand*214013 + 2531011; return (holdrand>>16) & 0x7fff`. The multiply is built from `lea`/`shl`, so a search for the usual `imul` constant misses it.
+`0x488d50`: `holdrand = holdrand*214013 + 2531011; return (holdrand>>16) & 0x7fff`. The multiply is built from `lea`/`shl`, so a search for the usual `imul` constant misses it. `tests/golden/crt_rand.txt` holds the 1024 values after `srand(0)`, from the emulated exe.
 
 ### MSVC 4 `qsort`: confirmed
 `0x48a340` (helpers `shortsort` at `0x48a4a0` and `swap` at `0x48a500`) is the classic pre-2005 CRT `qsort`. The clone must reproduce exactly this:
@@ -106,9 +99,15 @@ recurse:
   if (pop(&lo, &hi)) goto recurse;
 ```
 
-`shortsort` keeps the *first* maximum (`if (comp(p, max) > 0) max = p`). Call sites:
-- `1sp_scr2.cpp:115`: collision results;
-- `1sp_lev.cpp:768`: the visible level objects, after `look_at` has run builders;
+`shortsort` keeps the *first* maximum (`if (comp(p, max) > 0) max = p`).
+
+**Test vectors:** `tests/golden/crt_qsort.txt` holds 435 runs of the emulated original, for element widths 1, 2 and 4, with many ties.
+- This transcription gives the same order in every run (`crt_vectors.py` checks it).
+- A stable sort, such as glibc's merge sort, differs in 336 of the 420 non-empty runs. For example, with 20 equal keys the original swaps elements 0 and 10: its pivot swap.
+
+Call sites:
+- `1sp_scr2.cpp:115`: collision results; width 1, by priority, with ties;
+- `1sp_lev.cpp:770`: the visible level objects, after `look_at` has run builders; width 2, distinct values;
 - `1io_txt.cpp:545`: text groups (not simulation).
 
 ### x87: the tick conversions are exact
@@ -148,7 +147,7 @@ The original counted lores, because the launcher always wrote `spr/load mode` 3 
   - The manifests are the original files again, byte for byte, and `data/flics/!global/` has the 22 lores masters (0.9 MB).
   - `Sprite::load` never builds lores pixels. It measures every lores target with `Lsprite::measure`, whose constructor already picks `lsource` over `source` and reads the scale flag from the target line.
   - The splinter lookup is back to the original `File::specified("lores")`.
-- **Verified:** `check` mode with `sprite_bounds=1` loads every mission's level. All 382 distinct sprites match the shipped caches in every phase (`ffarchive.py bounds`), including their hires and collision bounds. The `sprite_bounds` test keeps this against `tests/golden/sprite_bounds.txt`.
+- **Verified:** `check` mode with `sprite_dump=1` loads every mission's level. All 382 distinct sprites match the shipped caches in every phase (`ffarchive.py sprites`), including their hires and collision bounds. The `sprite_build` test keeps this against `tests/golden/sprite_bounds.txt`.
 - **Visible effect:** the title centres the copyright line with its bound `r` (`world.cpp:2561`). It now sits one lores pixel further left, as in the original, so the title frame hashes were regenerated.
 - **Demo effect,** on Windows/MSVC, whose CRT `rand` is the MSVC LCG; `--headless --fast --demo <name>`:
 
@@ -182,19 +181,35 @@ The original counted lores, because the launcher always wrote `spr/load mode` 3 
     - `data_size` bytes of RLE data, with no pointers;
     - per phase `{uint32 def[2]; short ox, oy, sx, sy}`, where `def` is an offset into the RLE data;
     - the palette, 256 × 4 bytes.
-  - The phase bounds now match (see above). The RLE data and the 7 shipped palette tables (`.spp`) can be compared one to one with the port's in-memory build too; that is not done yet.
+  - **Everything matches** for every sprite and palette the game loads, checked with `ffarchive.py sprites`:
+    - the phase bounds (see above);
+    - the hires and collision RLE data (size and CRC-32);
+    - all three tables of the 7 palettes: the palettes, the closest-colour table and the transparency table.
+
+    The `sprite_build` test keeps these against the golden files.
 - **The 1.1 exe**, for reference screenshots (phase 3 exit) and new demos (phase 5).
 
 ## Tools
 
-`tools/archive/ffarchive.py` (Python 3.8+, no dependencies):
+`tools/archive/ffarchive.py` (Python 3.8+, no dependencies) and `tools/archive/crt_vectors.py` (also needs pefile and Unicorn). Run them on the Windows PC from the repository root:
 
 ```sh
-python tools/archive/ffarchive.py --archive <root> bounds <pref>/sprite_bounds.txt   # the port's bounds vs the shipped caches
-python tools/archive/ffarchive.py bin2iso "<cd>.bin" ff12.iso         # then extract FIREFGHT/ with 7-Zip
-python tools/archive/ffarchive.py --archive <root> compare-cd <dir>   # every volume entry vs data/ and WORK.RTL
+python tools/archive/ffarchive.py provenance --write tests/golden/data_files.sha256   # data/ and music/ vs the archive
+# every sprite and palette the game builds, then the dump vs the shipped caches:
+cwdiags=extended build/windows-msvc/source/Release/firefight.exe --headless --fast check sprite_dump=1 --pref <dir>
+python tools/archive/ffarchive.py sprites <dir>
+python <venv>/python tools/archive/crt_vectors.py        # tests/golden/crt_qsort.txt and crt_rand.txt
+python tools/archive/ffarchive.py bin2iso "<cd>.bin" ff12.iso      # then extract FIREFGHT/ with 7-Zip
+python tools/archive/ffarchive.py compare-cd <dir>                 # every CD volume entry vs data/ and WORK.RTL
 python tools/archive/ffarchive.py unpack <dir>/PARAMS.VOL [outdir]
-python tools/archive/ffarchive.py cache <root>/FF/WORK.RTL/!GLOBAL/SPRITES/BOHATER2.SPL
+python tools/archive/ffarchive.py cache <archive>/FF/WORK.RTL/!GLOBAL/SPRITES/BOHATER2.SPL
 ```
 
 The disassembly above used Capstone and pefile on `FF/C/GAME/RELEASE/FIREFGHT.EXE`.
+
+## Still needs the archive
+
+These tasks are for the Windows PC:
+- **Reference screenshots** from the original 1.1 game, for the phase 3 exit (see [Executables](#executables)).
+- **New demos** recorded with the original 1.1 exe: an exact 1.1 oracle.
+- **The `level4c` desync:** if the port's traces (`randdebug`, `shipdebug`) don't explain it, the original debug exe can produce the same traces for comparison.

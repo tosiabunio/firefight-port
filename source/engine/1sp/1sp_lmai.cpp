@@ -173,41 +173,36 @@ void Lsprite::load (void)
   }
 }
 
-// Port: the engine switch sprite_bounds=1 writes the phase bounds of every sprite loaded to
-// sprite_bounds.txt in the preferences directory: one line per load, keyed by the sprite's
-// first target, "<target> <phases> l,r,u,d[*repeat] ...". The bounds of the original's
-// prebuilt caches are in tests/golden/sprite_bounds.txt (tools/archive/ffarchive.py bounds).
-static void dump_bounds (Phase *phase, int phases)
+// Port: with sprite_dump=1, describes the sprite just loaded (see Spr::dump_printf): its phase
+// bounds, "<target> <phases> l,r,u,d[*repeat] ...", and the size and CRC-32 of its hires and
+// collision data, "<target> hires <size> <crc> collis <size> <crc>".
+static void dump_sprite (Phase *phase, int phases, Lsprite &h, Lsprite &c)
 {
-  static FILE *f=NULL;
-  static int checked=0;
-  if (!checked)
-  {
-    checked=1;
-    if (Spr::dump_bounds)
-    {
-      char path[_MAX_PATH];
-      snprintf(path,sizeof(path),"%ssprite_bounds.txt",Comm::pref_path);
-      f=fopen(path,"w");
-    }
-  }
-  if (!f)
+  if (!Spr::dump)
     return;
   File::get_flags(File::specified(hires_id) ?hires_id :File::specified(collis_id) ?collis_id :lores_id);
-  fprintf(f,"%s %d",File::info.real_name,phases);
+  char target[sizeof(File::info.real_name)];
+  strcpy(target,File::info.real_name);
+
+  Spr::dump_printf(0,"%s %d",target,phases);
   for (int i=0; i<phases; )
   {
     int n=1;
     while ((i+n<phases)&&(phase[i+n].l==phase[i].l)&&(phase[i+n].r==phase[i].r)&&
       (phase[i+n].u==phase[i].u)&&(phase[i+n].d==phase[i].d))
       n++;
-    fprintf(f," %d,%d,%d,%d",phase[i].l,phase[i].r,phase[i].u,phase[i].d);
-    if (n>1)
-      fprintf(f,"*%d",n);
+    Spr::dump_printf(0,(n>1) ?" %d,%d,%d,%d*%d" :" %d,%d,%d,%d",
+      phase[i].l,phase[i].r,phase[i].u,phase[i].d,n);
     i+=n;
   }
-  fprintf(f,"\n");
-  fflush(f);
+  Spr::dump_printf(0,"\n");
+
+  Spr::dump_printf(1,"%s",target);
+  if (h.phases)
+    Spr::dump_printf(1," hires %d %08x",h.rledata_size,Spr::crc32(h.rledata,h.rledata_size));
+  if (c.phases)
+    Spr::dump_printf(1," collis %d %08x",c.rledata_size,Spr::crc32(c.rledata,c.rledata_size));
+  Spr::dump_printf(1,"\n");
 }
 
 void Sprite::load (char *_filename)
@@ -352,7 +347,7 @@ void Sprite::load (char *_filename)
         if (phase[i].u<maxu) maxu=phase[i].u;
         if (phase[i].d>maxd) maxd=phase[i].d;
       }
-      dump_bounds(phase,phases);
+      dump_sprite(phase,phases,h,c);
     }
   }
   catch (Failure)

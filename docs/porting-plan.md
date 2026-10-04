@@ -193,7 +193,7 @@ Each phase ends with something runnable and an exit check. Phases 5–7 can over
     - Lores bounds come from `Lsprite::measure` (the lores master at the lores target's scale, no pixels).
     - **Fixed against the archive (2026-10-04):** this first took the `source` FLC at 2×1, because the port data had dropped the `lores`/`lsource` lines. That was wrong for 15 sprites, among them the level sprite `bronie` (ship upgrades), whose bounds decide when its builders fire.
       - The manifests are the original files again, plus the 22 lores masters.
-      - All 382 sprites the game loads now match the shipped caches. The `sprite_bounds` test keeps them so.
+      - All 382 sprites the game loads now match the shipped caches. The `sprite_build` test keeps them so, along with their pixel data and the palette tables.
       - Details in [original-archive.md](original-archive.md#lores-bounds-15-sprites-were-wrong-fixed).
   - **Test tools, pulled forward from phase 5:**
     - `--fast` runs without the clock: one simulation step per frame, game time still 1/30 s per tick (`Eem::untimed`).
@@ -213,8 +213,8 @@ Each phase ends with something runnable and an exit check. Phases 5–7 can over
 
 ### Phase 5: determinism and the demo regression suite
 - **Clone the old-toolchain behaviours in `compat/`:**
-  1. **MSVC `rand()`.** `Rand::init` fills its table with `srand(0)` and 1024 × CRT `rand()` (`gobj.cpp:39-42`). glibc and Apple's libc produce different numbers, so embed the MSVC LCG. Confirmed in the 1.1 exe.
-  2. **MSVC 4 `qsort`.** The collision results are sorted with every priority 0 (`1sp.h:267-268`, `1sp_scr2.cpp:107-121`), and so are the visible level objects (`1sp_lev.cpp:768`). The order of equal keys is whatever MSVC's algorithm produced. The 1.1 exe holds the classic pre-2005 CRT `qsort`; [original-archive.md](original-archive.md#msvc-4-qsort-confirmed) has it.
+  1. **MSVC `rand()`.** `Rand::init` fills its table with `srand(0)` and 1024 × CRT `rand()` (`gobj.cpp:39-42`). glibc and Apple's libc produce different numbers, so embed the MSVC LCG. Confirmed in the 1.1 exe; `tests/golden/crt_rand.txt` has the table it must produce.
+  2. **MSVC 4 `qsort`.** The collision results are sorted with every priority 0 (`1sp.h:267-268`, `1sp_scr2.cpp:107-121`), and so are the visible level objects (`1sp_lev.cpp:768`). The order of equal keys is whatever MSVC's algorithm produced. The 1.1 exe holds the classic pre-2005 CRT `qsort`; [original-archive.md](original-archive.md#msvc-4-qsort-confirmed) has it. Test the clone against `tests/golden/crt_qsort.txt`: 435 runs of the original, emulated.
   3. **x87 floats: no switch needed.** The CRT ran x87 at 53-bit precision.
      - `METRONQUALITY` is 1024, so the `(int)(seconds*METRONQUALITY)` tick conversions are exact under x87 and SSE alike. The earlier ×1000 analysis (0.7 s → 699 vs 700) was wrong.
      - What can differ is a float result the original used straight from the register: converted to `int` or fed into the next operation. Evaluate those in `double` (sites in [original-archive.md](original-archive.md#x87-the-tick-conversions-are-exact)).
@@ -228,7 +228,7 @@ Each phase ends with something runnable and an exit check. Phases 5–7 can over
 - **If an original demo desyncs, suspects in order:**
   1. the compat behaviours above;
   2. collision scan order;
-  3. phase bounds: the `sprite_bounds` test checks them against the shipped caches;
+  3. phase bounds: the `sprite_build` test checks them against the shipped caches;
   4. render-path side effects: `World::display` calls `look_at` **with builders** (`world.cpp:74-81`). Until that is proven harmless, keep the original cadence of one render per batch of ticks, and run the same calls in headless mode;
   5. the uninitialised `ACannon::global_time` read (`alien.cpp:1726`, `==` instead of `=`);
   6. finally, a real 1.0 → 1.1 gameplay change. The demos were recorded on 20 May 1996; this source is August 1996. Every gameplay `.tdf` predates the demos, so only code changed; the archive's file dates list the candidate files ([original-archive.md](original-archive.md#the-demos-and-10--11)).

@@ -227,3 +227,46 @@ void Spr::check_csum (void)
   CHECK(csum==last_csum);
 }
                         
+// Port: the engine switch sprite_dump=1 describes every sprite and palette built, for comparison
+// with the original's prebuilt caches (tests/check_sprites.cmake, tools/archive/ffarchive.py
+// sprites). Two files in the preferences directory get one line per load, keyed by the manifest
+// path of the first target: sprite_bounds.txt the phase bounds (data=0), sprite_data.txt the
+// size and CRC-32 of the pixel data and palette tables (data=1).
+void Spr::dump_printf (int data, const char *fmt, ...)
+{
+  static FILE *f[2]={NULL,NULL};
+  static const char *names[2]={"sprite_bounds.txt","sprite_data.txt"};
+  if (!dump)
+    return;
+  if (!f[data])
+  {
+    char path[_MAX_PATH];
+    snprintf(path,sizeof(path),"%s%s",Comm::pref_path,names[data]);
+    if (!(f[data]=fopen(path,"w")))
+      return;
+  }
+  va_list args;
+  va_start(args,fmt);
+  vfprintf(f[data],fmt,args);
+  va_end(args);
+  fflush(f[data]);
+}
+
+// CRC-32 as zlib computes it (polynomial 0xEDB88320).
+unsigned Spr::crc32 (const void *buf, int size)
+{
+  static unsigned table[256];
+  if (!table[1])
+    for (unsigned n=0; n<256; n++)
+    {
+      unsigned c=n;
+      for (int k=0; k<8; k++)
+        c=(c&1) ?0xEDB88320u^(c>>1) :c>>1;
+      table[n]=c;
+    }
+  unsigned c=0xFFFFFFFFu;
+  const unsigned char *p=(const unsigned char*)buf;
+  for (int i=0; i<size; i++)
+    c=table[(c^p[i])&0xFF]^(c>>8);
+  return c^0xFFFFFFFFu;
+}

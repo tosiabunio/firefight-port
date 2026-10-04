@@ -7,18 +7,23 @@ See docs/original-archive.md for what the archive holds and what these checks fo
   ffarchive.py unpack VOL [OUTDIR]      list a .vol volume, or extract it into OUTDIR
   ffarchive.py cache FILE...            header and phases of built sprite caches (.sph/.spl/.spc)
   ffarchive.py compare-cd CDDIR         every file in CDDIR/*.vol against data/ or FF/WORK.RTL
-  ffarchive.py bounds DUMP              a sprite_bounds.txt dump of the port vs. the shipped caches
+  ffarchive.py provenance [--write F]   every file in data/ and music/ against its original; F gets
+                                        their SHA-256 list (tests/golden/data_files.sha256)
+  ffarchive.py sprites DIR              a sprite_dump=1 run of the port (DIR: its preferences) vs.
+                                        the shipped caches: phase bounds, pixel data, palette tables
 
 The archive root is --archive, else $FF_ARCHIVE, else this repository's parent directory if it
 holds FF/WORK.RTL, else ../FireFight next to the repository. Its file names are mixed-case 8.3
 names, so lookups ignore case.
 """
 import argparse
+import hashlib
 import os
 import pathlib
 import re
 import struct
 import sys
+import zlib
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 DATA = ROOT / 'data'
@@ -111,7 +116,14 @@ def read_cache(path):
     p = 15 + 36 + size
     ph = [struct.unpack_from('<4h', b, p + 16 * i + 8) for i in range(phases)]
     return {'level': level, 'scale': scale, 'mirrors': mirrors, 'onecolor': onecolor,
-            'rle_bytes': size, 'phases': ph}
+            'rle_bytes': size, 'phases': ph, 'rle': b[15 + 36:15 + 36 + size]}
+
+
+def read_palette_tables(path):
+    """A built palette cache (.spp): the 10 palettes, the 64^3 closest-colour and 256x256 tables."""
+    b = pathlib.Path(path).read_bytes()
+    return {'palettes': b[8:8 + 10240], 'closest': b[8 + 10240:8 + 10240 + 262144],
+            'tsp': b[8 + 10240 + 262144:]}
 
 
 def parse_manifest(path):
@@ -220,33 +232,87 @@ def parse_bounds_line(line):
     return target, out
 
 
-def cmd_bounds(a):
-    rtl = archive_root(a.archive) / 'FF' / 'WORK.RTL'
-    cache = lambda v: read_cache(find_ci(rtl, v.split()[0]))['phases'] if v else []
-    expected = {}                                    # first target -> shipped bounds, per area
+def cmd_provenance(a):
+    root = archive_root(a.archive)
+    origins = {'data': root / 'FF' / 'WORK.RTL', 'music': root / 'CDAudio'}
+    lines, bad = [], 0
+    for top, origin in origins.items():
+        for path in sorted((ROOT / top).rglob('*')):
+            if not path.is_file():
+                continue
+            rel = path.relative_to(ROOT).as_posix()
+            data = path.read_bytes()
+            original = find_ci(origin, path.relative_to(ROOT / top).as_posix())
+            if original is None or original.read_bytes() != data:
+                print(f"{rel}: {'no original' if original is None else 'differs from'} in {origin}")
+                bad += 1
+            lines.append(f'{hashlib.sha256(data).hexdigest()}  {rel}')
+    if a.write and not bad:
+        pathlib.Path(a.write).write_text('\n'.join(sorted(lines, key=lambda l: l[66:])) + '\n')
+    print(f'{len(lines)} files checked, {bad} differ from the archive' +
+          (f'; list written to {a.write}' if a.write and not bad else ''))
+    return 1 if bad else 0
+
+
+def shipped_sprites(rtl):
+    """first target -> [(bounds, data line)] for every sprite area in the original manifests, and
+    palette target -> data line, as sprite_bounds.txt and sprite_data.txt describe them."""
+    caches = {}
+    def cache(v):
+        if not v:
+            return None
+        path = find_ci(rtl, v.split()[0])
+        if path not in caches:
+            caches[path] = read_cache(path)
+        return caches[path]
+    crc = lambda b: f'{len(b)} {zlib.crc32(b):08x}'
+    sprites, palettes = {}, {}
     for man in sorted(rtl.glob('*.DIR')):
         for area, d in parse_manifest(man):
+            if 'target' in d:
+                key = d['target'].split()[0].replace('\\', '/').lower()
+                tables = read_palette_tables(find_ci(rtl, key))
+                palettes[key] = f'{key} ' + ' '.join(f'{k} {crc(v)}' for k, v in tables.items())
+                continue
             key = next((d[k] for k in ('hires', 'collis', 'lores') if k in d), None)
-            if key:
-                key = key.split()[0].replace('\\', '/').lower()
-                bounds = union_bounds(cache(d.get('hires')), cache(d.get('lores')), cache(d.get('collis')))
-                expected.setdefault(key, []).append(bounds)
-    seen, bad = set(), 0
-    for line in pathlib.Path(a.dump).read_text().splitlines():
-        if not line.strip() or line in seen:
-            continue
-        seen.add(line)
+            if not key:
+                continue
+            key = key.split()[0].replace('\\', '/').lower()
+            h, l, c = cache(d.get('hires')), cache(d.get('lores')), cache(d.get('collis'))
+            ph = lambda x: x['phases'] if x else []
+            bounds = union_bounds(ph(h), ph(l), ph(c))
+            data = key + (f" hires {crc(h['rle'])}" if h else '') + (f" collis {crc(c['rle'])}" if c else '')
+            sprites.setdefault(key, []).append((bounds, data))
+    return sprites, palettes
+
+
+def cmd_sprites(a):
+    rtl = archive_root(a.archive) / 'FF' / 'WORK.RTL'
+    sprites, palettes = shipped_sprites(rtl)
+    dump = pathlib.Path(a.dir)
+    bad = 0
+    bounds_lines = sorted(set(dump.joinpath('sprite_bounds.txt').read_text().splitlines()) - {''})
+    for line in bounds_lines:
         target, bounds = parse_bounds_line(line)
-        if target not in expected:
+        expected = [b for b, _ in sprites.get(target, [])]
+        if not expected:
             print(f'{target}: not in the original manifests')
             bad += 1
-        elif bounds not in expected[target]:
-            exp = expected[target][0]
+        elif bounds not in expected:
+            exp = expected[0]
             i = next((i for i, (x, y) in enumerate(zip(bounds, exp)) if x != y), min(len(bounds), len(exp)))
-            print(f'{target}: phase {i} is {bounds[i] if i < len(bounds) else None}, '
+            print(f'{target}: phase {i} bounds {bounds[i] if i < len(bounds) else None}, '
                   f'shipped {exp[i] if i < len(exp) else None} ({len(bounds)} vs {len(exp)} phases)')
             bad += 1
-    print(f'{len(seen)} sprites checked, {bad} differ from the shipped caches')
+    data_lines = sorted(set(dump.joinpath('sprite_data.txt').read_text().splitlines()) - {''})
+    for line in data_lines:
+        target = line.split()[0]
+        expected = [palettes[target]] if target in palettes else [d for _, d in sprites.get(target, [])]
+        if line not in expected:
+            print(f'{line}\n{"shipped:":>{len(target)}}{expected[0][len(target):] if expected else " nothing"}')
+            bad += 1
+    print(f'{len(bounds_lines)} sprite bounds and {len(data_lines)} pixel data/palette lines checked, '
+          f'{bad} differ from the shipped caches')
     return 1 if bad else 0
 
 
@@ -258,7 +324,8 @@ def main():
     p = sub.add_parser('unpack'); p.add_argument('vol'); p.add_argument('outdir', nargs='?'); p.set_defaults(f=cmd_unpack)
     p = sub.add_parser('cache'); p.add_argument('files', nargs='+'); p.set_defaults(f=cmd_cache)
     p = sub.add_parser('compare-cd'); p.add_argument('cddir'); p.set_defaults(f=cmd_compare_cd)
-    p = sub.add_parser('bounds'); p.add_argument('dump'); p.set_defaults(f=cmd_bounds)
+    p = sub.add_parser('sprites'); p.add_argument('dir'); p.set_defaults(f=cmd_sprites)
+    p = sub.add_parser('provenance'); p.add_argument('--write', metavar='FILE'); p.set_defaults(f=cmd_provenance)
     a = ap.parse_args()
     sys.exit(a.f(a) or 0)
 

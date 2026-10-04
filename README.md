@@ -15,7 +15,7 @@ This is the subset of the original Fire Fight (Chaos Works, 1996) material neede
 | `CMakeLists.txt`, `CMakePresets.json`, `vcpkg.json`, `cmake/` | Build system |
 | `source/compat/` | Port layer: MSVC CRT extensions and stand-ins for the Win32/DirectX APIs (inert stubs until the SDL2 drivers replace them) |
 | `tools/smoke/` | Dependency smoke test (SDL2 window and paletted present, SDL2_mixer FLAC/WAV, ENet loopback) |
-| `tools/archive/` | `ffarchive.py`: unpacks the original volumes, reads sprite caches, checks the port's data and sprite bounds against the archive |
+| `tools/archive/` | Run where the original archive is: `ffarchive.py` (volumes, sprite caches, data provenance, sprite checks) and `crt_vectors.py` (MSVC `qsort`/`rand` test vectors from the original exe) |
 
 ## Building
 
@@ -147,7 +147,7 @@ Per-entry flags: `o+` = one-colour (the weather overlays: fog, cloud, night), `m
 
 **Palette index 255 is the transparent key colour** (`key_color` in `1sp_lreb.cpp`). Keep it as alpha when converting frames to a modern format.
 
-A sprite's phase bounds are the union of its hires, lores and collision bounds. They are simulation state: they decide which level objects `look_at` sees and builds, and the on-screen tests of game objects. The `sprite_bounds` test checks every sprite the game loads against the original's prebuilt caches.
+A sprite's phase bounds are the union of its hires, lores and collision bounds. They are simulation state: they decide which level objects `look_at` sees and builds, and the on-screen tests of game objects. The `sprite_build` test checks the bounds, pixel data and palette tables of everything the game loads against the original's prebuilt caches.
 
 The rebuild path that turns FLC frames into engine sprites is the reference for anything else a converter must preserve. It lives in `source/engine/1sp/1sp_lmai.cpp`, `1sp_lreb.cpp`, `1sp_ldsa.cpp` and `1sp_flic.cpp`. With the original engine in loose-file mode, missing targets were simply rebuilt on first load. The port builds every sprite in memory on load and never writes the target files.
 

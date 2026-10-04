@@ -17,3 +17,6 @@ Firefght.log
 /.vs/
 /.vscode/
 CMakeUserPresets.json
+
+# Python bytecode from tools/
+__pycache__/

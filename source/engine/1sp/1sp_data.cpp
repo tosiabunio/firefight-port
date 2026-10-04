@@ -8,7 +8,7 @@
 
 int Spr::load_enabled, Video::work_mode, Video::use_320x200, Video::use_640x400;
 
-int Spr::onecolor, Spr::mirror, Spr::dump_bounds;
+int Spr::onecolor, Spr::mirror, Spr::dump;
 int Spr::toload=Spr::hires|Spr::lores|Spr::collis;
 int Spr::hires_scale=1,Spr::lores_scale=2,Spr::collis_scale=4;
 

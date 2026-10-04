@@ -14,9 +14,10 @@ Everything was selected by rule from the original archive. `README.md` documents
 - **Version 1.1 only.** This source is v1.1 (Aug 1996). The retail CD is 1.2, but it differs only in the executables (its `PARAMS.VOL` repacks the same files), and no 1.2 source exists. Don't try to reproduce 1.2 behaviour.
 - **Original archive:** `docs/original-archive.md` covers what the original archive (outside this repo) offers the port.
   - It has the 1.1 executables built from this source, which confirm the MSVC `rand`/`qsort` and the x87 precision.
-  - It has the shipped sprite caches, an exact oracle for the in-memory sprite build. The port's phase bounds match them for every sprite loaded.
-  - `tools/archive/ffarchive.py` runs the checks.
-  - It is never committed. Look for it at `$FF_ARCHIVE` or `../FireFight` (next to this clone). If it isn't there or isn't in the session's directories, don't guess its contents. Ask the user to copy it or `/add-dir` it, as "Getting the archive" in `docs/original-archive.md` describes.
+  - It has the shipped sprite caches. The port's sprite build matches them for every sprite and palette loaded: bounds, pixel data and tables.
+  - The archive is never committed and exists only on the Windows PC (`D:\_Projects\FireFight`). What it proves is committed as golden files and test vectors, so other machines work from the repo alone.
+  - Without the archive, don't guess its contents. A task that needs it (a new comparison, disassembly, running the original game) belongs on the Windows PC. See "Working without the archive" in `docs/original-archive.md`.
+  - `tools/archive/ffarchive.py` and `crt_vectors.py` produce and check those files.
 - **Port plan:** SDL2 + CMake, in phases with exit criteria, in `docs/porting-plan.md`. Follow its phase order and its determinism rules.
 - **Status: phase 3 done; the game shows in a window but has no input or sound yet.** The original sources build on every platform. Runtime (phase 2) and video (phase 3) are on SDL2. Sound, input and network still go through `source/compat/`, whose inert Win32/DirectX stand-ins phases 4–7 replace. Without input, the game runs its title loop and attract demos; sound is inactive until phase 6.
 
@@ -30,7 +31,8 @@ Everything was selected by rule from the original archive. `README.md` documents
     - `smoke`: the dependencies.
     - `headless_run`: the game runs headless for 30 s against `data/` (title loop, then an attract demo).
     - `golden_title`: in `--fast` mode, every 20th of the first 200 title frames must match `tests/golden/title_frames.sha256`. The frames are bit-identical on all platforms. If rendering changes on purpose, regenerate the hashes from `--headless --fast --shot-every 20 --quit-frames 200` (`tests/check_frames.cmake`).
-    - `sprite_bounds`: `check` mode loads every mission's level, and the phase bounds of every sprite loaded must match `tests/golden/sprite_bounds.txt`, which matches the original's prebuilt caches. A changed dump must pass `tools/archive/ffarchive.py bounds` before it replaces the golden file (`tests/check_sprite_bounds.cmake`).
+    - `sprite_build`: `check` mode loads every mission's level with `sprite_dump=1`. The phase bounds, pixel data CRCs and palette table CRCs must match `tests/golden/sprite_bounds.txt` and `sprite_data.txt`, which match the original's prebuilt caches. A changed dump must pass `tools/archive/ffarchive.py sprites` on the Windows PC before it replaces the golden files (`tests/check_sprites.cmake`).
+    - `data_files`: every file in `data/` and `music/` must have its SHA-256 from `tests/golden/data_files.sha256`, with nothing missing or extra. This catches line-ending or encoding conversion (`tests/check_data.cmake`).
 - **Windows on this machine:** MSVC is not on `PATH`. Run from an x64 Developer PowerShell, or call `C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Auxiliary\Build\vcvars64.bat` first. `VCPKG_ROOT` can be the bundled `…\BuildTools\VC\vcpkg`.
 - **Compile options:** `cmake/FFCompileOptions.cmake` sets them. `ff_common_options` (every target) adds `-fwrapv -fno-strict-aliasing -fsigned-char`; `ff_modern_options` (new code) adds strict warnings.
 - **Dependency targets:** `cmake/FFDependencies.cmake` normalises them to `ff::sdl2`, `ff::mixer` and `ff::enet`.

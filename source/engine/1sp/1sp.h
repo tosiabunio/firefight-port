@@ -37,7 +37,7 @@ public:
 
   //----- zmienne
   static int mirror, onecolor, toload, load_enabled, hires_scale, lores_scale, collis_scale;
-  static int dump_bounds;    // port: write every loaded sprite's phase bounds (Sprite::load)
+  static int dump;           // port: describe every sprite and palette built (dump_printf)
 
   //----- inicjalizacje
   enum work_modes   {work_normal, work_debug, work_safe };
@@ -50,6 +50,8 @@ public:
   static void       touch         (int totouch);
   static void       make_csum     (void);
   static void       check_csum    (void);
+  static void       dump_printf   (int data, const char *fmt, ...);
+  static unsigned   crc32         (const void *buf, int size);
 
 private:
   static int        calculate_csum     (void);
