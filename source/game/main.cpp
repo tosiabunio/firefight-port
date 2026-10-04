@@ -25,7 +25,8 @@
 //                     frames (input_script.cpp)
 //
 // Everything else is passed through as an original engine switch (debug=1, check, ...).
-// The exit code is non-zero when the engine reported a critical error.
+// The exit code is 1 when the engine reported a critical error. With --demo it is 3 when the
+// replay went out of sync and 4 when it stopped before the end of the recording.
 
 #include <compat/win32.h>
 #include <1lg.h>
@@ -171,5 +172,5 @@ int main(int argc, char *argv[])
   }
 
   game_main(&line[0]);
-  return critical_error_occurred ? 1 : 0;
+  return critical_error_occurred ? 1 : Comm::exit_code;
 }

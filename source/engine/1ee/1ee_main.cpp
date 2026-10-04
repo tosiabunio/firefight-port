@@ -1234,6 +1234,12 @@ void Eem::demo_terminate()
   status.reset(eem_DemoActive);
 }
 //---------------------------------------------------------------------------
+void Eem::demo_progress(unsigned *played, unsigned *blocks)
+{
+  *played=Demo_player::closed_played;
+  *blocks=Demo_player::closed_blocks;
+}
+//---------------------------------------------------------------------------
 void Eem::user_block_send(unsigned char *buffer, unsigned size)
 {
   DBG_CHECK(status.is(eem_Active));

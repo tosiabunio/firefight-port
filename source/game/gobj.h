@@ -76,6 +76,7 @@ class Object : public FastAlloc
 //KLASA POSIT
 class Posit
 {
+   friend class Stale_memory;  // port: reads what the original left in memory (stale.h)
    friend class Move;
    friend class Myship;
   private:
@@ -244,6 +245,7 @@ class Turn : public virtual Posit
 //KLASA MOVE
 class Move : public Turn
 {
+   friend class Stale_memory;  // port: reads what the original left in memory (stale.h)
   public:
    enum KickPower
    {
@@ -744,6 +746,7 @@ const int MAX_GM_SOUNDS=60;
 
 class Sound : public virtual Posit
 {
+   friend class Stale_memory;  // port: reads what the original left in memory (stale.h)
   protected:
    Sample* smp;
    static Sample sounds[MAX_GM_SOUNDS];

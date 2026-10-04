@@ -31,6 +31,7 @@ const int MAX_USERLEVELS=20;
 class User:
 public Object
 {
+   friend class Stale_memory;  // port: reads what the original left in memory (stale.h)
   public:
    enum {weap_num=6};
    enum Invent
@@ -246,6 +247,7 @@ public Colis,
 public Radar,
 public Sound
 {
+   friend class Stale_memory;  // port: reads what the original left in memory (stale.h)
    friend class Weapon;
    friend class User;
   private:

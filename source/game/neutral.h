@@ -84,6 +84,7 @@ public virtual Posit,
 public Listmanager,
 public Shadow
 {
+   friend class Stale_memory;  // port: reads what the original left in memory (stale.h)
   protected:
    int killflag;
    int counter;
@@ -408,6 +409,7 @@ public Handle,
 public virtual Life,
 public Radar
 {
+   friend class Stale_memory;  // port: reads what the original left in memory (stale.h)
   protected:
    int plane;
    int time;
@@ -472,6 +474,7 @@ public Move,
 public Listmanager,
 public Visible
 {
+   friend class Stale_memory;  // port: reads what the original left in memory (stale.h)
   private:
     struct Wkt
     {
@@ -509,6 +512,7 @@ public virtual Posit,
 public Listmanager,
 public Visible
 {
+   friend class Stale_memory;  // port: reads what the original left in memory (stale.h)
   protected:
    struct Wkt
    {

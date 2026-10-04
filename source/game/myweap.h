@@ -40,6 +40,7 @@ public Visible,
 public Listmanager,
 public Sound
 {
+   friend class Stale_memory;  // port: reads what the original left in memory (stale.h)
   private:
    int id;
    int time;
@@ -94,6 +95,7 @@ public LowColis,
 public Sound,
 public Visible
 {
+   friend class Stale_memory;  // port: reads what the original left in memory (stale.h)
   protected:
    struct Wektor
    {
@@ -166,6 +168,7 @@ public Move,
 public Listmanager,
 public Visible
 {
+   friend class Stale_memory;  // port: reads what the original left in memory (stale.h)
   private:
     struct Wkt
     {

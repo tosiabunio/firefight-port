@@ -54,6 +54,7 @@ public:
                        char *user_data = NULL, unsigned *size = NULL);
   static BOOL  play   (char *buffer, unsigned *size);
   static void  close  (void);
+  static unsigned closed_played, closed_blocks;  // port: blocks replayed and recorded at close
 };
 
 #endif

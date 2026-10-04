@@ -114,7 +114,7 @@ void** Cmanager::check (int x, int y, Sprite &s, int p, int m)
   int r;
   for (r=0; check_result[r]; r++);
   cm_pbuf=pbuf;
-  qsort(check_result,r,sizeof(char),qsort_compare);
+  msvc4_qsort(check_result,r,sizeof(char),qsort_compare);  // was qsort: equal keys keep MSVC 4's order
 
   int i;
   for (i=0; i<r; i++)

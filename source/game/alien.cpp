@@ -1723,7 +1723,7 @@ Impexp(_level_num)
   plane=_plane;
   param=_param;
   fr_shoot=0;
-  global_time==Mp::BEYONDTIME;
+  global_time=Stale_memory::word(dynamic_cast<void*>(this));  // was global_time==Mp::BEYONDTIME (stale.h)
   smoketime=shtime=shoot=time=0;
   time=Game::get_timer()%(param->active+param->passive);
   if (time>=param->passive)

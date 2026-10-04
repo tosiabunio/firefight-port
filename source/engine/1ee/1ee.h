@@ -770,6 +770,8 @@ public:
                                      unsigned *user_data_size = NULL);
   static BOOL  demo_is_active();
   static void  demo_terminate();
+  // Port: blocks replayed and recorded in the last demo played (for the demo tests).
+  static void  demo_progress(unsigned *played, unsigned *blocks);
 
   static void user_block_send(unsigned char *buffer, unsigned size);
   static BOOL user_block_receive(unsigned char *buffer, unsigned *size);

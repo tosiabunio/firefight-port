@@ -72,6 +72,7 @@ public Listmanager,
 public LowColis,
 public Visible
 {
+   friend class Stale_memory;  // port: reads what the original left in memory (stale.h)
   protected:
    struct Wektor : public Heap_object
    {
@@ -94,6 +95,7 @@ public Listmanager,
 public LowColis,
 public Visible
 {
+   friend class Stale_memory;  // port: reads what the original left in memory (stale.h)
   protected:
    struct Wektor : public Heap_object
    {

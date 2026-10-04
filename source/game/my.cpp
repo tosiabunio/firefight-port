@@ -817,26 +817,31 @@ Myship::~Myship(void)
   SEND_DEBUG_MESSAGE("ship destructed");
   if (smoke!=NULL)
   {
+    Stale_memory::object_deleted(smoke);  // port
     delete smoke;
     smoke=NULL;
   }
   if (scrcatch!=NULL)
   {
+    Stale_memory::object_deleted(scrcatch);  // port
     delete scrcatch;
     scrcatch=NULL;
   }
   if (dispinfo!=NULL)
   {
+    Stale_memory::object_deleted(dispinfo);  // port
     delete dispinfo;
     dispinfo=NULL;
   }
   if (weapon!=NULL)
   {
+    Stale_memory::object_deleted(weapon);  // port
     delete weapon;
     weapon=NULL;
   }
   if (myuser!=NULL)
   {
+    Stale_memory::object_deleted(myuser);  // port
     delete myuser;
     myuser=NULL;
   }

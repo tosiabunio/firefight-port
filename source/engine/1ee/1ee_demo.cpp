@@ -442,10 +442,17 @@ BOOL  Demo_player::play (char *buffer, unsigned *size)
   return(result);
 }
 //-----------------------------------------------------------------------------
+unsigned Demo_player::closed_played=0;
+unsigned Demo_player::closed_blocks=0;
+
 void  Demo_player::close (void)
 {
   DBG_CHECK(status.is(play_Initialized));
   DBG_CHECK(status.is(play_Opened));
+  // Port: how far the replay got, for Eem::demo_progress.
+  closed_played=block_pointer;
+  closed_blocks=header.blocks;
+  MESSAGE("demo closed after %u of %u blocks", block_pointer, header.blocks);
   if (main_buffer != NULL)
   {
     VirtualFree(main_buffer, 0, MEM_RELEASE);

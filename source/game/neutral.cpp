@@ -2411,16 +2411,19 @@ Wall::~Wall(void)
 {
   if (normal!=NULL)
   {
+    Stale_memory::object_deleted(normal);  // port
     delete normal;
     normal=NULL;
   }
   if (weapon!=NULL)
   {
+    Stale_memory::object_deleted(weapon);  // port
     delete weapon;
     weapon=NULL;
   }
   if (killer!=NULL)
   {
+    Stale_memory::object_deleted(killer);  // port
     delete killer;
     killer=NULL;
   }

@@ -767,7 +767,7 @@ void Level::look_at (int wx, int wy, int wsx, int wsy, char *gp, int byes, int o
             }
           }
         }
-        qsort(&buffer[olsize],lsize-olsize,sizeof(short),lgcompare);
+        msvc4_qsort(&buffer[olsize],lsize-olsize,sizeof(short),lgcompare);  // was qsort (compat/msvc4.h)
       buffer[lsize] = 0;
       lsize++;
       CHECK(lsize<buffer_size);

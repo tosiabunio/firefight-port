@@ -4,6 +4,7 @@
 # --- compat: CRT shims and the Win32/DirectX stand-ins (see compat/win32.h) --------------
 add_library(compat STATIC
   compat/crt.cpp
+  compat/msvc4.cpp
   compat/win32.cpp)
 # Sources include these as <compat/crt.h> and <compat/win32.h>.
 target_include_directories(compat PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
@@ -91,6 +92,8 @@ add_executable(firefight
   game/pilots.cpp
   game/print.cpp
   game/queue.cpp
+  game/stale.cpp
+  game/stale_gen.cpp
   game/sysset.cpp
   game/tools.cpp
   game/view.cpp
@@ -139,6 +142,28 @@ add_test(NAME sprite_build
           -DGOLDEN=${CMAKE_SOURCE_DIR}/tests/golden
           -P ${CMAKE_SOURCE_DIR}/tests/check_sprites.cmake)
 set_tests_properties(sprite_build PROPERTIES TIMEOUT 300)
+
+# Phase 5: the MSVC 4 rand and qsort clones must reproduce the original exe's results
+# (tests/golden/crt_*.txt, from tools/archive/crt_vectors.py).
+add_executable(crt_vectors ${CMAKE_SOURCE_DIR}/tests/crt_vectors.cpp)
+target_link_libraries(crt_vectors PRIVATE compat)
+ff_modern_options(crt_vectors)
+add_test(NAME crt_vectors
+  COMMAND crt_vectors ${CMAKE_SOURCE_DIR}/tests/golden/crt_rand.txt
+          ${CMAKE_SOURCE_DIR}/tests/golden/crt_qsort.txt)
+
+# Phase 5 determinism check: the 8 original attract demos (data/demo) must replay in sync to the
+# end of their recordings. --demo exits with 3 when the replay goes out of sync, 4 when it stops
+# early (game.cpp, Game::go).
+foreach(demo IN ITEMS level1 level2 level3 level4 level1C level2C level3C level4C)
+  add_test(NAME demo_${demo}
+    COMMAND firefight --data "${FF_DATA_DIR}" --pref "${CMAKE_CURRENT_BINARY_DIR}/demo_${demo}"
+            --headless --fast --demo ${demo})
+  set_tests_properties(demo_${demo} PROPERTIES
+    PASS_REGULAR_EXPRESSION "in sync to the end"
+    FAIL_REGULAR_EXPRESSION "without object_deleted"
+    TIMEOUT 300)
+endforeach()
 
 # Phase 4 input check: an input script starts the first mission from the title and flies it with
 # the keyboard, the mouse and a virtual game controller, switching with F11. The input states it

@@ -204,6 +204,7 @@ public Sound,
 public Handle,
 public Impexp
 {
+   friend class Stale_memory;  // port: reads what the original left in memory (stale.h)
   protected:
    enum{GO,FIRE};
    enum{TRACE,CIRCLEL,CIRCLER,STOP};

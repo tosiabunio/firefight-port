@@ -36,10 +36,10 @@ void Rand::init(void)
       queue->add(&d);
     }
   }
-  srand(0);
+  msvc4_srand(0);  // was srand and rand: MSVC 4's generator on every platform (compat/msvc4.h)
   for (int i=0;i<size;i++)
   {
-    data[i]=::rand();
+    data[i]=msvc4_rand();
   }
   lock();
 }
@@ -149,7 +149,9 @@ void Kill::run(void)
   DBG_CHECK(initialized);
   while (!queue->empty())
   {
-    delete (*(queue->head()));
+    Object *o=*(queue->head());
+    Stale_memory::object_deleted(o);  // port
+    delete o;
   }
 }
 
@@ -187,6 +189,7 @@ void FastAlloc::init(void)
   DBG_CHECK(!initialized);
   initialized=1;
   my_heap.init(objects_table,objects_number,"Main");
+  Stale_memory::reset();  // port
 }
 
 void FastAlloc::quit(void)
@@ -212,6 +215,7 @@ void FastAlloc::operator delete(void *ptr,size_t obj_size)
   }
   DBG_CHECK(initialized);
   DBG_CHECK(obj_size<=objects_table[0]);
+  Stale_memory::slot_freed(ptr,obj_size);  // port
   my_heap.free(ptr);
 }
 //KLASA POSIT
@@ -978,6 +982,7 @@ void Listmanager::quit(void)
   temp=(Object*)list->reset();
   while (temp!=NULL)
   {
+    Stale_memory::object_deleted(temp);  // port
     delete temp;
     temp=(Object*)list->get_next();
   }

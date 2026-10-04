@@ -43,6 +43,7 @@ extern GameManager *gamemanager;
 #include "build.h"
 #include "world.h"
 #include "gobj.h"
+#include "stale.h"
 #include "debug.h"
 #include "gman.h"
 #include "msg.h"

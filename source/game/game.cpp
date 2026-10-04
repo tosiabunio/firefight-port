@@ -443,6 +443,8 @@ int Game::header_single(void)
   return (Statistics::Single());
 }
 
+static int demo_sync_failed=0;  // port: the last demo replay diverged (Eem_demo_sync_failure)
+
 void Game::play(void)
 {
   try
@@ -476,6 +478,7 @@ void Game::play(void)
   catch (Eem_demo_sync_failure)
   {
     MESSAGE("NETWORK: Eem demo synchronization failure caught.");
+    demo_sync_failed=1;  // port: see Game::go
     Game::loop_quit();
   }
   catch (TerminateMission)
@@ -877,6 +880,22 @@ void Game::go(void)
     MESSAGE("playing demo %s",name);
     set_demo_properties(PLAY_FILENAME,name,0);
     play_demo();
+    // The exit code tells whether the replay stayed in sync to the end of the recording: 3 if it
+    // diverged, 4 if it stopped early (the demo tests).
+    unsigned played,blocks;
+    Eem::demo_progress(&played,&blocks);
+    if (demo_sync_failed)
+    {
+      MESSAGE("demo %s: out of sync after %u of %u blocks",name,played,blocks);
+      Comm::exit_code=3;
+    }
+    else if ((blocks==0)||(played<blocks))
+    {
+      MESSAGE("demo %s: stopped after %u of %u blocks",name,played,blocks);
+      Comm::exit_code=4;
+    }
+    else
+      MESSAGE("demo %s: in sync to the end (%u blocks)",name,blocks);
     throw TerminateGame();
   }
   if (Mp::BUILDSPRITESMODE)
@@ -973,7 +992,7 @@ void Game::_clear_flags(void)
 void Game::init_all(HINSTANCE this_instance, HINSTANCE previous_instance,
                    LPSTR command_line,int window_state)
 {
-  srand(0);
+  msvc4_srand(0);  // was srand (compat/msvc4.h)
   progress_start(100,this_instance);
   progress_text("Connecting players");
   Cwe_param cp;

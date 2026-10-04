@@ -553,7 +553,7 @@ int Text::compile_texts (char *dst, char *src)
 
   if (dst!=NULL)
   {
-    qsort(&sorted[0],groups_num,sizeof(char*),sorted_compare);
+    msvc4_qsort(&sorted[0],groups_num,sizeof(char*),sorted_compare);  // was qsort (compat/msvc4.h)
 //    for (int gn=0; gn<groups_num; gn++)
 //      DBG_MESSAGE("label %04d: %s",gn,sorted[gn]);
     mem_free(sorted,"sorted");
