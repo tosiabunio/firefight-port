@@ -14,7 +14,7 @@ enum
 };
 
 Bitflag            Net::status;
-Array<Net::Player> Net::players;
+Net::Player        Net::players[Net::max_enum_players];
 int                Net::players_qty = 0;
 Net::Game          Net::current_game;
 Net::Player        Net::current_player;
@@ -29,7 +29,6 @@ static void log_line(const char *text)
 void Net::quit (void)
 {
   enet_transport::shutdown();
-  players.free();
   ENGINFO ("net statistics: messages received %d, messages sent %d", diag_total_in, diag_total_out);
   status.reset(net_Initialized|net_InGame);
 }
@@ -45,8 +44,7 @@ void Net::init (int debug)
   DBG_CHECK(!status.is(net_Initialized));
   if (!enet_transport::startup(log_line))
     FAILURE2(Eem_error::dp_not_installed, "network initialization failed (ENet)");
-  players.alloc (max_enum_players, "Net::players");
-  players.fillbyte(0);
+  memset(players, 0, sizeof(players));
   players_qty = 0;
   memset(&current_game, 0, sizeof(current_game));
   memset(&current_player, 0, sizeof(current_player));
@@ -132,7 +130,7 @@ Net::Player *Net::list_players (unsigned *count, int *result)
 {
   enet_transport::Player roster[enet_transport::max_players];
   int n = enet_transport::roster(roster);
-  players.fillbyte(0);
+  memset(players, 0, sizeof(players));
   for (int i=0; i<n && i<max_enum_players; i++)
   {
     players[i].id = roster[i].id;
@@ -143,7 +141,7 @@ Net::Player *Net::list_players (unsigned *count, int *result)
     *count = n;
   if (result)
     *result = res_OK;
-  return (&players[0]);
+  return (players);
 }
 //-----------------------------------------------------------------------------
 unsigned Net::get_players_num (void)

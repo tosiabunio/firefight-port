@@ -101,7 +101,7 @@ public:
   };
 private:
   static Bitflag status;
-  static Array<Player> players;
+  static Player  players[max_enum_players];  // plain data: Net::quit runs after the static destructors
   static int     players_qty;
   static Game    current_game;
   static Player  current_player;

@@ -8,6 +8,8 @@
 # execute_process runs its commands at the same time (as a pipeline), which is how the two
 # peers run side by side; the client retries until the host is listening.
 
+cmake_minimum_required(VERSION 3.25)
+
 file(REMOVE_RECURSE "${PREF}")
 file(MAKE_DIRECTORY "${PREF}/host" "${PREF}/client")
 set(common --data "${DATA}" --headless --fast --port ${PORT} --quit-frames 1200)
