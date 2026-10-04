@@ -1,4 +1,5 @@
 #include "1ee_hdrs.h"
+#include <SDL.h>
 
 //----------------------------------------------------------------------------
 // Eem constants
@@ -32,6 +33,7 @@ int              Eem::queue_delay(0);
 int              Eem::timer_id(0);
 int              Eem::timer_frq(0);
 int              Eem::untimed(0);
+int              Eem::dump(0);
 Comm::wpp        Eem::old_window_proc=NULL;
 int              Eem::last_return_code=0;
 int              Eem::players_max(0);
@@ -60,6 +62,7 @@ void Eem::callback_timer (void) //#T 96:05:06:21:46
   {
     ping_counter++;
     Joy::callback_joy();
+    Mouse::flush();  // port: the pointer position goes before the tick
     // Port: the timer runs on the main thread, so the tick is queued directly. In network
     // mode the original posted WM_TIMER to move it from the timer thread to the main thread.
     push_event(ev_Timer);
@@ -121,6 +124,14 @@ int Eem::window_proc(int *presult, HWND hwnd,UINT message,WPARAM wparam,LPARAM l
     }
   }
   return (processed); 
+}
+//---------------------------------------------------------------------------
+// Port: the SDL input events (Comm::input_proc). The original drivers had Windows hooks.
+void Eem::sdl_event (const SDL_Event &event)
+{
+  Kbd::sdl_event(event);
+  Mouse::sdl_event(event);
+  Joy::sdl_event(event);
 }
 //---------------------------------------------------------------------------
 void Eem::init_multi ()
@@ -350,6 +361,7 @@ void Eem::init (int size, int frequency, int network_supported, int check_sync,
 
 
     old_window_proc=Comm::set_window_proc(Eem::window_proc);
+    Comm::input_proc=Eem::sdl_event;
     char buf[80];
     strcpy(buf,"log mmu");
     if (status.is(eem_Timed))
@@ -366,6 +378,7 @@ void Eem::init (int size, int frequency, int network_supported, int check_sync,
 //---------------------------------------------------------------------------
 void Eem::quit (void)
 {
+  Comm::input_proc=NULL;
   Demo_recorder::quit();
   Demo_player::quit();
   Kbd::quit();
@@ -474,6 +487,9 @@ int Eem::read (unsigned user_sync_data, unsigned char user_flags)
     {
       receive_states();
       Comm::process_messages();
+      Mouse::flush();  // port: see Mouse::sdl_event
+      if (untimed)
+        Joy::callback_joy();  // port: no timer to poll it (callback_timer)
     }
     while (!status.is(eem_Active|eem_AutoActive));
     receive_states();
@@ -532,7 +548,69 @@ int Eem::read (unsigned user_sync_data, unsigned char user_flags)
   }
   while ((!last_return_code) && (status.is(eem_Multi)) && (!status.is(eem_InNetActive)));
   previous_read_empty=!last_return_code;
+  if (last_return_code&&dump)
+    dump_state();
   return(last_return_code);
+}
+//---------------------------------------------------------------------------
+// Port: with the engine switch input_dump=1, input_states.txt in the preferences directory gets
+// the local player's input state of each tick that differs from the line before, after the tick
+// number: the keys (set-1 scan codes, +128 extended) held, struck (+) and released (-), the text,
+// the mouse, the virtual keys and the joystick bits. It is what demos record and network play
+// sends, so tests compare it across platforms (tests/check_input.cmake).
+static void dump_bits (char *&p, const unsigned char *bits, int bytes, const char *prefix)
+{
+  for (int i=0; i<bytes*8; i++)
+    if (Bit::is((unsigned char*)bits,i))
+    {
+      p+=sprintf(p,"%s%x",prefix,i);
+      prefix=",";
+    }
+}
+
+void Eem::dump_state (void)
+{
+  static FILE *f=NULL;
+  static unsigned ticks=0;
+  static char last[4096];
+  ticks++;
+  if (!f)
+  {
+    char path[_MAX_PATH];
+    snprintf(path,sizeof(path),"%sinput_states.txt",Comm::pref_path);
+    if (!(f=fopen(path,"w")))
+    {
+      dump=0;
+      return;
+    }
+  }
+  Player_state *st=(*players)[local_player].states.peek();
+  char line[4096], *p=line;
+  p+=sprintf(p,"flags %02x kbd",(int)st->user_flags);
+  dump_bits(p,st->kbd.arr_state,KBD_ARRAY_SIZE," ");
+  dump_bits(p,st->kbd.arr_struck,KBD_ARRAY_SIZE," +");
+  dump_bits(p,st->kbd.arr_release,KBD_ARRAY_SIZE," -");
+  p+=sprintf(p," text \"");
+  for (int i=0; (i<KBD_STRING_SIZE)&&st->kbd.string[i]; i++)
+    p+=sprintf(p,"%c",st->kbd.string[i]);
+  p+=sprintf(p,"\" mouse %d,%d",(int)st->mouse.x,(int)st->mouse.y);
+  dump_bits(p,&st->mouse.arr_state,1," ");
+  dump_bits(p,&st->mouse.arr_struck,1," +");
+  dump_bits(p,&st->mouse.arr_release,1," -");
+  dump_bits(p,&st->mouse.arr_dblclk,1," d");
+  p+=sprintf(p," vkey");
+  dump_bits(p,st->vkey.arr_state,VKEY_ARRAY_SIZE," ");
+  dump_bits(p,st->vkey.arr_struck,VKEY_ARRAY_SIZE," +");
+  dump_bits(p,st->vkey.arr_release,VKEY_ARRAY_SIZE," -");
+  p+=sprintf(p," joy");
+  dump_bits(p,st->joy.arr_state,JOY_ARRAY_SIZE," ");
+  dump_bits(p,st->joy.prev_arr_state,JOY_ARRAY_SIZE," prev ");
+  if (strcmp(line,last))
+  {
+    strcpy(last,line);
+    fprintf(f,"%u %s\n",ticks,line);
+    fflush(f);
+  }
 }
 //---------------------------------------------------------------------------
 void Eem::next_read (void)

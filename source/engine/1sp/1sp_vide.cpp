@@ -223,21 +223,15 @@ Screen *Video::get_screen (void)
 
     video_device=&vd_sdl;  // port: was vd_ddraw (full screen) or vd_bitmap (windowed)
 
-    // TODO(phase 4): map mouse coordinates from the window.
+    // Port: the mouse maps over the picture, the framebuffer (headless). With a window,
+    // VD_sdl::present replaces it with the picture's area in the window. The original mapped
+    // over the display: in its default 640x480 mode that was 480 lines for the 400 drawn.
     {
       RECT rc;
       rc.left  =0;
       rc.right =screen_rsx;
-      if(mode_flag==Spr::hires)
-      {
-        rc.top   =use_640x400 ?0   :0;   //?0          :40;
-        rc.bottom=use_640x400 ?400 :480; //?screen_rsy :screen_rsy+40;
-      }
-      else
-      {
-        rc.top   =use_320x200 ?0   :0;   //?0          :20;
-        rc.bottom=use_320x200 ?200 :240; //?screen_rsy :screen_rsy+20;
-      }
+      rc.top   =0;
+      rc.bottom=screen_rsy;  // was use_640x400 ?400 :480 (hires), use_320x200 ?200 :240 (lores)
       Comm::reinit_mouse(&rc,screen_sx,screen_sy);
     }
 

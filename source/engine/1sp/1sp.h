@@ -304,6 +304,7 @@ public:
   static int shot_every;    // port: frames between frame dumps; 0: off
   static int quit_frames;   // port: request quit (as if the window were closed) after this many frames
   static int frames;        // port: frames shown so far
+  static void (*frame_proc) (int frame);  // port: called after each shown frame (input scripts)
 
   //----- metody operacji na palecie
   static void load_palette (char *name=NULL, int update_tsp=1);

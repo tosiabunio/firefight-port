@@ -236,25 +236,13 @@ public:
 // Joy
 //===========================================================================
 
+// Port: an SDL game controller, else a plain SDL joystick, in place of the winmm joystick API.
+// It still yields the original state: 32 buttons and 6 axes read as digital directions.
 class Joy
 {
 friend class Eem;
   static Bitflag status;
-  static JOYCAPS caps; 
-  static unsigned dev_number; 
-  static DWORD    read_flags;
-  static DWORD    x_center;
-  static DWORD    y_center;
-  static DWORD    z_center;
-  static DWORD    r_center;
-  static DWORD    u_center;
-  static DWORD    v_center;
-  static DWORD    x_dead;
-  static DWORD    y_dead;
-  static DWORD    z_dead;
-  static DWORD    r_dead;
-  static DWORD    u_dead;
-  static DWORD    v_dead;
+  static int      dead;
   static int      last_1;
   static int      last_2;
   static int      last_3;
@@ -266,6 +254,10 @@ friend class Eem;
   static void  complete (void);
 	static void  callback_joy (void);
   static void  init_ref(void);
+  static void  sdl_event (const SDL_Event &event);
+  static void  open_device (int index);
+  static void  close_device (void);
+  static void  push_state (unsigned char *joy_state);
 public:
   enum
   {
@@ -310,6 +302,8 @@ public:
 // Mouse
 //===========================================================================
 
+// Port: SDL mouse events in place of the WH_MOUSE hook. Coordinates are window coordinates (were
+// screen coordinates), and the clip rectangle is the picture's area in the window (Video).
 class Mouse
 {
 friend class Eem;
@@ -318,18 +312,23 @@ friend class Eem;
   static char *names[MOUSE_NAMES_SIZE];
   static int   last_x;
 	static int   last_y;
-	static HHOOK hook_handler;
   static RECT  cr;
   static RECT  *clip_rect;
 	static int   screen_sx;
 	static int   screen_sy;
-	static HWND  hwnd;
+  static int   pointer_x;
+  static int   pointer_y;
+  static int   moved;
+  static int   relative;
   static void  init_ref(void);
   static void  next_read (void);
   static void  get_event (int event);
   static void  clear (void);
   static void  complete (void);
-	static LRESULT CALLBACK callback_mouse (int nCode, WPARAM wParam, LPARAM lParam);
+  static void  sdl_event (const SDL_Event &event);
+  static void  push_position (void);
+  static void  flush (void);
+  static void  update_relative (void);
 public:
   enum
   {
@@ -364,6 +363,8 @@ public:
 	static void goto_xy (int x, int y);
   static int  is_initialized(void);
   static void set_ex_param (RECT *rc, int sx, int sy);
+  // Port: capture the mouse (SDL relative mode) while the window has focus, for mouse steering.
+  static void set_relative (int on);
 
   static char *get_key_name(int code);
   static char *get_struck_name(void);
@@ -376,6 +377,7 @@ public:
 // Kbd
 //===========================================================================
 
+// Port: SDL key events in place of the WH_KEYBOARD hook, still as PC set-1 scan codes.
 class Kbd
 {
 friend class Eem;
@@ -385,12 +387,12 @@ friend class Eem;
 	static int  last_key;
   static unsigned char ref[KBD_REF_SIZE][2];
   static char *names[KBD_NAMES_SIZE];
-	static HHOOK hook_handler;
   static void init_ref(void);
   static void next_read (void);
   static void get_event (int event);
   static void clear (void);
   static void complete (void);
+  static void sdl_event (const SDL_Event &event);
 public:
   enum
   {
@@ -467,7 +469,6 @@ public:
     num_6, num_7, num_8, num_9
   };
 private:
-	static LRESULT CALLBACK callback_keyboard (int nCode, WPARAM wParam, LPARAM lParam);
    static char upper_scan (char ch);
 public:
   static void init ();
@@ -706,6 +707,7 @@ public:
   // Port: run without the clock (--fast): one tick per read, as fast as possible, while the
   // game still counts 1/frequency seconds per tick.
   static int   untimed;
+  static int   dump;     // port: input_dump=1, see dump_state
 private:
   static int   queue_tail;
   static int   queue_head;
@@ -743,6 +745,7 @@ private:
   static void  init_multi ();
 
   static int   window_proc(int *presult, HWND hwnd,UINT message,WPARAM wparam,LPARAM lparam);
+  static void  sdl_event(const SDL_Event &event);
   static int   get_player_pos(unsigned player);
   static void  send_state     (void);
   static void  receive_states (void);
@@ -754,6 +757,7 @@ private:
   static void  error_dump_all(void);
   static void  error_dump_player(Player *player);
   static void  error_dump_state(Player_state *state);
+  static void  dump_state(void);
 
 
   static inline Player_state *get_new();

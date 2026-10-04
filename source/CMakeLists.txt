@@ -76,6 +76,7 @@ add_executable(firefight
   game/game.cpp
   game/gman.cpp
   game/gobj.cpp
+  game/input_script.cpp
   game/item.cpp
   game/kbdsta.cpp
   game/list.cpp
@@ -138,6 +139,20 @@ add_test(NAME sprite_build
           -DGOLDEN=${CMAKE_SOURCE_DIR}/tests/golden
           -P ${CMAKE_SOURCE_DIR}/tests/check_sprites.cmake)
 set_tests_properties(sprite_build PROPERTIES TIMEOUT 300)
+
+# Phase 4 input check: an input script starts the first mission from the title and flies it with
+# the keyboard, the mouse and a virtual game controller, switching with F11. The input states it
+# produces (key scan codes and text, mouse position and buttons, joystick bits, virtual keys) must
+# match the golden file on every platform: demos and network play exchange exactly these.
+add_test(NAME input_play
+  COMMAND ${CMAKE_COMMAND}
+          -DFIREFIGHT=$<TARGET_FILE:firefight> -DDATA=${FF_DATA_DIR}
+          -DPREF=${CMAKE_CURRENT_BINARY_DIR}/input_play
+          -DSCRIPT=${CMAKE_SOURCE_DIR}/tests/input/mission1.txt
+          -DEXPECTED=${CMAKE_SOURCE_DIR}/tests/golden/input_states.txt
+          -DFRAMES=1000
+          -P ${CMAKE_SOURCE_DIR}/tests/check_input.cmake)
+set_tests_properties(input_play PROPERTIES TIMEOUT 300)
 
 # Data check: every file in data/ and music/ must have the SHA-256 listed in the golden file,
 # which was checked against the original archive, and no file may be missing or extra.

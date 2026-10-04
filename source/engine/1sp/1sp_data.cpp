@@ -24,6 +24,7 @@ int Video::shot_interval;
 int Video::shot_every;
 int Video::quit_frames;
 int Video::frames;
+void (*Video::frame_proc) (int frame)=NULL;
 
 Tsp tsp;
 

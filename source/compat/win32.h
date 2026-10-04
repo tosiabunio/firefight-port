@@ -5,7 +5,7 @@
 // This header replaces <windows.h>, <windowsx.h>, <commctrl.h>, <mmsystem.h>, <dsound.h> and
 // <dplay.h> on all platforms, Windows included, so every build sees the same stubs. What is
 // left (phase 3 removed the window, GDI and DirectDraw parts) lives in win32.cpp:
-//   - input hooks, DirectSound, DirectPlay, MCI, mixer, wave-out and joystick calls are inert
+//   - DirectSound, DirectPlay, MCI, mixer and wave-out calls are inert
 //     and report failure or "nothing there" (LoadLibrary returns NULL);
 //   - a few calls with an obvious portable meaning are implemented for real: the clocks
 //     (GetTickCount, timeGetTime), GetUserName, SleepEx and VirtualAlloc.
@@ -68,7 +68,6 @@ FF_DECLARE_HANDLE(HBRUSH);
 FF_DECLARE_HANDLE(HPALETTE);
 FF_DECLARE_HANDLE(HMENU);
 FF_DECLARE_HANDLE(HKEY);
-FF_DECLARE_HANDLE(HHOOK);
 FF_DECLARE_HANDLE(HMIXER);
 FF_DECLARE_HANDLE(HMIXEROBJ);
 FF_DECLARE_HANDLE(HWAVEOUT);
@@ -79,7 +78,6 @@ typedef HWAVEOUT  *LPHWAVEOUT;
 
 typedef LRESULT (CALLBACK *WNDPROC)(HWND, UINT, WPARAM, LPARAM);
 typedef BOOL    (CALLBACK *DLGPROC)(HWND, UINT, WPARAM, LPARAM);
-typedef LRESULT (CALLBACK *HOOKPROC)(int, WPARAM, LPARAM);
 typedef intptr_t (WINAPI *FARPROC)(void);
 
 #define TRUE  1
@@ -148,14 +146,6 @@ struct WNDCLASS
   LPCSTR    lpszClassName;
 };
 
-struct MOUSEHOOKSTRUCT
-{
-  POINT   pt;
-  HWND    hwnd;
-  UINT    wHitTestCode;
-  uintptr_t dwExtraInfo;
-};
-
 struct PAINTSTRUCT
 {
   HDC  hdc;
@@ -174,15 +164,6 @@ struct PAINTSTRUCT
 #define WM_DISPLAYCHANGE     0x007E
 #define WM_COMMAND           0x0111
 #define WM_TIMER             0x0113
-#define WM_LBUTTONDOWN       0x0201
-#define WM_LBUTTONUP         0x0202
-#define WM_LBUTTONDBLCLK     0x0203
-#define WM_RBUTTONDOWN       0x0204
-#define WM_RBUTTONUP         0x0205
-#define WM_RBUTTONDBLCLK     0x0206
-#define WM_MBUTTONDOWN       0x0207
-#define WM_MBUTTONUP         0x0208
-#define WM_MBUTTONDBLCLK     0x0209
 #define BN_CLICKED           0
 #define WM_QUERYNEWPALETTE   0x030F
 #define WM_PALETTECHANGED    0x0311
@@ -215,8 +196,6 @@ struct PAINTSTRUCT
 #define IDYES    6
 #define IDNO     7
 #define MB_TASKMODAL    0x00002000L
-#define WH_KEYBOARD     2
-#define WH_MOUSE        7
 #define IDI_WINLOGO     MAKEINTRESOURCE(32517)
 #define IDC_ARROW       MAKEINTRESOURCE(32512)
 #define BLACK_BRUSH     4
@@ -284,9 +263,8 @@ struct MEMORYSTATUS
 #define WAIT_FAILED    0xFFFFFFFFL
 #define INFINITE       0xFFFFFFFF
 
-// --- multimedia: timer, wave out, mixer, joystick, MCI -------------------------------------------
+// --- multimedia: timer, wave out, mixer, MCI -----------------------------------------------------
 #define MMSYSERR_NOERROR 0
-#define JOYERR_NOERROR   0
 #define CALLBACK_NULL    0x00000000L
 #define CALLBACK_WINDOW  0x00010000L
 
@@ -400,36 +378,6 @@ struct MIXERCONTROLDETAILS_UNSIGNED { DWORD dwValue; };
 #define MIXERLINE_COMPONENTTYPE_SRC_SYNTHESIZER (MIXERLINE_COMPONENTTYPE_SRC_FIRST + 7)
 #define MIXERLINE_COMPONENTTYPE_SRC_WAVEOUT     (MIXERLINE_COMPONENTTYPE_SRC_FIRST + 8)
 #define MIXERCONTROL_CONTROLTYPE_VOLUME         0x50030001L
-
-#define MAXPNAMELEN_JOY 32
-struct JOYCAPS
-{
-  WORD wMid, wPid;
-  CHAR szPname[MAXPNAMELEN_JOY];
-  UINT wXmin, wXmax, wYmin, wYmax, wZmin, wZmax;
-  UINT wNumButtons, wPeriodMin, wPeriodMax;
-  UINT wRmin, wRmax, wUmin, wUmax, wVmin, wVmax;
-  UINT wCaps, wMaxAxes, wNumAxes, wMaxButtons;
-  CHAR szRegKey[32];
-  CHAR szOEMVxD[260];
-};
-struct JOYINFO { UINT wXpos, wYpos, wZpos, wButtons; };
-struct JOYINFOEX
-{
-  DWORD dwSize, dwFlags;
-  DWORD dwXpos, dwYpos, dwZpos, dwRpos, dwUpos, dwVpos;
-  DWORD dwButtons, dwButtonNumber, dwPOV, dwReserved1, dwReserved2;
-};
-#define JOYSTICKID1        0
-#define JOY_RETURNX        0x00000001L
-#define JOY_RETURNY        0x00000002L
-#define JOY_RETURNZ        0x00000004L
-#define JOY_RETURNR        0x00000008L
-#define JOY_RETURNU        0x00000010L
-#define JOY_RETURNV        0x00000020L
-#define JOY_RETURNBUTTONS  0x00000080L
-#define JOY_RETURNCENTERED 0x00000400L
-#define JOY_USEDEADZONE    0x00000800L
 
 typedef UINT MCIDEVICEID;
 typedef DWORD MCIERROR;
@@ -644,17 +592,9 @@ DWORD   SleepEx(DWORD milliseconds, BOOL alertable);
 // windows and messages
 BOOL    DestroyWindow(HWND hwnd);
 LONG    GetWindowLong(HWND hwnd, int index);
-BOOL    GetClientRect(HWND hwnd, LPRECT rect);
-BOOL    ClientToScreen(HWND hwnd, POINT *point);
 HICON   LoadIcon(HINSTANCE instance, LPCSTR name);
-int     ShowCursor(BOOL show);
-BOOL    SetCursorPos(int x, int y);
 void    PostQuitMessage(int exit_code);
 LRESULT DefWindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
-HHOOK   SetWindowsHookEx(int id, HOOKPROC proc, HINSTANCE instance, DWORD thread_id);
-BOOL    UnhookWindowsHookEx(HHOOK hook);
-LRESULT CallNextHookEx(HHOOK hook, int code, WPARAM wparam, LPARAM lparam);
-UINT    MapVirtualKey(UINT code, UINT map_type);
 // multimedia
 DWORD    timeGetTime();
 MMRESULT waveOutOpen(LPHWAVEOUT handle, UINT device, const WAVEFORMATEX *format, DWORD_PTR callback,
@@ -671,10 +611,6 @@ MMRESULT mixerGetLineInfo(HMIXEROBJ mixer, MIXERLINE *line, DWORD flags);
 MMRESULT mixerGetLineControls(HMIXEROBJ mixer, MIXERLINECONTROLS *controls, DWORD flags);
 MMRESULT mixerGetControlDetails(HMIXEROBJ mixer, MIXERCONTROLDETAILS *details, DWORD flags);
 MMRESULT mixerSetControlDetails(HMIXEROBJ mixer, MIXERCONTROLDETAILS *details, DWORD flags);
-UINT     joyGetNumDevs();
-MMRESULT joyGetDevCaps(UINT id, JOYCAPS *caps, UINT size);
-MMRESULT joyGetPos(UINT id, JOYINFO *info);
-MMRESULT joyGetPosEx(UINT id, JOYINFOEX *info);
 MCIERROR mciSendCommand(MCIDEVICEID id, UINT msg, DWORD_PTR flags, DWORD_PTR param);
 BOOL     mciGetErrorString(MCIERROR error, LPSTR text, UINT size);
 

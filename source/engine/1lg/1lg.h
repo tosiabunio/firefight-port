@@ -19,6 +19,8 @@
 
 #define DATE_STAMP char Comm::date_stamp[]=__DATE__ " " __TIME__
 
+union SDL_Event;  // port: see Comm::input_proc
+
 #define LOG_INFO               if(Log::info(__FILE__,__LINE__)==NULL) (void)0; else
 #define LINEUNIQUE2(id,line)   lineunique_##id##_##line
 #define LINEUNIQUE1(id,line)   LINEUNIQUE2(id,line)
@@ -112,6 +114,9 @@ public:
   static void      process_messages (void);
   static void      wait_messages (unsigned ms);
   static void      (*tick_service) (void);
+  // Port: every SDL event goes here too, after the window procedure chain: 1ee's keyboard,
+  // mouse and game controller drivers (were Windows hooks and the winmm joystick API).
+  static void      (*input_proc) (const SDL_Event &event);
   static void      debug_break (void);
   static int       show_message_box (char *text, int ask);
   static char      pref_path[];        // settings, pilots and log; ends with a separator

@@ -1,0 +1,86 @@
+1 flags 00 kbd text "" mouse 0,0 vkey joy
+2 flags 40 kbd text "" mouse 0,0 vkey joy
+250 flags 40 kbd 1c +1c text "" mouse 0,0 vkey c +c joy
+251 flags 00 kbd text "" mouse 0,0 vkey joy
+252 flags 40 kbd text "" mouse 0,0 vkey joy
+253 flags 40 kbd -1c text "" mouse 0,0 vkey -c joy
+254 flags 40 kbd text "" mouse 0,0 vkey joy
+401 flags 40 kbd 1c +1c text "" mouse 0,0 vkey c +c joy
+402 flags 00 kbd text "" mouse 0,0 vkey joy
+403 flags 40 kbd text "" mouse 0,0 vkey joy
+439 flags 40 kbd c8 +c8 text "" mouse 0,0 vkey 3 +3 joy
+440 flags 40 kbd c8 text "" mouse 0,0 vkey 3 joy
+509 flags 40 kbd -c8 text "" mouse 0,0 vkey -3 joy
+510 flags 40 kbd text "" mouse 0,0 vkey joy
+519 flags 40 kbd cb +cb text "" mouse 0,0 vkey 1 +1 joy
+520 flags 40 kbd cb text "" mouse 0,0 vkey 1 joy
+539 flags 40 kbd -cb text "" mouse 0,0 vkey -1 joy
+540 flags 40 kbd text "" mouse 0,0 vkey joy
+549 flags 40 kbd 39 +39 text " " mouse 0,0 vkey 5 +5 joy
+550 flags 40 kbd 39 text "" mouse 0,0 vkey 5 joy
+589 flags 40 kbd -39 text "" mouse 0,0 vkey -5 joy
+590 flags 40 kbd text "" mouse 0,0 vkey joy
+591 flags 40 kbd 10 +10 text "q" mouse 0,0 vkey joy
+592 flags 40 kbd -10 text "" mouse 0,0 vkey joy
+593 flags 40 kbd 2a +2a text "" mouse 0,0 vkey d +d joy
+594 flags 40 kbd 3,2a +3 text "@" mouse 0,0 vkey d,10 +10 joy
+595 flags 40 kbd 2a -3 text "" mouse 0,0 vkey d -10 joy
+596 flags 40 kbd 2a,35 +35 text "?" mouse 0,0 vkey d joy
+597 flags 40 kbd 2a -35 text "" mouse 0,0 vkey d joy
+598 flags 40 kbd 2a,39 +39 text "" mouse 0,0 vkey 5,d +5 joy
+599 flags 40 kbd 2a -39 text "" mouse 0,0 vkey d -5 joy
+600 flags 40 kbd -2a text "" mouse 0,0 vkey -d joy
+601 flags 40 kbd 48 +48 text "" mouse 0,0 vkey 3 +3 joy
+602 flags 40 kbd -48 text "" mouse 0,0 vkey -3 joy
+603 flags 40 kbd 9c +9c text "" mouse 0,0 vkey c +c joy
+604 flags 40 kbd -9c text "" mouse 0,0 vkey -c joy
+605 flags 40 kbd b8 +b8 text "" mouse 0,0 vkey 9 +9 joy
+606 flags 40 kbd -b8 text "" mouse 0,0 vkey -9 joy
+607 flags 40 kbd 4a +4a text "-" mouse 0,0 vkey a +a joy
+608 flags 40 kbd -4a text "" mouse 0,0 vkey -a joy
+609 flags 40 kbd 57 +57 text "" mouse 0,0 vkey joy
+610 flags 41 kbd 57 text "" mouse 0,0 vkey joy
+611 flags 41 kbd -57 text "" mouse 0,0 vkey joy
+612 flags 41 kbd text "" mouse 0,0 vkey joy
+629 flags 41 kbd text "" mouse 280,40 vkey joy
+639 flags 41 kbd text "" mouse 280,40 3 +3 vkey 17 +17 joy
+640 flags 41 kbd text "" mouse 280,40 3 vkey 17 joy
+689 flags 41 kbd text "" mouse 280,40 -3 vkey -17 joy
+690 flags 41 kbd text "" mouse 280,40 vkey joy
+699 flags 41 kbd text "" mouse 280,40 1 +1 vkey 5 +5 joy
+700 flags 41 kbd text "" mouse 280,40 1 vkey 5 joy
+729 flags 41 kbd text "" mouse 280,40 -1 vkey -5 joy
+730 flags 41 kbd text "" mouse 280,40 vkey joy
+734 flags 41 kbd text "" mouse 319,199 vkey joy
+739 flags 41 kbd text "" mouse 319,199 2 +2 vkey joy
+740 flags 41 kbd text "" mouse 319,199 2 vkey joy
+741 flags 41 kbd text "" mouse 319,199 -2 vkey joy
+742 flags 41 kbd text "" mouse 319,199 vkey joy
+749 flags 41 kbd 57 +57 text "" mouse 319,199 vkey joy
+750 flags 42 kbd 57 text "" mouse 319,199 vkey joy
+751 flags 42 kbd -57 text "" mouse 319,199 vkey joy
+752 flags 42 kbd text "" mouse 319,199 vkey joy
+769 flags 42 kbd text "" mouse 319,199 vkey 3 +3 joy 22
+770 flags 42 kbd text "" mouse 319,199 vkey 3 joy 22 prev 22
+829 flags 42 kbd text "" mouse 319,199 vkey -3 joy prev 22
+830 flags 42 kbd text "" mouse 319,199 vkey joy
+839 flags 42 kbd text "" mouse 319,199 vkey 1 +1 joy 20
+840 flags 42 kbd text "" mouse 319,199 vkey 1 joy 20 prev 20
+859 flags 42 kbd text "" mouse 319,199 vkey -1 joy prev 20
+860 flags 42 kbd text "" mouse 319,199 vkey joy
+869 flags 42 kbd text "" mouse 319,199 vkey 6 +6 joy 0
+870 flags 42 kbd text "" mouse 319,199 vkey 6 joy 0 prev 0
+899 flags 42 kbd text "" mouse 319,199 vkey -6 joy prev 0
+900 flags 42 kbd text "" mouse 319,199 vkey joy
+904 flags 42 kbd text "" mouse 319,199 vkey d +d joy 1
+905 flags 42 kbd text "" mouse 319,199 vkey d joy 1,27 prev 1
+906 flags 42 kbd text "" mouse 319,199 vkey d joy 1,25,27 prev 1,27
+907 flags 42 kbd text "" mouse 319,199 vkey d joy 1,3,25,27 prev 1,25,27
+908 flags 42 kbd text "" mouse 319,199 vkey d joy 1,3,4,25,27 prev 1,3,25,27
+909 flags 42 kbd text "" mouse 319,199 vkey d joy 1,3,4,25,27 prev 1,3,4,25,27
+914 flags 42 kbd text "" mouse 319,199 vkey -d joy prev 1,3,4,25,27
+915 flags 42 kbd text "" mouse 319,199 vkey joy
+949 flags 42 kbd 57 +57 text "" mouse 319,199 vkey joy
+950 flags 40 kbd 57 text "" mouse 319,199 vkey joy
+951 flags 40 kbd -57 text "" mouse 319,199 vkey joy
+952 flags 40 kbd text "" mouse 319,199 vkey joy

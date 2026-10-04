@@ -16,6 +16,7 @@ char        Comm::pref_path[_MAX_PATH]="";
 int         Comm::headless=0;
 unsigned    Comm::quit_time=0;
 void        (*Comm::tick_service) (void)=NULL;
+void        (*Comm::input_proc) (const SDL_Event &event)=NULL;
 int         Comm::production=1;
 char        Comm::working_path[_MAX_PATH];
 
@@ -185,6 +186,8 @@ static void dispatch_sdl_event (SDL_Event &event)
         Comm::window_proc(Comm::hwnd,WM_ACTIVATEAPP,FALSE,0);
       break;
   }
+  if(Comm::input_proc)
+    Comm::input_proc(event);
 }
 
 void Comm::process_messages (void)

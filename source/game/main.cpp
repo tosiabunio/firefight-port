@@ -3,7 +3,7 @@
 //
 //   firefight [--data <dir>] [--pref <dir>] [--headless] [--quit-after <s>] [--fullscreen]
 //             [--stretch] [--shots <s>] [--fast] [--shot-every <n>] [--quit-frames <n>]
-//             [--demo <name>] [switch ...]
+//             [--demo <name>] [--input <file>] [switch ...]
 //
 //   --data <dir>      directory holding cwe.ini and the *.dir manifests. Default: "data" next
 //                     to the executable, else the repository's data/ (development builds),
@@ -21,6 +21,8 @@
 //   --quit-frames <n> act as if the window were closed after n frames (quit_frames=<n>)
 //   --demo <name>     play one recorded demo (level1 ... level4C) instead of the title loop,
 //                     then quit (demo=<name>)
+//   --input <file>    play an input script: keys, mouse and a virtual game controller at given
+//                     frames (input_script.cpp)
 //
 // Everything else is passed through as an original engine switch (debug=1, check, ...).
 // The exit code is non-zero when the engine reported a critical error.
@@ -40,6 +42,7 @@
 #endif
 
 int game_main(char *command_line);
+bool input_script_load(const char *file);
 
 namespace fs = std::filesystem;
 
@@ -116,6 +119,7 @@ int main(int argc, char *argv[])
 #endif
   const char *data_dir = nullptr;
   const char *pref_dir = nullptr;
+  const char *input_script = nullptr;
   std::string line = std::string("\"") + argv[0] + "\"";
   for (int i = 1; i < argc; i++)
   {
@@ -138,6 +142,8 @@ int main(int argc, char *argv[])
       line += " quit_frames=" + std::string(argv[++i]);
     else if (arg == "--demo" && i + 1 < argc)
       line += " demo=" + std::string(argv[++i]);
+    else if (arg == "--input" && i + 1 < argc)
+      input_script = argv[++i];
     else if (arg == "--fullscreen")
       line += " fullscreen=1";
     else if (arg == "--stretch")
@@ -145,6 +151,10 @@ int main(int argc, char *argv[])
     else
       line += " " + arg;
   }
+
+  // Before changing to the data directory, so a relative script path means the current one.
+  if (input_script && !input_script_load(input_script))
+    return 2;
 
   const fs::path data = data_dir ? fs::u8path(data_dir) : default_data_dir();
   std::error_code ec;

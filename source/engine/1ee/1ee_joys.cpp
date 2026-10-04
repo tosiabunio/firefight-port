@@ -1,9 +1,11 @@
 #include "1ee_hdrs.h"
+#include <SDL.h>
 
 const int joy_Initialized    = 0x00000010; // Joy zainicjalizowany
 const int joy_Active         = 0x00000001; // Joy zainicjalizowany
 const int joy_OnLine         = 0x00000002; // Joy zainicjalizowany
 const int joy_AfterClear     = 0x00000004; // Joy zainicjalizowany
+const int joy_Subsystem      = 0x00000020; // port: SDL game controller subsystem started
 
 const int evj_1              = 0x00010000; // 1/3 czesc danych joysticka
 const int evj_2              = 0x00020000; // 2/3 czesc danych joysticka
@@ -12,120 +14,126 @@ const int evj_3              = 0x00040000; // 3/3 czesc danych joysticka
 // Joy static variables
 //----------------------------------------------------------------------------
 Bitflag        Joy::status(0);
-JOYCAPS        Joy::caps; 
-unsigned       Joy::dev_number(0xFFFFFFFF); 
-DWORD          Joy::read_flags = JOY_RETURNBUTTONS | JOY_RETURNCENTERED | JOY_USEDEADZONE;
-DWORD          Joy::x_center;
-DWORD          Joy::y_center;
-DWORD          Joy::z_center;
-DWORD          Joy::r_center;
-DWORD          Joy::u_center;
-DWORD          Joy::v_center;
-
-DWORD          Joy::x_dead(0);
-DWORD          Joy::y_dead(0);
-DWORD          Joy::z_dead(0);
-DWORD          Joy::r_dead(0);
-DWORD          Joy::u_dead(0);
-DWORD          Joy::v_dead(0);
+int            Joy::dead(0);
 int            Joy::last_1(0);
 int            Joy::last_2(0);
 int            Joy::last_3(0);
 unsigned       Joy::diag_busy(0);
 char          *Joy::names[JOY_NAMES_SIZE];
+
+// Port: the open device. joystick is set for a game controller too.
+static SDL_GameController *controller=NULL;
+static SDL_Joystick       *joystick=NULL;
+static SDL_JoystickID      joystick_id=-1;
+
+static char *name_or_empty (const char *name)
+{
+  return((char*)(name ?name :""));
+}
 //===========================================================================
 // Joy
 //===========================================================================
+// Port: the dead zone is a percentage of the axis range on either side of the centre, as with
+// winmm's (max-min)*percent/100. SDL axes run from -32768 to 32767, centred on 0.
 void Joy::set_dead_zone (int dead_percent)
 {
-  if (caps.wNumAxes > 0)
-  {
-    read_flags |= JOY_RETURNX; 
-    x_center = (caps.wXmax + caps.wXmin + 1)/2;
-    x_dead = ((caps.wXmax - caps.wXmin) * dead_percent)/100;
-  }
-  if (caps.wNumAxes > 1)
-  {
-    read_flags |= JOY_RETURNY; 
-    y_center = (caps.wYmax + caps.wYmin + 1)/2;
-    y_dead = ((caps.wYmax - caps.wYmin) * dead_percent)/100;
-  }
-  if (caps.wNumAxes > 2)
-  {
-    read_flags |= JOY_RETURNZ; 
-    z_center = (caps.wZmax + caps.wZmin + 1)/2;
-    z_dead = ((caps.wZmax - caps.wZmin) * dead_percent)/100;
-  }
-  if (caps.wNumAxes > 3)
-  {
-    read_flags |= JOY_RETURNR; 
-    r_center = (caps.wRmax + caps.wRmin + 1)/2;
-    r_dead = ((caps.wRmax - caps.wRmin) * dead_percent)/100;
-  }
-  if (caps.wNumAxes > 4)
-  {
-    read_flags |= JOY_RETURNU; 
-    u_center = (caps.wUmax + caps.wUmin + 1)/2;
-    u_dead = ((caps.wUmax - caps.wUmin) * dead_percent)/100;
-  }
-  if (caps.wNumAxes > 5)
-  {
-    read_flags |= JOY_RETURNV; 
-    v_center = (caps.wVmax + caps.wVmin + 1)/2;
-    v_dead = ((caps.wVmax - caps.wVmin) * dead_percent)/100;
-  }
+  dead = (65535 * dead_percent)/100;
 }
 //---------------------------------------------------------------------------
+// Port: the first SDL joystick or game controller (was the first winmm joystick). Devices can be
+// plugged in later (sdl_event).
 void Joy::init (int dead_percent)
 {
   status.set(joy_Initialized);
   init_ref();
-  UINT joy_num = joyGetNumDevs();
-  JOYCAPS jc;
-  JOYINFO ji;
-  MMRESULT res_jc, res_ji;
-  BOOL found = FALSE;
+  set_dead_zone(dead_percent);
   SYSINFO("joystick driver capabilities");
-  SYSINFO("  %d joysticks supported", joy_num);
-  for (unsigned i=0; i<joy_num; i++)
+  // Headless runs (tests) ignore real devices. Only an input script's virtual controller, whose
+  // subsystem is started by then, is opened (usable).
+  if (Comm::headless&&!SDL_WasInit(SDL_INIT_GAMECONTROLLER))
   {
-    res_ji = joyGetPos(i, &ji);
-    res_jc = joyGetDevCaps(i, &jc, sizeof(JOYCAPS));
-    if ((res_ji==JOYERR_NOERROR)&&(res_ji==JOYERR_NOERROR))
-    {
-      SYSINFO("  joystick #%d found",i);
-      SYSINFO("    product name :'%s'", jc.szPname);
-      SYSINFO("    registry key : '%s'", jc.szRegKey);
-      SYSINFO("    driver OEM : '%s'", jc.szOEMVxD);
-      SYSINFO("    axes max/now : %d/%d", jc.wMaxAxes, jc.wNumAxes);
-      if (jc.wNumAxes > 0)
-        SYSINFO("    %c min/max : %d/%d", 'X', jc.wXmin, jc.wXmax);
-      if (jc.wNumAxes > 1)
-        SYSINFO("    %c min/max : %d/%d", 'Y', jc.wYmin, jc.wYmax);
-      if (jc.wNumAxes > 2)
-        SYSINFO("    %c min/max : %d/%d", 'Z', jc.wZmin, jc.wZmax);
-      if (jc.wNumAxes > 3)
-        SYSINFO("    %c min/max : %d/%d", 'R', jc.wRmin, jc.wRmax);
-      if (jc.wNumAxes > 4)
-        SYSINFO("    %c min/max : %d/%d", 'U', jc.wUmin, jc.wUmax);
-      if (jc.wNumAxes > 5)
-        SYSINFO("    %c min/max : %d/%d", 'V', jc.wVmin, jc.wVmax);
-      SYSINFO("    buttons num : %d", jc.wNumButtons);
-      SYSINFO("    polling min/max : %d/%d ms", jc.wPeriodMin, jc.wPeriodMax);
-      if (dev_number==0xFFFFFFFF)  // Will use first available joystick
-      {
-        dev_number = i;
-        caps = jc;
-        status.set(joy_Active);
-        set_dead_zone(dead_percent);
-      }
-      found = TRUE;
-    }
+    SYSINFO("  not used when headless");
+    return;
   }
-  if (!found)
-    SYSINFO("  no joysticks found");
+  if (SDL_InitSubSystem(SDL_INIT_GAMECONTROLLER)!=0)
+  {
+    SYSINFO("  SDL game controllers unavailable: %s", (char*)SDL_GetError());
+    return;
+  }
+  status.set(joy_Subsystem);
+  int joy_num = SDL_NumJoysticks();
+  SYSINFO("  %d joysticks found", joy_num);
+  for (int i=0; i<joy_num; i++)
+  {
+    SYSINFO("  joystick #%d: '%s'%s", i, name_or_empty(SDL_JoystickNameForIndex(i)),
+            SDL_IsGameController(i) ?", game controller" :"");
+    if (!status.is(joy_Active))
+      open_device(i);
+  }
+}
+//---------------------------------------------------------------------------
+static int usable (int index)
+{
+  return (!Comm::headless||SDL_JoystickIsVirtual(index));
+}
+//---------------------------------------------------------------------------
+void Joy::open_device (int index)
+{
+  if (!usable(index))
+    return;
+  if (SDL_IsGameController(index))
+  {
+    controller = SDL_GameControllerOpen(index);
+    joystick = controller ?SDL_GameControllerGetJoystick(controller) :NULL;
+  }
   else
-    MESSAGE("joystick connected");
+    joystick = SDL_JoystickOpen(index);
+  if (joystick==NULL)
+  {
+    controller = NULL;
+    SYSINFO("  joystick #%d not opened: %s", index, (char*)SDL_GetError());
+    return;
+  }
+  joystick_id = SDL_JoystickInstanceID(joystick);
+  if (controller)
+    SYSINFO("    game controller '%s'", name_or_empty(SDL_GameControllerName(controller)));
+  else
+    SYSINFO("    axes %d, buttons %d, hats %d", SDL_JoystickNumAxes(joystick),
+            SDL_JoystickNumButtons(joystick), SDL_JoystickNumHats(joystick));
+  status.set(joy_Active);
+  MESSAGE("joystick connected");
+}
+//---------------------------------------------------------------------------
+void Joy::close_device (void)
+{
+  if (controller)
+    SDL_GameControllerClose(controller);
+  else if (joystick)
+    SDL_JoystickClose(joystick);
+  controller = NULL;
+  joystick = NULL;
+  joystick_id = -1;
+  status.reset(joy_Active);
+}
+//---------------------------------------------------------------------------
+// Port: hot plugging. The original read one joystick found at start and dropped it on an error.
+void Joy::sdl_event (const SDL_Event &e)
+{
+  if (!status.is(joy_Subsystem))
+    return;
+  if ((e.type==SDL_JOYDEVICEADDED)&&!status.is(joy_Active))  // sent for game controllers too
+    open_device(e.jdevice.which);
+  else if ((e.type==SDL_JOYDEVICEREMOVED)&&status.is(joy_Active)&&(e.jdevice.which==joystick_id))
+  {
+    MESSAGE("Joystick disconected");
+    // Release whatever it held; the original kept its last state.
+    unsigned char joy_state[JOY_ARRAY_SIZE];
+    memset(joy_state, 0, JOY_ARRAY_SIZE);
+    push_state(joy_state);
+    close_device();
+    for (int i=0; (i<SDL_NumJoysticks())&&!status.is(joy_Active); i++)
+      open_device(i);
+  }
 }
 //---------------------------------------------------------------------------
 void Joy::init_ref(void)
@@ -181,8 +189,70 @@ void Joy::init_ref(void)
 void Joy::quit (void)
 {
   ENGINFO("joystick status: queue overflown %d", diag_busy);
+  close_device();
+  if (status.is(joy_Subsystem))
+    SDL_QuitSubSystem(SDL_INIT_GAMECONTROLLER);
+  status.reset(joy_Subsystem);
   status.reset(joy_Active);
   status.reset(joy_Initialized);
+}
+//----------------------------------------------------------------------------
+// Port: an axis outside the dead zone sets its minus or plus bit (as the winmm position compared
+// with centre-dead and centre+dead).
+static void axis_bits (unsigned char *joy_state, int value, int minus, int dead)
+{
+  if (value < -dead)
+    Bit::set(joy_state, minus);
+  else if (value > dead)
+    Bit::set(joy_state, minus+1);
+}
+//----------------------------------------------------------------------------
+// Port: was joyGetPosEx. A game controller reads as an Xbox pad did through winmm: X/Y the left
+// stick, Z the triggers (left is plus), R/U the right stick, and buttons 1-10 A, B, X, Y, the
+// shoulders, Back, Start and the stick clicks. Its D-pad, a POV hat the original didn't read,
+// also sets the X/Y bits, and so does a plain joystick's first hat.
+static void read_device (unsigned char *joy_state, int dead)
+{
+  if (controller)
+  {
+    static const SDL_GameControllerButton buttons[] = {
+      SDL_CONTROLLER_BUTTON_A, SDL_CONTROLLER_BUTTON_B, SDL_CONTROLLER_BUTTON_X,
+      SDL_CONTROLLER_BUTTON_Y, SDL_CONTROLLER_BUTTON_LEFTSHOULDER,
+      SDL_CONTROLLER_BUTTON_RIGHTSHOULDER, SDL_CONTROLLER_BUTTON_BACK,
+      SDL_CONTROLLER_BUTTON_START, SDL_CONTROLLER_BUTTON_LEFTSTICK,
+      SDL_CONTROLLER_BUTTON_RIGHTSTICK};
+    for (int i=0; i<(int)(sizeof(buttons)/sizeof(buttons[0])); i++)
+      if (SDL_GameControllerGetButton(controller, buttons[i]))
+        Bit::set(joy_state, Joy::button1+i);
+    axis_bits(joy_state, SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_LEFTX), Joy::x_minus, dead);
+    axis_bits(joy_state, SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_LEFTY), Joy::y_minus, dead);
+    axis_bits(joy_state, SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_TRIGGERLEFT)-
+                         SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_TRIGGERRIGHT), Joy::z_minus, dead);
+    axis_bits(joy_state, SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_RIGHTY), Joy::r_minus, dead);
+    axis_bits(joy_state, SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_RIGHTX), Joy::u_minus, dead);
+    if (SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_DPAD_LEFT))  Bit::set(joy_state, Joy::x_minus);
+    if (SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_DPAD_RIGHT)) Bit::set(joy_state, Joy::x_plus);
+    if (SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_DPAD_UP))    Bit::set(joy_state, Joy::y_minus);
+    if (SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_DPAD_DOWN))  Bit::set(joy_state, Joy::y_plus);
+  }
+  else
+  {
+    int buttons = SDL_min(SDL_JoystickNumButtons(joystick), 32);
+    for (int i=0; i<buttons; i++)
+      if (SDL_JoystickGetButton(joystick, i))
+        Bit::set(joy_state, Joy::button1+i);
+    int axes = SDL_min(SDL_JoystickNumAxes(joystick), 6);
+    for (int i=0; i<axes; i++)
+      axis_bits(joy_state, SDL_JoystickGetAxis(joystick, i), Joy::x_minus+2*i, dead);
+    if (SDL_JoystickNumHats(joystick)>0)
+    {
+      Uint8 hat = SDL_JoystickGetHat(joystick, 0);
+      if (hat&SDL_HAT_LEFT)  Bit::set(joy_state, Joy::x_minus);
+      if (hat&SDL_HAT_RIGHT) Bit::set(joy_state, Joy::x_plus);
+      if (hat&SDL_HAT_UP)    Bit::set(joy_state, Joy::y_minus);
+      if (hat&SDL_HAT_DOWN)  Bit::set(joy_state, Joy::y_plus);
+    }
+  }
 }
 //----------------------------------------------------------------------------
 void Joy::callback_joy (void)
@@ -197,85 +267,38 @@ void Joy::callback_joy (void)
   status.set(joy_OnLine);
   unsigned char joy_state[JOY_ARRAY_SIZE];
   memset(joy_state, 0, JOY_ARRAY_SIZE);
-  JOYINFOEX ji;
-  memset(&ji, 0, sizeof(ji));
-  ji.dwSize = sizeof(ji);
-  ji.dwFlags = read_flags;
-  MMRESULT res = joyGetPosEx(JOYSTICKID1, &ji);
-  if (res!=MMSYSERR_NOERROR)
-  {
-    MESSAGE("Joystick disconected");
-    status.reset(joy_Active);
-  }
-  else
-  {
-    memcpy(joy_state, &ji.dwButtons, 4);
-    if (caps.wNumAxes>0)
-    {
-      if (ji.dwXpos < x_center - x_dead)
-        Bit::set(joy_state, x_minus);
-      else if (ji.dwXpos > x_center + x_dead)
-        Bit::set(joy_state, x_plus);
-      if (caps.wNumAxes>1)
-      {
-        if (ji.dwYpos < y_center - y_dead)
-          Bit::set(joy_state, y_minus);
-        else if (ji.dwYpos > y_center + y_dead)
-          Bit::set(joy_state, y_plus);
-        if (caps.wNumAxes>2)
-        {
-          if (ji.dwZpos < z_center - z_dead)
-            Bit::set(joy_state, z_minus);
-          else if (ji.dwZpos > z_center + z_dead)
-            Bit::set(joy_state, z_plus);
-          if (caps.wNumAxes>3)
-          {
-            if (ji.dwRpos < r_center - r_dead)
-              Bit::set(joy_state, r_minus);
-            else if (ji.dwRpos > r_center + r_dead)
-              Bit::set(joy_state, r_plus);
-            if (caps.wNumAxes>4)
-            {
-              if (ji.dwUpos < u_center - u_dead)
-                Bit::set(joy_state, u_minus);
-              else if (ji.dwUpos > u_center + u_dead)
-                Bit::set(joy_state, u_plus);
-              if (caps.wNumAxes>5)
-              {
-                if (ji.dwVpos < v_center - v_dead)
-                  Bit::set(joy_state, v_minus);
-                else if (ji.dwVpos > v_center + v_dead)
-                  Bit::set(joy_state, v_plus);
-              }
-            }
-          }
-        }
-      }
-    }
-    int event;
-    event = ev_Joy | evj_1;
-    event |= (*((short*)(&(joy_state[0]))));
-    if (event!=last_1)
-    {
-      last_1 = event;
-      Eem::push_event(event);
-    }
-    event = ev_Joy | evj_2;
-    event |= (*((short*)(&(joy_state[2]))));
-    if (event!=last_2)
-    {
-      last_2 = event;
-      Eem::push_event(event);
-    }
-    event = ev_Joy | evj_3;
-    event |= (*((short*)(&(joy_state[4]))));
-    if (event!=last_3)
-    {
-      last_3 = event;
-      Eem::push_event(event);
-    }
-  }
+  read_device(joy_state, dead);
+  push_state(joy_state);
   status.reset(joy_OnLine);
+}
+//----------------------------------------------------------------------------
+// Port: split out of callback_joy.
+void Joy::push_state (unsigned char *joy_state)
+{
+  // Port: the halves are (unsigned short), were (short). Sign extension set every event bit when
+  // button 16 or 32 was down, and the event then passed for a key or a tick.
+  int event;
+  event = ev_Joy | evj_1;
+  event |= (unsigned short)(*((short*)(&(joy_state[0]))));
+  if (event!=last_1)
+  {
+    last_1 = event;
+    Eem::push_event(event);
+  }
+  event = ev_Joy | evj_2;
+  event |= (unsigned short)(*((short*)(&(joy_state[2]))));
+  if (event!=last_2)
+  {
+    last_2 = event;
+    Eem::push_event(event);
+  }
+  event = ev_Joy | evj_3;
+  event |= (unsigned short)(*((short*)(&(joy_state[4]))));
+  if (event!=last_3)
+  {
+    last_3 = event;
+    Eem::push_event(event);
+  }
 }
 //----------------------------------------------------------------------------
 void  Joy::next_read (void)

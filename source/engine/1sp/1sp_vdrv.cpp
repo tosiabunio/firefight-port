@@ -55,6 +55,7 @@ void    VD_none::clear_screen (HDC hdc)
 static SDL_Window   *sdl_window;
 static SDL_Renderer *sdl_renderer;
 static SDL_Texture  *sdl_texture;
+static RECT          mouse_rect;   // the picture's area in the window, as last given to the mouse
 
 // The 20 colours Windows reserved in an 8-bit palette. The DirectDraw device kept them at
 // indices 0-9 and 246-255 (GetSystemPaletteEntries), so those indices always showed these
@@ -105,6 +106,7 @@ void    VD_sdl::init(int x, int y)
 {
   width=x;
   height=y;
+  memset(&mouse_rect,0,sizeof(mouse_rect));  // Video::get_screen gave the framebuffer area
   screen_buf=(unsigned char*)Heap::alloc(x*y,"main screen");
   if(sdl_renderer)
   {
@@ -206,6 +208,24 @@ void    VD_sdl::present (void)
   SDL_RenderClear(sdl_renderer);
   SDL_RenderCopy(sdl_renderer,sdl_texture,NULL,&dst);
   SDL_RenderPresent(sdl_renderer);
+
+  // The mouse works in window coordinates, which differ from the renderer's pixels on high-DPI
+  // displays. Its clip rectangle is the picture (the original's was the full screen display).
+  int win_w,win_h;
+  SDL_GetWindowSize(sdl_window,&win_w,&win_h);
+  if((out_w>0)&&(out_h>0))
+  {
+    RECT rc;
+    rc.left  =(LONG)((long long)dst.x*win_w/out_w);
+    rc.right =(LONG)((long long)(dst.x+dst.w)*win_w/out_w);
+    rc.top   =(LONG)((long long)dst.y*win_h/out_h);
+    rc.bottom=(LONG)((long long)(dst.y+dst.h)*win_h/out_h);
+    if((rc.right>rc.left)&&(rc.bottom>rc.top)&&memcmp(&rc,&mouse_rect,sizeof(rc)))
+    {
+      mouse_rect=rc;
+      Comm::reinit_mouse(&rc,screen_sx,screen_sy);
+    }
+  }
 }
 
 // Saves the frame as it would be shown (after the palette) when Video::shot_interval is due.
@@ -257,6 +277,8 @@ void    VD_sdl::show_screen (HDC hdc)
   Video::frames++;
   dump_frame();
   present();
+  if(Video::frame_proc)
+    Video::frame_proc(Video::frames);
   if((Video::quit_frames>0)&&(Video::frames==Video::quit_frames))
   {
     SDL_Event quit;

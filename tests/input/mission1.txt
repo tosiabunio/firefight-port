@@ -1,0 +1,78 @@
+# Input script for the input_play test (see source/game/input_script.cpp for the format).
+# From the title it starts the first mission (GREEN 6, "Static") and flies it with each control
+# set in turn: keyboard, then F11 to mouse steering, then F11 to the game controller, then F11
+# back to the keyboard. With --fast the frames match the simulation steps one to one.
+
+# Title: Return opens the mission screen, a second Return starts the mission.
+250 key Return down
+252 key Return up
+400 key Return down
+402 key Return up
+
+# Keyboard: forward (gray Up), turn left (gray Left), fire (Space).
+450 log keyboard
+450 key Up down
+520 key Up up
+530 key Left down
+550 key Left up
+560 key Space down
+600 key Space up
+
+# Keys and their text: letters, digits and punctuation, with and without Shift; keypad and
+# extended keys (set-1 scan codes, +128 for E0); a shifted key with no shifted character.
+602 key Q down
+603 key Q up
+604 key Left Shift down
+605 key 2 down
+606 key 2 up
+607 key / down
+608 key / up
+609 key Space down
+610 key Space up
+611 key Left Shift up
+612 key Keypad 8 down
+613 key Keypad 8 up
+614 key Keypad Enter down
+615 key Keypad Enter up
+616 key Right Alt down
+617 key Right Alt up
+618 key Keypad - down
+619 key Keypad - up
+
+# F11: mouse steering. The right button flies to the pointer, the left button fires.
+620 key F11 down
+622 key F11 up
+640 log mouse
+640 mouse 560 80
+650 mouse right down
+700 mouse right up
+710 mouse left down
+740 mouse left up
+745 mouse 700 450
+750 mouse middle down
+752 mouse middle up
+
+# F11: game controller. D-pad and left stick steer, A fires, B is turbo.
+760 key F11 down
+762 key F11 up
+780 log pad
+780 pad dpup down
+840 pad dpup up
+850 pad leftx -32768
+870 pad leftx 0
+880 pad a down
+910 pad a up
+915 pad b down
+916 pad righty 32767
+917 pad lefttrigger 32767
+918 pad y down
+919 pad leftshoulder down
+925 pad b up
+925 pad righty 0
+925 pad lefttrigger 0
+925 pad y up
+925 pad leftshoulder up
+
+# F11: keyboard again.
+960 key F11 down
+962 key F11 up

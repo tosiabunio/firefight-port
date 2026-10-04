@@ -184,7 +184,8 @@ void SysSet::action(SysSet::SetType type)
   DBG_CHECK(type>_FIRST&&type<_LAST);
   switch (type)
   {
-      case INPUT_DEVICE: switch (data[type])
+      case INPUT_DEVICE: Mouse::set_relative(data[type]==1);  // port: mouse steering captures the mouse
+                         switch (data[type])
                          {
                            case 0: RegData::SetCurrentControlSet(RegData::ctlset_Kbd);
                                    break;

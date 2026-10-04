@@ -1,4 +1,5 @@
 #include "1ee_hdrs.h"
+#include <SDL.h>
 
 //----------------------------------------------------------------------------
 // Mouse buttons
@@ -26,64 +27,128 @@ const int mouse_Initialized  = 0x00000010; // Mouse zainicjalizowana
 // Mouse static variables
 //----------------------------------------------------------------------------
 Bitflag       Mouse::status(0);
-HHOOK         Mouse::hook_handler(NULL);
 int           Mouse::last_x;
 int           Mouse::last_y;
-HWND          Mouse::hwnd=NULL;
 unsigned char Mouse::ref[MOUSE_REF_SIZE];
 char         *Mouse::names[MOUSE_NAMES_SIZE];
 int           Mouse::screen_sx(0);
 int           Mouse::screen_sy(0);
 RECT          Mouse::cr;
 RECT         *Mouse::clip_rect=NULL;
+int           Mouse::pointer_x(0);
+int           Mouse::pointer_y(0);
+int           Mouse::moved(0);
+int           Mouse::relative(0);
 //===========================================================================
 // Mouse methods
 //===========================================================================
-LRESULT CALLBACK Mouse::callback_mouse (int nCode, WPARAM wParam, LPARAM lParam)
+// Port: was callback_mouse, the WH_MOUSE hook, which pushed the pointer position with every mouse
+// message. Windows coalesced the moves into one message, so the position is now pushed once per
+// batch of events (flush) and before each button. The window class had no CS_DBLCLKS, so
+// Windows never sent double clicks.
+void Mouse::sdl_event (const SDL_Event &e)
 {
-  MOUSEHOOKSTRUCT *mh = (MOUSEHOOKSTRUCT*)lParam;
+  switch (e.type)
+  {
+    case SDL_MOUSEMOTION:
+      if (SDL_GetRelativeMouseMode())
+      {
+        // The hidden pointer stays on the picture (was SetCursorPos in complete).
+        pointer_x+=e.motion.xrel;
+        pointer_y+=e.motion.yrel;
+        if (clip_rect)
+        {
+          pointer_x=SDL_clamp(pointer_x,(int)clip_rect->left,(int)clip_rect->right-1);
+          pointer_y=SDL_clamp(pointer_y,(int)clip_rect->top,(int)clip_rect->bottom-1);
+        }
+      }
+      else
+      {
+        pointer_x=e.motion.x;
+        pointer_y=e.motion.y;
+      }
+      moved=1;
+      break;
+    case SDL_MOUSEBUTTONDOWN:
+    case SDL_MOUSEBUTTONUP:
+    {
+      int event=ev_Mouse;
+      int action=(e.type==SDL_MOUSEBUTTONDOWN) ?evm_Down :evm_Up;
+      switch (e.button.button)
+      {
+        case SDL_BUTTON_LEFT:   event|=(action|mb_Left);   break;
+        case SDL_BUTTON_MIDDLE: event|=(action|mb_Middle); break;
+        case SDL_BUTTON_RIGHT:  event|=(action|mb_Right);  break;
+      }
+      if (!SDL_GetRelativeMouseMode())
+      {
+        pointer_x=e.button.x;
+        pointer_y=e.button.y;
+      }
+      push_position();
+      if (event!=ev_Mouse)
+        Eem::push_event(event);
+      break;
+    }
+    case SDL_WINDOWEVENT:
+      if ((e.window.event==SDL_WINDOWEVENT_FOCUS_GAINED)||
+          (e.window.event==SDL_WINDOWEVENT_FOCUS_LOST))
+        update_relative();
+      break;
+  }
+}
+//---------------------------------------------------------------------------
+void Mouse::push_position (void)
+{
   int event;
   event=(ev_Mouse|evm_NewX);
-  if (mh->pt.x>0)
-    event|=(unsigned short)mh->pt.x;
+  if (pointer_x>0)
+    event|=(unsigned short)pointer_x;
   Eem::push_event(event);
   event=(ev_Mouse|evm_NewY);
-  if (mh->pt.y>0)
-    event|=(unsigned short)mh->pt.y;
+  if (pointer_y>0)
+    event|=(unsigned short)pointer_y;
   Eem::push_event(event);
-  event=ev_Mouse;
-  switch (wParam)
-  {
-    case WM_LBUTTONDBLCLK: event|=(evm_DblClk|mb_Left);   break;
-    case WM_LBUTTONDOWN:   event|=(evm_Down  |mb_Left);   break;
-    case WM_LBUTTONUP:     event|=(evm_Up    |mb_Left);   break;
-    case WM_MBUTTONDBLCLK: event|=(evm_DblClk|mb_Middle); break;
-    case WM_MBUTTONDOWN:   event|=(evm_Down  |mb_Middle); break;
-    case WM_MBUTTONUP:     event|=(evm_Up    |mb_Middle); break;
-    case WM_RBUTTONDBLCLK: event|=(evm_DblClk|mb_Right);  break;
-    case WM_RBUTTONDOWN:   event|=(evm_Down  |mb_Right);  break;
-    case WM_RBUTTONUP:     event|=(evm_Up    |mb_Right);  break;
-  }
-  if (event!=ev_Mouse)
-    Eem::push_event(event);
-  if (nCode<0)
-    return(CallNextHookEx(hook_handler, nCode, wParam, lParam));
-  else
-    return(0);
+  moved=0;
+}
+//---------------------------------------------------------------------------
+// Port: Eem calls this before it queues a tick and after each message pump.
+void Mouse::flush (void)
+{
+  if (moved)
+    push_position();
+}
+//---------------------------------------------------------------------------
+// Port: relative mode hides the pointer and keeps it in the window, as the full screen original
+// did, so mouse steering can't click outside. It is on only while the window has focus.
+void Mouse::set_relative (int on)
+{
+  relative=on;
+  update_relative();
+}
+//---------------------------------------------------------------------------
+void Mouse::update_relative (void)
+{
+  if (Comm::headless||!status.is(mouse_Initialized))
+    return;
+  SDL_Window *window=SDL_GetKeyboardFocus();
+  SDL_bool want=(relative&&window) ?SDL_TRUE :SDL_FALSE;
+  if (SDL_GetRelativeMouseMode()==want)
+    return;
+  SDL_SetRelativeMouseMode(want);
+  // Leaving it, put the system pointer where the game's was.
+  if (!want&&window)
+    SDL_WarpMouseInWindow(window,pointer_x,pointer_y);
 }
 //---------------------------------------------------------------------------
 void Mouse::init (void)
 {
   DBG_CHECK(!status.is(mouse_Initialized));
-  hwnd = Comm::hwnd;
   Comm::reinit_mouse = Mouse::set_ex_param;
   status.set(mouse_Initialized);
   clear();
   init_ref();
-  hook_handler = SetWindowsHookEx(WH_MOUSE, (HOOKPROC)Mouse::callback_mouse,
-                                  NULL, Eem::get_thread());
-  if (hook_handler==NULL)
-    FAILURE2(Eem_error::general, "unable to hook mouse [Mouse::init]");
+  update_relative();
   MESSAGE ("mouse connected.");
 }
 //---------------------------------------------------------------------------
@@ -100,31 +165,13 @@ void Mouse::goto_xy(int x, int y)
     {
       y=((clip_rect->bottom-clip_rect->top)*y)/screen_sy;
       y = y+clip_rect->top;
-    } 
-  }
-  else
-  {
-    RECT r;
-    POINT pt;
-    GetClientRect(hwnd, &r);
-    pt.x=0; pt.y=0;
-    ClientToScreen(hwnd, &pt); 
-    r.left   +=pt.x; 
-    r.right  +=pt.x;
-    r.top    +=pt.y;
-    r.bottom +=pt.y;
-    if (screen_sx)
-    {
-      x = ((r.right-r.left)*x)/screen_sx;
-      x = x+r.left;
-    }
-    if (screen_sy)
-    {
-      y = ((r.bottom-r.top)*y)/screen_sy;
-      y = y+r.top;
     }
   }
-  SetCursorPos(x,y);
+  // Port: was SetCursorPos, with the window's client area when there was no clip rectangle.
+  pointer_x = x;
+  pointer_y = y;
+  if (!Comm::headless&&!SDL_GetRelativeMouseMode()&&SDL_GetMouseFocus())
+    SDL_WarpMouseInWindow(SDL_GetMouseFocus(),x,y);
   last_x = x;
   last_y = y;
 }
@@ -142,6 +189,18 @@ void Mouse::set_ex_param (RECT *rc, int sx, int sy)
 {
   if (rc)
   {
+    // Port: the picture changes place in the window when it is resized. Keep the pointer on the
+    // same spot of it (the first time, in its centre).
+    if (clip_rect&&(cr.right>cr.left)&&(cr.bottom>cr.top))
+    {
+      pointer_x=rc->left+(pointer_x-cr.left)*(rc->right-rc->left)/(cr.right-cr.left);
+      pointer_y=rc->top+(pointer_y-cr.top)*(rc->bottom-rc->top)/(cr.bottom-cr.top);
+    }
+    else
+    {
+      pointer_x=(rc->left+rc->right)/2;
+      pointer_y=(rc->top+rc->bottom)/2;
+    }
     cr = *rc;
     clip_rect = &cr;
     if (!Comm::production)
@@ -152,16 +211,18 @@ void Mouse::set_ex_param (RECT *rc, int sx, int sy)
     clip_rect = NULL;
   screen_sx = sx;
   screen_sy = sy;
-  if (rc)
-    ShowCursor(FALSE);
+  if (rc&&!Comm::headless)
+    SDL_ShowCursor(SDL_DISABLE);
 }
 //---------------------------------------------------------------------------
 void Mouse::quit (void)
 {
-  UnhookWindowsHookEx(hook_handler);
   status = 0;
-  hook_handler = NULL;
-  ShowCursor(TRUE); 
+  if (!Comm::headless)
+  {
+    SDL_SetRelativeMouseMode(SDL_FALSE);
+    SDL_ShowCursor(SDL_ENABLE);
+  }
   MESSAGE ("mouse disconnected");
 }
 //---------------------------------------------------------------------------
@@ -358,36 +419,16 @@ void Mouse::complete (void)
       my=clip_rect->bottom-1;
     else
       my=last_y;
-    if ((mx!=last_x)||(my!=last_y))
-      SetCursorPos(mx, my);
+    // Port: SetCursorPos dropped here. In relative mode the pointer is already kept on the
+    // picture (sdl_event); a visible system pointer in a window is left where it is.
     mx=((mx-clip_rect->left)*screen_sx)/(clip_rect->right-clip_rect->left);
     my=((my-clip_rect->top)*screen_sy)/(clip_rect->bottom-clip_rect->top);
   }
   else
   {
-    RECT r;
-    POINT pt;
-    GetClientRect(hwnd, &r);
-    pt.x=0; pt.y=0;
-    ClientToScreen(hwnd, &pt); 
-    r.left   +=pt.x; 
-    r.right  +=pt.x;
-    r.top    +=pt.y;
-    r.bottom +=pt.y;
-    if (last_x<r.left)
-      mx=r.left;
-    else if (last_x>=r.right)
-      mx=r.right-1;
-    else
-      mx=last_x;
-    if (last_y<r.top)
-      my=r.top;
-    else if (last_y>=r.bottom)
-      my=r.bottom-1;
-    else
-      my=last_y;
-    mx=((mx-r.left)*screen_sx)/(r.right-r.left);
-    my=((my-r.top)*screen_sy)/(r.bottom-r.top);
+    // Port: no picture yet (was the window's client area).
+    mx=0;
+    my=0;
   }
   st->x = (short)mx;
   st->y = (short)my;

@@ -362,6 +362,7 @@ void Cwe::init (Cwe_param *param)
     // Port: fast=1 runs without the clock. Eem then makes one simulation step per frame, as
     // fast as possible, so a run is the same frame for frame (for tests and replays).
     Eem::untimed = Cmd_line::get_int("fast",0);
+    Eem::dump = Cmd_line::get_int("input_dump",0);  // port: see Eem::dump_state
     Eem::init(text.value(eem_queue_size),
               text.value(eem_timer_frequency), 
               text.value(eem_net_supported),
