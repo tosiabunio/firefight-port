@@ -2,7 +2,7 @@
 
 The Mac (Apple Silicon) builds and tests the port. It doesn't have the original archive: that stays on the Windows PC (see [original-archive.md](original-archive.md#working-without-the-archive)). Everything the archive proves is in the repository as golden files and test vectors.
 
-One-time setup (tools, vcpkg, clone): see "Quick start on macOS" in `README.md`.
+One-time setup (tools, vcpkg, clone): see "Quick start on macOS" in [`porting.md`](porting.md).
 
 ## Checking a branch before it goes to `main`
 

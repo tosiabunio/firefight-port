@@ -9,7 +9,7 @@ This repo is the porting basis for **Fire Fight** (Chaos Works, 1996), a Win95/D
 - the game data, with hires art only,
 - the CD soundtrack as FLAC.
 
-Everything was selected by rule from the original archive. `README.md` documents the provenance, the selection rules, what was left out, and the full data, sprite and music details. Comments and many identifiers are in Polish.
+Everything was selected by rule from the original archive. `README.md` is about the game, for the public repository: its history, the rights situation, screenshots, building, playing, credits and the license. `docs/porting.md` documents the port: its status, the repository contents, the provenance, the selection rules, what was left out, and the full data, sprite and music details. Comments and many identifiers are in Polish.
 
 - **Version 1.1 only.** This source is v1.1 (Aug 1996). The retail CD is 1.2, but it differs only in the executables (its `PARAMS.VOL` repacks the same files), and no 1.2 source exists. Don't try to reproduce 1.2 behaviour.
 - **Original archive:** `docs/original-archive.md` covers what the original archive (outside this repo) offers the port.
@@ -83,6 +83,7 @@ Include paths for a build: `source`, `source/game`, `source/regdata`, `source/en
 - **`data/` is byte-exact original data:** CP852 text with CRLF line endings, plus binaries. `.gitattributes` keeps Git from converting it.
   - Never re-encode or reformat data files. The in-game fonts index glyphs by byte value.
   - No data file has been edited. The manifests keep their `lores`/`lsource` lines: lores bounds count towards the phase bounds.
+- **License:** code written for the port is 0BSD (`LICENSE`). The original 1996 code, data and music have no license; they are kept for preservation (README, "About this repository").
 - **Lowercase names:** keep new file names lowercase.
 - **Path resolution:** manifest paths are mixed-case DOS paths (the original engine `strupr()`s them). Resolve them as lowercase with `\` changed to `/`, relative to `data/`.
 - **Source files** are UTF-8. Git normalises their line endings.
@@ -139,7 +140,7 @@ Modules are mostly static-class singletons with `init`/`quit`. Each header auto-
   - `check` loads every level, which rebuilds all sprites.
   - Debug switches: `memorydebug`, `debugkeys`, `netdebug`, `randdebug`, `shipdebug`, `syncfail`.
 
-## Data and music (details in `README.md`)
+## Data and music (details in `docs/porting.md`)
 
 - **Manifests:** each `data/<volume>.dir` maps logical names to files. Code opens data only by logical name. The exceptions are `cwe.ini` and the manifests themselves.
 - **Mount order:** at startup the game mounts `update,global,params`. Each mission then mounts `update,<world>,<world><n>`, plus `<world><n>s` (speech) when dialogs are on.

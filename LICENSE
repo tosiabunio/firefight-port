@@ -1,0 +1,25 @@
+Scope
+
+This license covers the code written for the Fire Fight port, from 2026 onwards: the build
+system, the port layer (source/compat), the port's own source files, its changes to the
+original sources as far as they can be told apart from them, the tests and the tools.
+
+It does not cover the original Fire Fight (1996): its source code, data and soundtrack are
+copyright 1996 Chaos Works, Electronic Arts and Epic MegaGames, and come with no license.
+They are kept here to preserve the game; see README.md.
+
+-------------------------------------------------------------------------------------------
+
+Zero-Clause BSD
+
+Copyright (C) 2026 by Maciej Miąsik
+
+Permission to use, copy, modify, and/or distribute this software for any purpose with or
+without fee is hereby granted.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS
+SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL
+THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY
+DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF
+CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE
+OR PERFORMANCE OF THIS SOFTWARE.
