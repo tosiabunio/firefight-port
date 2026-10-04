@@ -259,7 +259,7 @@ Each phase ends with something runnable and an exit check. Phases 5–7 can over
 - **Golden demos:** record a further set with the port across several missions and skill levels. CI replays them on all three OSes; this is the cross-platform determinism gate.
 - **1.1 demos:** the archive holds the original 1.1 executables, built from this source. If they run, demos they record are an exact 1.1 oracle without the 1.0 question.
 - **Exit:** the original demos replay in sync, or any divergence is explained and documented, and the golden demos pass on Windows, Linux and macOS.
-- **Outcome so far** (2026-10-04): **all 8 original demos replay in sync to the end of their recordings** on Windows/MSVC x64, Linux GCC and Clang x86-64 and macOS arm64, in Debug and Release. The `demo_<name>` tests replay each one. Still to do: the golden demos recorded with the port.
+- **Outcome so far** (2026-10-04): **all 8 original demos replay in sync to the end of their recordings** on Windows/MSVC x64, Linux GCC and Clang x86-64 and macOS arm64, in Debug and Release. The `demo_<name>` tests replay each one. Four golden demos recorded with the port cover other worlds and both skills; the `golden_<name>` tests replay them on every platform.
   - **Clones:** `compat/msvc4.*` has MSVC 4's `rand`/`srand` and `qsort`. `Rand::init`, the collision results, the visible level objects and the text labels use them on every platform; the CRT's are no longer called. The `crt_vectors` test checks both against the vectors from the 1.1 exe.
   - **The stale cannon timer was the last cause.**
     - `ACannon`'s constructor has `global_time==Mp::BEYONDTIME`, so the original read whatever its FastAlloc slot held at that offset: 232 in the 32-bit MSVC layout.
@@ -273,7 +273,10 @@ Each phase ends with something runnable and an exit check. Phases 5–7 can over
     - `1sp_lev.cpp`'s region sizes (`(int)(max_sx*mulx)`) can't differ: `max_sx` and `max_sy` are 8192 in every level, a power of two, so the float product is exact.
     - The parallax of the backgrounds, fog and clouds (`neutral.cpp`, `(int)(mx*world->get_x())`) and the title's logo flight (`world.cpp`, `Header`) used a float result straight from the x87 register. They are now evaluated in `double`, which reproduces the 53-bit result exactly: a product of two floats is exact in a double, and the original then rounded or truncated once. Both only move pictures, and the title frames didn't change.
     - `tools.cpp` already computes in `double`; `params.cpp`'s `MB2SHOOTCOUNT` is exact with the shipped data.
-  - **Demo runner:** `--demo <name>` logs whether the replay stayed in sync to the end of the recording and exits with 3 when it diverged, 4 when it stopped early. It replaces the planned `--play-demo --strict-sync`.
+  - **Golden demos** (`tests/demos`): gray1 and gray2 on normal skill, net3 and green3 on hard, about 1,900 ticks of play each. The original demos cover only green6, brown2, green1 and white1.
+    - `tests/demos/flight.py` writes an input script that selects the mission, opens the mission screen's demo menu (debug mode) and records it, then flies with random but fixed keys: forward, turns, both fire buttons, strafing, turbo, weapon and inventory keys.
+    - `tests/record_demo.cmake` records one: it sets the skill in `settings.ini`, runs the script headless with `cwdiags=extended` and copies the recording. Recorded on macOS; replayed in sync in Debug and Release.
+  - **Demo runner:** `--demo <name>` logs whether the replay stayed in sync to the end of the recording and exits with 3 when it diverged, 4 when it stopped early. `--demo !<path>` plays a demo file. It replaces the planned `--play-demo --strict-sync`. `main.cpp` passes the argument on as given, because the engine upper-cases its switches.
 
 ### Phase 6: audio (`1ss`)
 - **Samples:** SDL2_mixer, with the original voice model:
