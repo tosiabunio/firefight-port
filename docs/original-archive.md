@@ -13,8 +13,8 @@ The archive is private and is never committed. It lives on the Windows developme
 | `tests/golden/data_files.sha256` | SHA-256 of every file in `data/` and `music/`. Each one was found byte-identical to its archive original (`FF/WORK.RTL`, `CDAudio`) | `ffarchive.py provenance --write` | test `data_files` |
 | `tests/golden/sprite_bounds.txt` | Phase bounds of every sprite the game loads, equal to the shipped caches | a `sprite_dump=1` run, checked with `ffarchive.py sprites` | test `sprite_build` |
 | `tests/golden/sprite_data.txt` | Size and CRC-32 of every sprite's hires and collision pixel data, and of every palette's three tables, equal to the shipped caches | same | test `sprite_build` |
-| `tests/golden/crt_qsort.txt` | 435 runs of the original `qsort`, by element width, keys and resulting order | `crt_vectors.py`, which runs the 1.1 exe's code in an emulator | the phase 5 clone (no test yet) |
-| `tests/golden/crt_rand.txt` | The original `rand` after `srand(0)`: the 1024 values of the `Rand` table | same | the phase 5 clone (no test yet) |
+| `tests/golden/crt_qsort.txt` | 435 runs of the original `qsort`, by element width, keys and resulting order | `crt_vectors.py`, which runs the 1.1 exe's code in an emulator | test `crt_vectors` (`compat/msvc4.h`) |
+| `tests/golden/crt_rand.txt` | The original `rand` after `srand(0)`: the 1024 values of the `Rand` table | same | test `crt_vectors` |
 
 On a machine without the archive, don't guess what it holds. Use this document and the files above. Anything that needs the archive itself is a task for the Windows PC. That covers a new comparison, disassembly, and running the original game.
 
@@ -156,6 +156,8 @@ The original counted lores, because the launcher always wrote `spr/load mode` 3 
 | `level1`, `level2`, `level3`, `level4`, `level1c`, `level2c`, `level3c` | desync at checks 0x364–0x2791 | **in sync to the end of the recording** (1,261–4,281 frames) |
 | `level4c` | desync at 0x1165 | desync at 0x1606 |
 
+  Phase 5 brought `level4c` into sync too: its desync came from `ACannon`'s uninitialised timer, which the port now reads as the original's memory held it (`Stale_memory`, see [porting-plan.md](porting-plan.md#phase-5-determinism-and-the-demo-regression-suite)). With the MSVC 4 `rand` and `qsort` clones, all 8 demos replay in sync on every platform.
+
 ### The demos and 1.0 → 1.1
 - **Recording:** the 8 demos were recorded on 20 May 1996, 11:45–12:02, so with a build from before 1.0 shipped. The same files are on the CD and in the shareware tree.
 - **Data:** every gameplay `.tdf` predates them. Only `TITLE.TDF` (26 Aug) and `TEXT.TXT` (23 May) are later.
@@ -212,4 +214,4 @@ The disassembly above used Capstone and pefile on `FF/C/GAME/RELEASE/FIREFGHT.EX
 These tasks are for the Windows PC:
 - **Reference screenshots** from the original 1.1 game, for the phase 3 exit (see [Executables](#executables)).
 - **New demos** recorded with the original 1.1 exe: an exact 1.1 oracle.
-- **The `level4c` desync:** if the port's traces (`randdebug`, `shipdebug`) don't explain it, the original debug exe can produce the same traces for comparison.
+- **Confirm offset 232:** `Stale_memory` (phase 5) assumes `ACannon::global_time` is at offset 232 (0xE8) of the 1.1 exe's `ACannon`, as clang's MSVC layout says. All 8 demos replaying in sync is strong evidence; `ACannon::run`'s `sub [reg+0E8h], …` in the Release exe would confirm it.

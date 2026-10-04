@@ -198,7 +198,7 @@ Each phase ends with something runnable and an exit check. Phases 5–7 can over
   - **Test tools, pulled forward from phase 5:**
     - `--fast` runs without the clock: one simulation step per frame, game time still 1/30 s per tick (`Eem::untimed`).
     - `--demo <name>` plays one recorded demo.
-    - With both, every demo desynced early. Since the lores bounds fix, 7 of the 8 replay in sync to the end on Windows/MSVC, whose CRT `rand` is the MSVC LCG. `level4c` still desyncs, at check 0x1606. Other platforms need the phase 5 `rand` clone first.
+    - With both, every demo desynced early. Since the lores bounds fix, 7 of the 8 replay in sync to the end on Windows/MSVC, whose CRT `rand` is the MSVC LCG. `level4c` still desyncs, at check 0x1606. Other platforms need the phase 5 `rand` clone first. (Phase 5 brought all 8 into sync.)
   - **Not ported:** sound stays inactive until phase 6 (the DirectSound stub would fail init). Mouse mapping waits for phase 4 (done there).
 
 ### Phase 4: input; single player becomes playable
@@ -254,11 +254,26 @@ Each phase ends with something runnable and an exit check. Phases 5–7 can over
   2. collision scan order;
   3. phase bounds: the `sprite_build` test checks them against the shipped caches;
   4. render-path side effects: `World::display` calls `look_at` **with builders** (`world.cpp:74-81`). Until that is proven harmless, keep the original cadence of one render per batch of ticks, and run the same calls in headless mode;
-  5. the uninitialised `ACannon::global_time` read (`alien.cpp:1726`, `==` instead of `=`);
+  5. the uninitialised `ACannon::global_time` read (`alien.cpp:1726`, `==` instead of `=`): emulated, see the outcome below;
   6. finally, a real 1.0 → 1.1 gameplay change. The demos were recorded on 20 May 1996; this source is August 1996. Every gameplay `.tdf` predates the demos, so only code changed; the archive's file dates list the candidate files ([original-archive.md](original-archive.md#the-demos-and-10--11)).
 - **Golden demos:** record a further set with the port across several missions and skill levels. CI replays them on all three OSes; this is the cross-platform determinism gate.
 - **1.1 demos:** the archive holds the original 1.1 executables, built from this source. If they run, demos they record are an exact 1.1 oracle without the 1.0 question.
 - **Exit:** the original demos replay in sync, or any divergence is explained and documented, and the golden demos pass on Windows, Linux and macOS.
+- **Outcome so far** (2026-10-04): **all 8 original demos replay in sync to the end of their recordings** on Windows/MSVC x64, Linux GCC and Clang x86-64 and macOS arm64, in Debug and Release. The `demo_<name>` tests replay each one. Still to do: the golden demos recorded with the port.
+  - **Clones:** `compat/msvc4.*` has MSVC 4's `rand`/`srand` and `qsort`. `Rand::init`, the collision results, the visible level objects and the text labels use them on every platform; the CRT's are no longer called. The `crt_vectors` test checks both against the vectors from the 1.1 exe.
+  - **The stale cannon timer was the last cause.**
+    - `ACannon`'s constructor has `global_time==Mp::BEYONDTIME`, so the original read whatever its FastAlloc slot held at that offset: 232 in the 32-bit MSVC layout.
+    - Slots are reused last freed first. A cannon built away from the screen counted that value down and was removed when it went negative. It was then rebuilt in the same slot the next tick, inheriting the negative value, so whether it stayed or churned depended on the slot's history.
+    - The demos need the exact value. With 0, `level2C` desyncs; with `BEYONDTIME`, `level4C` does. They are what Windows and the Mac got from their own (different) layouts.
+    - **Emulated:** `Stale_memory` (`game/stale.*`) keeps the word for each slot as the original's memory held it. Every deletion of a game object first writes the bytes its own 32-bit layout has at offsets 232–235. A slot never used holds 0, and pointers stand in as a non-null address (0x00400000) or 0.
+    - `tools/layout/stale_memory.py` generates the per-class table (`stale_gen.cpp`) from clang's `i386-pc-windows-msvc` record layouts, which follow MSVC's rules. 25 of the 69 game object classes reach offset 232; the most common previous occupant is an `Unblock`, whose `Posit::y` sits there.
+    - A wrong layout would have shown: with this table, both `level2C` and `level4C` replay in sync, as do the other six. Confirming offset 232 in the 1.1 exe's `ACannon::run` is a task for the archive.
+    - `FastAlloc::operator delete` warns if a game object was deleted without `Stale_memory::object_deleted`; the tests fail on that warning.
+  - **x87 floats:** the sites in [original-archive.md](original-archive.md#x87-the-tick-conversions-are-exact), checked one by one.
+    - `1sp_lev.cpp`'s region sizes (`(int)(max_sx*mulx)`) can't differ: `max_sx` and `max_sy` are 8192 in every level, a power of two, so the float product is exact.
+    - The parallax of the backgrounds, fog and clouds (`neutral.cpp`, `(int)(mx*world->get_x())`) and the title's logo flight (`world.cpp`, `Header`) used a float result straight from the x87 register. They are now evaluated in `double`, which reproduces the 53-bit result exactly: a product of two floats is exact in a double, and the original then rounded or truncated once. Both only move pictures, and the title frames didn't change.
+    - `tools.cpp` already computes in `double`; `params.cpp`'s `MB2SHOOTCOUNT` is exact with the shipped data.
+  - **Demo runner:** `--demo <name>` logs whether the replay stayed in sync to the end of the recording and exits with 3 when it diverged, 4 when it stopped early. It replaces the planned `--play-demo --strict-sync`.
 
 ### Phase 6: audio (`1ss`)
 - **Samples:** SDL2_mixer, with the original voice model:
@@ -317,7 +332,7 @@ Each phase ends with something runnable and an exit check. Phases 5–7 can over
 | Simulation side effects in the render path (builders in `look_at`) | Headless runs or a different frame pacing change outcomes | Keep the original render cadence; investigate in phase 5 |
 | `FastAlloc` slot overflow on other ABIs (992/1024 bytes on MSVC x64; GCC/Clang unknown) | Memory corruption | `static_assert` all object sizes; enlarge the slot if needed. Doesn't affect determinism |
 | Blitter reimplementation not pixel-exact | Visual differences; collision order changes | Unit-test each mode against the asm semantics. Screenshot diffs |
-| Uninitialised `ACannon::global_time` | Behaviour depended on stale memory | Bit-exact goal: characterise first. Emulate it if the original demos need it; otherwise fix it and document the change |
+| Uninitialised `ACannon::global_time` | Behaviour depended on stale memory | Characterised: the original demos need it. Emulated with the original's 32-bit layout (`Stale_memory`, phase 5) |
 | Internet play through NAT | Players can't connect | UPnP/NAT-PMP mapping, manual forwarding, and the relay server for everything else |
 | Internet latency and jitter | Lockstep stalls | Session-wide input delay chosen from measured round trips. The frame cap already slows the game rather than desyncing it |
 | Untrusted packets from the internet | Crashes or exploits through the 1996 parser | Validate before parsing, rate limits, parser fuzzing in CI |

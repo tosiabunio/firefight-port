@@ -15,7 +15,7 @@ git pull --ff-only
 cmake --workflow --preset macos-clang
 ```
 
-The run configures, builds Debug and Release, and runs every test in both. It must end with `100% tests passed` twice. The tests are `smoke`, `headless_run`, `golden_title`, `sprite_build`, `input_play` and `data_files`.
+The run configures, builds Debug and Release, and runs every test in both. It must end with `100% tests passed` twice. The tests are `smoke`, `headless_run`, `golden_title`, `sprite_build`, `crt_vectors`, the eight `demo_<name>`, `input_play` and `data_files`.
 
 Then fast-forward `main`, if CI on the branch is green too (`gh run list --branch <branch>`):
 
@@ -38,6 +38,7 @@ Golden files describe the original game. Never regenerate them to make a Mac run
 | `sprite_build` | The sprite build differs from the original's caches: bounds, pixel data or palette tables. | The failing lines are in the test output. All lines are in `build/macos-clang/source/sprite_build/*.sorted.txt`. |
 | `golden_title` | Rendering differs. The title frames are bit-identical on every platform, for example after `-ffp-contract=off` stopped Clang fusing `a*b+c` on arm64. | The frames in `build/macos-clang/source/golden_title/`. Compare them with the same frames from a Linux or Windows build. |
 | `headless_run` | Start-up, the title loop or shutdown broke. | The log in the test output (the game echoes it to stderr). |
+| `demo_<name>` | An original demo went out of sync (`out of sync after N of M blocks`) or stopped early. All 8 replay in sync on every platform. | The log in the test output, with the state dump at the divergence. `docs/porting-plan.md`, phase 5, lists the suspects. |
 | `input_play` | An input state differs: a key's scan code or text, the mouse position or buttons, or the joystick bits. The states don't depend on the simulation, so they are the same on every platform. | The first differing line is in the test output; all of them are in `build/macos-clang/source/input_play/input_states.txt`. |
 
 ## What needs the Windows PC
@@ -52,5 +53,5 @@ If a task on the Mac needs one of these, stop and say so instead of guessing. Th
 
 ## Notes
 
-- **Demos desync on macOS for now.** `firefight --headless --fast --demo level1` replays in sync on Windows (7 of 8 demos), because MSVC's `rand` is the original's. Apple's libc `rand` differs, and so does its `qsort` on ties. So demos desync on the Mac until the phase 5 clones exist. They must reproduce `tests/golden/crt_rand.txt` and `crt_qsort.txt`. Don't chase these desyncs before then.
+- **The original demos replay in sync on the Mac too.** The `demo_<name>` tests replay all 8 (`firefight --headless --fast --demo level1`). A desync on the Mac alone is a platform difference to find, like any other test failure here; the suspects are listed in `docs/porting-plan.md` (phase 5).
 - **Builds are arm64 only, macOS 11 or later** (`CMAKE_OSX_ARCHITECTURES=arm64`).
