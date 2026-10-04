@@ -11,6 +11,7 @@ This is the subset of the original Fire Fight (Chaos Works, 1996) material neede
 | `data/` | Retail game data, laid out exactly as the `*.dir` manifests expect (see below) |
 | `music/` | CD-audio soundtrack, `track02.flac` … `track09.flac` (lossless rips of the CD tracks) |
 | `docs/porting-plan.md` | The port plan: SDL2 + CMake, phases, decisions |
+| `docs/macos.md` | Working on the Mac: checking a branch before `main`, test failures, what needs the Windows PC |
 | `docs/original-archive.md` | What the original archive holds beyond this subset (built 1.1 executables, shipped sprite caches, the 1.2 CD), and what was verified against it |
 | `CMakeLists.txt`, `CMakePresets.json`, `vcpkg.json`, `cmake/` | Build system |
 | `source/compat/` | Port layer: MSVC CRT extensions and stand-ins for the Win32/DirectX APIs (inert stubs until the SDL2 drivers replace them) |

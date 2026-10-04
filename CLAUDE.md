@@ -18,6 +18,7 @@ Everything was selected by rule from the original archive. `README.md` documents
   - The archive is never committed and exists only on the Windows PC (`D:\_Projects\FireFight`). What it proves is committed as golden files and test vectors, so other machines work from the repo alone.
   - Without the archive, don't guess its contents. A task that needs it (a new comparison, disassembly, running the original game) belongs on the Windows PC. See "Working without the archive" in `docs/original-archive.md`.
   - `tools/archive/ffarchive.py` and `crt_vectors.py` produce and check those files.
+- **On the Mac:** `docs/macos.md` covers checking a branch, what a failing test means there, and what must wait for the Windows PC.
 - **Port plan:** SDL2 + CMake, in phases with exit criteria, in `docs/porting-plan.md`. Follow its phase order and its determinism rules.
 - **Status: phase 3 done; the game shows in a window but has no input or sound yet.** The original sources build on every platform. Runtime (phase 2) and video (phase 3) are on SDL2. Sound, input and network still go through `source/compat/`, whose inert Win32/DirectX stand-ins phases 4–7 replace. Without input, the game runs its title loop and attract demos; sound is inactive until phase 6.
 
