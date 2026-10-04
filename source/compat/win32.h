@@ -2,11 +2,12 @@
 //
 // Phase 1 of the port (docs/porting-plan.md) made the original code compile and link on every
 // platform against these stand-ins; phases 2-7 rewrite the drivers on SDL2 and remove them.
-// This header replaces <windows.h>, <windowsx.h>, <commctrl.h>, <mmsystem.h>, <dsound.h> and
-// <dplay.h> on all platforms, Windows included, so every build sees the same stubs. What is
-// left (phase 3 removed the window, GDI and DirectDraw parts) lives in win32.cpp:
-//   - DirectSound, DirectPlay, MCI, mixer and wave-out calls are inert
-//     and report failure or "nothing there" (LoadLibrary returns NULL);
+// This header replaces <windows.h>, <windowsx.h>, <commctrl.h>, <mmsystem.h> and <dplay.h> on
+// all platforms, Windows included, so every build sees the same stubs. What is left (phase 3
+// removed the window, GDI and DirectDraw parts, phase 6 DirectSound, MCI, the mixer and
+// wave-out) lives in win32.cpp:
+//   - DirectPlay calls are inert and report failure or "nothing there" (LoadLibrary returns
+//     NULL);
 //   - a few calls with an obvious portable meaning are implemented for real: the clocks
 //     (GetTickCount, timeGetTime), GetUserName, SleepEx and VirtualAlloc.
 // Only what the original sources use is declared. Layouts follow the Win32 SDK where the code
@@ -68,13 +69,9 @@ FF_DECLARE_HANDLE(HBRUSH);
 FF_DECLARE_HANDLE(HPALETTE);
 FF_DECLARE_HANDLE(HMENU);
 FF_DECLARE_HANDLE(HKEY);
-FF_DECLARE_HANDLE(HMIXER);
-FF_DECLARE_HANDLE(HMIXEROBJ);
-FF_DECLARE_HANDLE(HWAVEOUT);
 #undef FF_DECLARE_HANDLE
 typedef HINSTANCE  HMODULE;
 typedef void      *HGDIOBJ;
-typedef HWAVEOUT  *LPHWAVEOUT;
 
 typedef LRESULT (CALLBACK *WNDPROC)(HWND, UINT, WPARAM, LPARAM);
 typedef BOOL    (CALLBACK *DLGPROC)(HWND, UINT, WPARAM, LPARAM);
@@ -167,8 +164,6 @@ struct PAINTSTRUCT
 #define BN_CLICKED           0
 #define WM_QUERYNEWPALETTE   0x030F
 #define WM_PALETTECHANGED    0x0311
-#define MM_MCINOTIFY         0x03B9
-#define MM_MIXM_CONTROL_CHANGE 0x3D1
 
 #define WS_OVERLAPPED   0x00000000L
 #define WS_POPUP        0x80000000L
@@ -263,10 +258,7 @@ struct MEMORYSTATUS
 #define WAIT_FAILED    0xFFFFFFFFL
 #define INFINITE       0xFFFFFFFF
 
-// --- multimedia: timer, wave out, mixer, MCI -----------------------------------------------------
-#define MMSYSERR_NOERROR 0
-#define CALLBACK_NULL    0x00000000L
-#define CALLBACK_WINDOW  0x00010000L
+// --- multimedia: timer, the sample format, the mixer lines RegData names ----------------------
 
 struct WAVEFORMATEX
 {
@@ -279,142 +271,16 @@ struct WAVEFORMATEX
   WORD  cbSize;
 };
 typedef WAVEFORMATEX *LPWAVEFORMATEX;
-struct WAVEHDR
-{
-  LPSTR     lpData;
-  DWORD     dwBufferLength;
-  DWORD     dwBytesRecorded;
-  DWORD_PTR dwUser;
-  DWORD     dwFlags;
-  DWORD     dwLoops;
-  WAVEHDR  *lpNext;
-  DWORD_PTR reserved;
-};
-typedef WAVEHDR *LPWAVEHDR;
 #define WAVE_FORMAT_PCM 1
-#define WAVE_MAPPER     ((UINT)-1)
 
 #define mmioFOURCC(c0, c1, c2, c3) \
   ((DWORD)(BYTE)(c0) | ((DWORD)(BYTE)(c1) << 8) | ((DWORD)(BYTE)(c2) << 16) | ((DWORD)(BYTE)(c3) << 24))
 #define FOURCC_RIFF mmioFOURCC('R', 'I', 'F', 'F')
 
-#define MIXER_SHORT_NAME_CHARS 16
-#define MIXER_LONG_NAME_CHARS  64
-#define MAXPNAMELEN            32
-struct MIXERLINE
-{
-  DWORD     cbStruct;
-  DWORD     dwDestination;
-  DWORD     dwSource;
-  DWORD     dwLineID;
-  DWORD     fdwLine;
-  DWORD_PTR dwUser;
-  DWORD     dwComponentType;
-  DWORD     cChannels;
-  DWORD     cConnections;
-  DWORD     cControls;
-  CHAR      szShortName[MIXER_SHORT_NAME_CHARS];
-  CHAR      szName[MIXER_LONG_NAME_CHARS];
-  struct
-  {
-    DWORD dwType;
-    DWORD dwDeviceID;
-    WORD  wMid;
-    WORD  wPid;
-    UINT  vDriverVersion;
-    CHAR  szPname[MAXPNAMELEN];
-  } Target;
-};
-struct MIXERCONTROL
-{
-  DWORD cbStruct;
-  DWORD dwControlID;
-  DWORD dwControlType;
-  DWORD fdwControl;
-  DWORD cMultipleItems;
-  CHAR  szShortName[MIXER_SHORT_NAME_CHARS];
-  CHAR  szName[MIXER_LONG_NAME_CHARS];
-  union
-  {
-    struct { LONG lMinimum, lMaximum; } s1;
-    struct { DWORD dwMinimum, dwMaximum; } s2;
-    DWORD dwReserved[6];
-  } Bounds;
-  union
-  {
-    DWORD cSteps;
-    DWORD cbCustomData;
-    DWORD dwReserved[6];
-  } Metrics;
-};
-struct MIXERLINECONTROLS
-{
-  DWORD cbStruct;
-  DWORD dwLineID;
-  union { DWORD dwControlID; DWORD dwControlType; };
-  DWORD cControls;
-  DWORD cbmxctrl;
-  MIXERCONTROL *pamxctrl;
-};
-struct MIXERCONTROLDETAILS
-{
-  DWORD cbStruct;
-  DWORD dwControlID;
-  DWORD cChannels;
-  union { HWND hwndOwner; DWORD cMultipleItems; };
-  DWORD cbDetails;
-  LPVOID paDetails;
-};
-struct MIXERCONTROLDETAILS_UNSIGNED { DWORD dwValue; };
-#define MIXER_OBJECTF_MIXER                     0x00000000L
-#define MIXER_OBJECTF_HMIXER                    0x80000000L
-#define MIXER_GETLINEINFOF_COMPONENTTYPE        0x00000003L
-#define MIXER_GETLINECONTROLSF_ONEBYTYPE        0x00000002L
-#define MIXER_GETCONTROLDETAILSF_VALUE          0x00000000L
-#define MIXER_SETCONTROLDETAILSF_VALUE          0x00000000L
 #define MIXERLINE_COMPONENTTYPE_SRC_FIRST       0x00001000L
 #define MIXERLINE_COMPONENTTYPE_SRC_LINE        (MIXERLINE_COMPONENTTYPE_SRC_FIRST + 2)
 #define MIXERLINE_COMPONENTTYPE_SRC_COMPACTDISC (MIXERLINE_COMPONENTTYPE_SRC_FIRST + 5)
 #define MIXERLINE_COMPONENTTYPE_SRC_SYNTHESIZER (MIXERLINE_COMPONENTTYPE_SRC_FIRST + 7)
-#define MIXERLINE_COMPONENTTYPE_SRC_WAVEOUT     (MIXERLINE_COMPONENTTYPE_SRC_FIRST + 8)
-#define MIXERCONTROL_CONTROLTYPE_VOLUME         0x50030001L
-
-typedef UINT MCIDEVICEID;
-typedef DWORD MCIERROR;
-struct MCI_GENERIC_PARMS { DWORD_PTR dwCallback; };
-struct MCI_OPEN_PARMS
-{
-  DWORD_PTR   dwCallback;
-  MCIDEVICEID wDeviceID;
-  LPCSTR      lpstrDeviceType;
-  LPCSTR      lpstrElementName;
-  LPCSTR      lpstrAlias;
-};
-struct MCI_PLAY_PARMS   { DWORD_PTR dwCallback; DWORD dwFrom; DWORD dwTo; };
-struct MCI_SET_PARMS    { DWORD_PTR dwCallback; DWORD dwTimeFormat; DWORD dwAudio; };
-struct MCI_STATUS_PARMS { DWORD_PTR dwCallback; DWORD_PTR dwReturn; DWORD dwItem; DWORD dwTrack; };
-#define MCI_OPEN                     0x0803
-#define MCI_CLOSE                    0x0804
-#define MCI_PLAY                     0x0806
-#define MCI_STOP                     0x0808
-#define MCI_SET                      0x080D
-#define MCI_STATUS                   0x0814
-#define MCI_NOTIFY                   0x00000001L
-#define MCI_NOTIFY_SUCCESSFUL        0x0001
-#define MCI_WAIT                     0x00000002L
-#define MCI_FROM                     0x00000004L
-#define MCI_TO                       0x00000008L
-#define MCI_TRACK                    0x00000010L
-#define MCI_OPEN_TYPE                0x00002000L
-#define MCI_OPEN_ELEMENT             0x00000200L
-#define MCI_STATUS_ITEM              0x00000100L
-#define MCI_STATUS_NUMBER_OF_TRACKS  0x00000003L
-#define MCI_SET_TIME_FORMAT          0x00000400L
-#define MCI_FORMAT_TMSF              10
-#define MCI_CDA_STATUS_TYPE_TRACK    0x00004001L
-#define MCI_CDA_TRACK_AUDIO          (0x00001100L + 0)
-#define MCI_MAKE_TMSF(t, m, s, f) \
-  ((DWORD)(((BYTE)(t) | ((WORD)(m) << 8)) | ((DWORD)(BYTE)(s) | ((WORD)(f) << 8)) << 16))
 
 // --- COM base --------------------------------------------------------------------------------
 struct IUnknown
@@ -424,72 +290,6 @@ struct IUnknown
   virtual ULONG   Release() = 0;
 };
 
-// --- DirectSound --------------------------------------------------------------------------------
-struct DSCAPS
-{
-  DWORD dwSize, dwFlags, dwMinSecondarySampleRate, dwMaxSecondarySampleRate;
-  DWORD dwPrimaryBuffers, dwMaxHwMixingAllBuffers, dwMaxHwMixingStaticBuffers;
-  DWORD dwMaxHwMixingStreamingBuffers, dwFreeHwMixingAllBuffers, dwFreeHwMixingStaticBuffers;
-  DWORD dwFreeHwMixingStreamingBuffers, dwMaxHw3DAllBuffers, dwMaxHw3DStaticBuffers;
-  DWORD dwMaxHw3DStreamingBuffers, dwFreeHw3DAllBuffers, dwFreeHw3DStaticBuffers;
-  DWORD dwFreeHw3DStreamingBuffers, dwTotalHwMemBytes, dwFreeHwMemBytes;
-  DWORD dwMaxContigFreeHwMemBytes, dwUnlockTransferRateHwBuffers;
-  DWORD dwPlayCpuOverheadSwBuffers, dwReserved1, dwReserved2;
-};
-struct DSBUFFERDESC
-{
-  DWORD          dwSize;
-  DWORD          dwFlags;
-  DWORD          dwBufferBytes;
-  DWORD          dwReserved;
-  LPWAVEFORMATEX lpwfxFormat;
-};
-struct IDirectSoundBuffer : IUnknown
-{
-  virtual HRESULT GetStatus(LPDWORD status) = 0;
-  virtual HRESULT Lock(DWORD offset, DWORD bytes, LPVOID *ptr1, LPDWORD bytes1, LPVOID *ptr2, LPDWORD bytes2, DWORD flags) = 0;
-  virtual HRESULT Play(DWORD reserved1, DWORD reserved2, DWORD flags) = 0;
-  virtual HRESULT SetCurrentPosition(DWORD position) = 0;
-  virtual HRESULT SetFormat(LPWAVEFORMATEX format) = 0;
-  virtual HRESULT SetVolume(LONG volume) = 0;
-  virtual HRESULT SetPan(LONG pan) = 0;
-  virtual HRESULT Stop() = 0;
-  virtual HRESULT Unlock(LPVOID ptr1, DWORD bytes1, LPVOID ptr2, DWORD bytes2) = 0;
-  virtual HRESULT Restore() = 0;
-};
-struct IDirectSound : IUnknown
-{
-  virtual HRESULT CreateSoundBuffer(DSBUFFERDESC *desc, IDirectSoundBuffer **buffer, IUnknown *outer) = 0;
-  virtual HRESULT GetCaps(DSCAPS *caps) = 0;
-  virtual HRESULT SetCooperativeLevel(HWND hwnd, DWORD level) = 0;
-};
-typedef IDirectSound       *LPDIRECTSOUND;
-typedef IDirectSoundBuffer *LPDIRECTSOUNDBUFFER;
-
-#define DS_OK                     S_OK
-#define FF_DSERR(code)            ((HRESULT)(0x88780000u | (code)))
-#define DSERR_OUTOFMEMORY         ((HRESULT)0x8007000EL)
-#define DSERR_BUFFERLOST          FF_DSERR(150)
-#define DSSCL_EXCLUSIVE           0x00000003
-#define DSBPLAY_LOOPING           0x00000001
-#define DSBSTATUS_PLAYING         0x00000001
-#define DSBCAPS_PRIMARYBUFFER     0x00000001
-#define DSBCAPS_STATIC            0x00000002
-#define DSBCAPS_LOCSOFTWARE       0x00000008
-#define DSBCAPS_CTRLFREQUENCY     0x00000020
-#define DSBCAPS_CTRLPAN           0x00000040
-#define DSBCAPS_CTRLVOLUME        0x00000080
-#define DSCAPS_PRIMARYMONO        0x00000001
-#define DSCAPS_PRIMARYSTEREO      0x00000002
-#define DSCAPS_PRIMARY8BIT        0x00000004
-#define DSCAPS_PRIMARY16BIT       0x00000008
-#define DSCAPS_CONTINUOUSRATE     0x00000010
-#define DSCAPS_EMULDRIVER         0x00000020
-#define DSCAPS_CERTIFIED          0x00000040
-#define DSCAPS_SECONDARYMONO      0x00000100
-#define DSCAPS_SECONDARYSTEREO    0x00000200
-#define DSCAPS_SECONDARY8BIT      0x00000400
-#define DSCAPS_SECONDARY16BIT     0x00000800
 
 // --- DirectPlay (DirectX 3) ---------------------------------------------------------------------
 typedef DWORD DPID;
@@ -597,21 +397,5 @@ void    PostQuitMessage(int exit_code);
 LRESULT DefWindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
 // multimedia
 DWORD    timeGetTime();
-MMRESULT waveOutOpen(LPHWAVEOUT handle, UINT device, const WAVEFORMATEX *format, DWORD_PTR callback,
-                     DWORD_PTR instance, DWORD flags);
-MMRESULT waveOutClose(HWAVEOUT handle);
-MMRESULT waveOutReset(HWAVEOUT handle);
-MMRESULT waveOutPrepareHeader(HWAVEOUT handle, LPWAVEHDR header, UINT size);
-MMRESULT waveOutUnprepareHeader(HWAVEOUT handle, LPWAVEHDR header, UINT size);
-MMRESULT waveOutWrite(HWAVEOUT handle, LPWAVEHDR header, UINT size);
-UINT     mixerGetNumDevs();
-MMRESULT mixerOpen(HMIXER *mixer, UINT id, DWORD_PTR callback, DWORD_PTR instance, DWORD flags);
-MMRESULT mixerClose(HMIXER mixer);
-MMRESULT mixerGetLineInfo(HMIXEROBJ mixer, MIXERLINE *line, DWORD flags);
-MMRESULT mixerGetLineControls(HMIXEROBJ mixer, MIXERLINECONTROLS *controls, DWORD flags);
-MMRESULT mixerGetControlDetails(HMIXEROBJ mixer, MIXERCONTROLDETAILS *details, DWORD flags);
-MMRESULT mixerSetControlDetails(HMIXEROBJ mixer, MIXERCONTROLDETAILS *details, DWORD flags);
-MCIERROR mciSendCommand(MCIDEVICEID id, UINT msg, DWORD_PTR flags, DWORD_PTR param);
-BOOL     mciGetErrorString(MCIERROR error, LPSTR text, UINT size);
 
 #endif

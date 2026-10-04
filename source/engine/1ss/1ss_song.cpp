@@ -1,9 +1,28 @@
 #include "1ss_hdrs.h"
+#include <SDL_mixer.h>
 
-UINT CD::DeviceID;
+// Port: the CD audio tracks are FLAC files, <music>/track02.flac, track03.flac... (was MCI CD
+// audio). Track numbers count audio tracks only, as the original did once it had skipped the
+// CD's data track 1: track N is the file numbered N+1. SDL_mixer streams the file; playing it with
+// repeat loops it, as the MCI notification that restarted a finished track did. With sound off
+// (SOS_NONE) nothing plays; the original still played the CD then.
+
 int CD::tracks;
 int CD::current_track;
-static int data_skip=0;
+static const int data_skip=1;
+static char music_dir[_MAX_PATH+1]="music";
+static Mix_Music* music=NULL;
+
+static void track_file(char* path,int track)
+{
+  sprintf(path,"%s/track%02d.flac",music_dir,track+data_skip);
+}
+
+void CD::set_directory(const char* dir)
+{
+  strncpy(music_dir,dir,_MAX_PATH);
+  music_dir[_MAX_PATH]=0;
+}
 
 CD::CD()
 {
@@ -18,35 +37,18 @@ CD::~CD()
 
 void CD::init(void)
 {
-  DWORD dwReturn;
-  MCI_OPEN_PARMS mciOpenParms;
-  MCI_STATUS_PARMS mciStatusParams;
   if(!Sounds::active) return;
-  // Open the cdaudio device (simple) with wait.
-  mciOpenParms.lpstrDeviceType="cdaudio";
-  dwReturn=mciSendCommand(NULL,MCI_OPEN,MCI_OPEN_TYPE|MCI_WAIT,(DWORD_PTR)(LPVOID)&mciOpenParms);
-  if(dwReturn) return;
-  // Get the device ID.
-  DeviceID=mciOpenParms.wDeviceID;
-  // Get number of tracks
-  mciStatusParams.dwItem=MCI_STATUS_NUMBER_OF_TRACKS;
-  dwReturn=mciSendCommand(DeviceID,MCI_STATUS,MCI_STATUS_ITEM|MCI_WAIT,(DWORD_PTR)(LPVOID)&mciStatusParams);
-  if(!dwReturn) tracks=(int)mciStatusParams.dwReturn;
-  if(tracks>0) {
-    MCI_STATUS_PARMS mciStatusParams;
-    // check track type
-    mciStatusParams.dwItem=MCI_CDA_STATUS_TYPE_TRACK;
-    mciStatusParams.dwTrack=1;
-    if(!mciSendCommand(DeviceID,MCI_STATUS,MCI_STATUS_ITEM|MCI_TRACK|MCI_WAIT,(DWORD_PTR)(LPVOID)&mciStatusParams)) {
-      if(mciStatusParams.dwReturn!=MCI_CDA_TRACK_AUDIO) {
-        tracks--;
-        data_skip=1;
-      }
-    }
+  // count the tracks (was the number of audio tracks on the CD)
+  char path[_MAX_PATH+32];
+  tracks=0;
+  for(;;) {
+    track_file(path,tracks+1);
+    FILE* file=fopen(path,"rb");
+    if(file==NULL) break;
+    fclose(file);
+    tracks++;
   }
-  // close cdaudio device
-  MCI_GENERIC_PARMS mciGenericParms;
-  mciSendCommand(DeviceID,MCI_CLOSE,MCI_WAIT,(DWORD_PTR)(LPVOID)&mciGenericParms);
+  ENGINFO("music: %d tracks in %s",tracks,music_dir);
 }
 
 void CD::play(int track,int repeat)
@@ -55,53 +57,48 @@ void CD::play(int track,int repeat)
   if(track>tracks) return;
   if(track==0) return;
   CD::stop();
-  DWORD dwReturn;
-  MCI_OPEN_PARMS mciOpenParms;
-  MCI_PLAY_PARMS mciPlayParms;
-  MCI_SET_PARMS mciSetParms;
-  if(track>tracks) return;
-  // open cdaudio device
-  mciOpenParms.lpstrDeviceType="cdaudio";
-  dwReturn=mciSendCommand(NULL,MCI_OPEN,MCI_OPEN_TYPE|MCI_WAIT,(DWORD_PTR)(LPVOID)&mciOpenParms);
-  if(dwReturn) return;
-  // Get the device ID.
-  DeviceID=mciOpenParms.wDeviceID;
-  // Set the current time format to TMSF.
-  // This should be the default, but do it anyway.
-  mciSetParms.dwTimeFormat=MCI_FORMAT_TMSF;
-  dwReturn=mciSendCommand(DeviceID, MCI_SET,MCI_WAIT|MCI_SET_TIME_FORMAT,(DWORD_PTR)(LPVOID)&mciSetParms);
-  if(dwReturn) {
+  if(Sounds::active_mode==SOS_NONE) return;
+  char path[_MAX_PATH+32];
+  track_file(path,track);
+  music=Mix_LoadMUS(path);
+  if(music==NULL) {
+    WARNING("music track %s does not load (%s)",path,Mix_GetError());
+    return;
+  }
+  if(Mix_PlayMusic(music,repeat?-1:1)!=0) {
+    WARNING("music track %s does not play (%s)",path,Mix_GetError());
     CD::stop();
     return;
   }
-  // Set the start and stop positions of the CD.
-  mciPlayParms.dwFrom=MCI_MAKE_TMSF(track+data_skip, 0, 0, 0);
-  mciPlayParms.dwTo=MCI_MAKE_TMSF(track+data_skip+1, 0, 0, 0);
-  mciPlayParms.dwCallback=(DWORD_PTR)Comm::hwnd;
-  // Send the play command with notification.
-  unsigned notify=repeat?MCI_NOTIFY:0;
-  if(track==tracks) dwReturn=mciSendCommand(DeviceID,MCI_PLAY,MCI_FROM|notify,(DWORD_PTR)(LPVOID)&mciPlayParms);
-  else dwReturn=mciSendCommand(DeviceID,MCI_PLAY,MCI_FROM|MCI_TO|notify,(DWORD_PTR)(LPVOID)&mciPlayParms);
-  if(dwReturn) {
-    CD::stop();
-    return;
-  }
+  MESSAGE("music: track %d%s",track,repeat?", looped":"");
   current_track=track;
 }
 
 void CD::stop(void)
 {
   if(!Sounds::active) return;
-  MCI_GENERIC_PARMS mciGenericParms;
-  // stop cdaudio device
-  mciSendCommand(DeviceID,MCI_STOP,MCI_WAIT,(DWORD_PTR)(LPVOID)&mciGenericParms);
-  // close cdaudio device
-  mciSendCommand(DeviceID,MCI_CLOSE,MCI_WAIT,(DWORD_PTR)(LPVOID)&mciGenericParms);
+  if(music!=NULL) {
+    Mix_HaltMusic();
+    Mix_FreeMusic(music);
+    music=NULL;
+  }
   current_track=0;
-} 
+}
+
+void CD::pause(void)
+{
+  if(music!=NULL) Mix_PauseMusic();
+}
+
+void CD::resume(void)
+{
+  if(music!=NULL) Mix_ResumeMusic();
+}
+
+// Port: MIDI songs (the MCI sequencer) were the music of the shareware edition, which the retail
+// game, built without SHAREWARE, never plays. Not ported.
 
 char* Song::song;
-UINT Song::DeviceID;
 
 Song::Song()
 {
@@ -110,52 +107,14 @@ Song::Song()
 
 Song::~Song()
 {
-  Song::stop();
 }
-
 
 void Song::play(char* midi_file,int repeat)
 {
-  if((!Sounds::active)||(!Sounds::app_active)) return;
-  if(midi_file==NULL) return;
-  Song::stop();
-  DWORD dwReturn;
-  MCI_OPEN_PARMS mciOpenParms;
-  MCI_PLAY_PARMS mciPlayParms;
-  // open sequencer device
-  mciOpenParms.lpstrDeviceType="sequencer";
-  mciOpenParms.lpstrElementName=midi_file;
-  dwReturn=mciSendCommand(NULL,MCI_OPEN,MCI_OPEN_TYPE|MCI_OPEN_ELEMENT|MCI_WAIT,(DWORD_PTR)(LPVOID)&mciOpenParms);
-  if(dwReturn) {
-    char message[256];
-    mciGetErrorString(dwReturn,message,256);
-    DBG_MESSAGE("Can't play: %s",message);
-    return;
-  }
-  // Get the device ID.
-  DeviceID=mciOpenParms.wDeviceID;
-  mciPlayParms.dwFrom=0;
-  mciPlayParms.dwCallback=(DWORD_PTR)Comm::hwnd;
-  // Send the play command with notification.
-  unsigned notify=repeat?MCI_NOTIFY:0;
-  dwReturn=mciSendCommand(DeviceID,MCI_PLAY,MCI_FROM|repeat,(DWORD_PTR)(LPVOID)&mciPlayParms);
-  if(dwReturn) {
-    char message[256];
-    mciGetErrorString(dwReturn,message,256);
-    DBG_MESSAGE("Can't play: %s",message);
-    Song::stop();
-  }
-  song=midi_file;
+  (void)midi_file,repeat;
 }
 
 void Song::stop(void)
 {
-  if(!Sounds::active) return;
-  MCI_GENERIC_PARMS mciGenericParms;
-  // stop sequencer device
-  mciSendCommand(DeviceID,MCI_STOP,MCI_WAIT,(DWORD_PTR)(LPVOID)&mciGenericParms);
-  // close sequencer device
-  mciSendCommand(DeviceID,MCI_CLOSE,MCI_WAIT,(DWORD_PTR)(LPVOID)&mciGenericParms);
   song=NULL;
-}               
-
+}

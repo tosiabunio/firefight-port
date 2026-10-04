@@ -178,6 +178,16 @@ foreach(demo IN ITEMS gray1 net3 green3 gray2)
     TIMEOUT 300)
 endforeach()
 
+# Phase 6 sound check: demo level1 replays with the sound on, through SDL's disk audio driver.
+# The sound system must start, the mission's soundtrack track play and the output not be silent,
+# and the replay must stay in sync (tests/check_sound.cmake).
+add_test(NAME sound_play
+  COMMAND ${CMAKE_COMMAND}
+          -DFIREFIGHT=$<TARGET_FILE:firefight> -DDATA=${FF_DATA_DIR}
+          -DPREF=${CMAKE_CURRENT_BINARY_DIR}/sound_play
+          -P ${CMAKE_SOURCE_DIR}/tests/check_sound.cmake)
+set_tests_properties(sound_play PROPERTIES TIMEOUT 300)
+
 # Phase 4 input check: an input script starts the first mission from the title and flies it with
 # the keyboard, the mouse and a virtual game controller, switching with F11. The input states it
 # produces (key scan codes and text, mouse position and buttons, joystick bits, virtual keys) must

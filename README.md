@@ -21,7 +21,7 @@ This is the subset of the original Fire Fight (Chaos Works, 1996) material neede
 
 ## Building
 
-The port is in progress (see `docs/porting-plan.md`). Phases 1–4 are in place: the original game compiles on all three platforms, its runtime runs on SDL2, it draws in an SDL window, and it takes keyboard, mouse and game controller input. Sound and network are still inert stubs, so for now the game is playable in single player without sound. The simulation reproduces the original's: the 8 original attract demos replay in sync on every platform. F11 cycles the control sets (keyboard, mouse steering, game controller); with mouse steering the window captures the mouse while it has focus. Useful options (all in `source/game/main.cpp`):
+The port is in progress (see `docs/porting-plan.md`). Phases 1–6 are in place: the original game compiles on all three platforms, its runtime runs on SDL2, it draws in an SDL window, it takes keyboard, mouse and game controller input, and it plays its sounds and the CD soundtrack (from `music/`) through SDL2_mixer. Network play is still an inert stub, so for now the game is single player. The simulation reproduces the original's: the 8 original attract demos replay in sync on every platform. F11 cycles the control sets (keyboard, mouse steering, game controller); with mouse steering the window captures the mouse while it has focus. Useful options (all in `source/game/main.cpp`):
 
 - `--fullscreen`: desktop full screen.
 - `--stretch`: 4:3 like a CRT; the default is square pixels.
@@ -30,8 +30,9 @@ The port is in progress (see `docs/porting-plan.md`). Phases 1–4 are in place:
 - `--demo level1`: play one recorded demo.
 - `--shot-every <n>` / `--shots <s>`: dump frames.
 - `--input <file>`: play an input script (keys, mouse, a virtual game controller); the format is in `source/game/input_script.cpp`.
+- `--music <dir>`: the soundtrack; the default is `music/` next to the data directory.
 
-Settings, pilots, the log and frame dumps live in the SDL preferences directory (override with `--pref <dir>`).
+Settings, pilots, the log and frame dumps live in the SDL preferences directory (override with `--pref <dir>`). The sound and music volumes are set in the game's options and kept in `settings.ini`.
 
 **Requirements:** CMake ≥ 3.25, Ninja, a C++17 compiler, and [vcpkg](https://github.com/microsoft/vcpkg) with the `VCPKG_ROOT` environment variable pointing at it. vcpkg builds SDL2, SDL2_mixer (with FLAC) and ENet from `vcpkg.json` on first configure.
 
@@ -156,15 +157,15 @@ The rebuild path that turns FLC frames into engine sprites is the reference for 
 
 ## Music
 
-Track selection is data-driven. `data/!global/missions.tdf` lists `headersong`, `footersong`, `songs` (one per entry in `missions_order`) and `netsongs`. The engine skips the CD's data track (see `source/engine/1ss/1ss_song.cpp`), so **song number N is `music/track{N+1:02}.flac`**. For example, `headersong = 1` (the title screen) plays `track02.flac`.
+Track selection is data-driven. `data/!global/missions.tdf` lists `headersong`, `footersong`, `songs` (one per entry in `missions_order`) and `netsongs`. The engine skips the CD's data track (see `source/engine/1ss/1ss_song.cpp`), so **song number N is `music/track{N+1:02}.flac`**. For example, `headersong = 1` (the mission screen) plays `track02.flac`. Mission songs loop.
 
 ## Porting notes
 
 - **Include paths:** `source/game`, `source/regdata`, `source/engine/common` and each `source/engine/<module>`. Every game `.cpp` includes only `headers.h`.
 - **Original defines:** retail = no `SHAREWARE`. `UNPROTECT` disables the CD-ROM check. `_DEBUG` turns on `HI_DEBUG`, which in turn forbids global `operator new` (allocations go through the engine heap via `NEW(...)`).
-- **Platform-bound code to replace, by module:**
+- **Platform-bound code in the original, by module** (all on SDL2 now, except DirectPlay):
   - `1sp`: DirectDraw video, 8-bit palette, and the asm blitters.
-  - `1ss`: DirectSound and MCI CD audio. Replace CD audio with `music/`.
+  - `1ss`: DirectSound and MCI CD audio. CD audio is now `music/`.
   - `1ee`: Win32 keyboard, mouse, joystick and timer, DirectPlay networking, and demo record/playback.
   - `1rg`: Windows registry and command line.
   - `1lg`: Win32 window procedure and message boxes.

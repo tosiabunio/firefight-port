@@ -1,16 +1,20 @@
 // Port entry point (SDL_main): resolves the data and preferences directories, then runs the
 // original game (game_main in game.cpp, formerly WinMain).
 //
-//   firefight [--data <dir>] [--pref <dir>] [--headless] [--quit-after <s>] [--fullscreen]
-//             [--stretch] [--shots <s>] [--fast] [--shot-every <n>] [--quit-frames <n>]
-//             [--demo <name>] [--input <file>] [switch ...]
+//   firefight [--data <dir>] [--pref <dir>] [--music <dir>] [--headless] [--sound]
+//             [--quit-after <s>] [--fullscreen] [--stretch] [--shots <s>] [--fast]
+//             [--shot-every <n>] [--quit-frames <n>] [--demo <name>] [--input <file>] [switch ...]
 //
 //   --data <dir>      directory holding cwe.ini and the *.dir manifests. Default: "data" next
 //                     to the executable, else the repository's data/ (development builds),
 //                     else the current directory
 //   --pref <dir>      settings, pilots and the log. Default: SDL_GetPrefPath
+//   --music <dir>     the soundtrack, track02.flac ... Default: "music" next to the data
+//                     directory
 //   --headless        no window, video, sound or input devices (adds the engine switches
 //                     headless=1 sos_none=1)
+//   --sound           with --headless, keep the sound (drop sos_none=1); for tests with SDL's
+//                     dummy or disk audio driver
 //   --quit-after <s>  act as if the window were closed after s seconds (quit_after=<ms>)
 //   --fullscreen      desktop full screen (fullscreen=1)
 //   --stretch         show the 640x400 picture at 4:3 like a CRT (stretch=1); default: square pixels
@@ -30,6 +34,7 @@
 
 #include <compat/win32.h>
 #include <1lg.h>
+#include <1ss.h>
 
 #include <SDL.h>
 
@@ -124,7 +129,9 @@ int main(int argc, char *argv[])
 #endif
   const char *data_dir = nullptr;
   const char *pref_dir = nullptr;
+  const char *music_dir = nullptr;
   const char *input_script = nullptr;
+  bool headless = false, sound = false;
   std::string line = std::string("\"") + argv[0] + "\"";
   for (int i = 1; i < argc; i++)
   {
@@ -133,8 +140,12 @@ int main(int argc, char *argv[])
       data_dir = argv[++i];
     else if (arg == "--pref" && i + 1 < argc)
       pref_dir = argv[++i];
+    else if (arg == "--music" && i + 1 < argc)
+      music_dir = argv[++i];
     else if (arg == "--headless")
-      line += " headless=1 sos_none=1";
+      headless = true;
+    else if (arg == "--sound")
+      sound = true;
     else if (arg == "--quit-after" && i + 1 < argc)
       line += " quit_after=" + std::to_string((int)(atof(argv[++i]) * 1000));
     else if (arg == "--shots" && i + 1 < argc)
@@ -156,6 +167,8 @@ int main(int argc, char *argv[])
     else
       line += " " + arg;
   }
+  if (headless)
+    line += sound ? " headless=1" : " headless=1 sos_none=1";
 
   // Before changing to the data directory, so a relative script path means the current one.
   if (input_script && !input_script_load(input_script))
@@ -163,6 +176,10 @@ int main(int argc, char *argv[])
 
   const fs::path data = data_dir ? fs::u8path(data_dir) : default_data_dir();
   std::error_code ec;
+  // The soundtrack, as an absolute path before changing to the data directory.
+  fs::path music = music_dir ? fs::u8path(music_dir) : data / ".." / "music";
+  music = fs::absolute(music, ec).lexically_normal();
+  CD::set_directory(music.u8string().c_str());
   fs::current_path(data, ec);
   if (ec)
   {

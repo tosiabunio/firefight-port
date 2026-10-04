@@ -1,204 +1,72 @@
 #include "1ss_hdrs.h"
+#include <1ba.h>
+#include <1rg.h>
+#include <1cw_strg.h>
+#include <SDL_mixer.h>
 
-static MIXERLINE sound_line;
-static MIXERLINE music_line;
-static MIXERLINECONTROLS controls;
-static MIXERCONTROL sound_volume_control;
-static MIXERCONTROL music_volume_control;
-static MIXERCONTROLDETAILS sound_volume_control_details;
-static MIXERCONTROLDETAILS music_volume_control_details;
-static MIXERCONTROLDETAILS_UNSIGNED saved_sound_volume[2];
-static MIXERCONTROLDETAILS_UNSIGNED saved_music_volume[2];
-static MIXERCONTROLDETAILS_UNSIGNED new_sound_volume[2];
-static MIXERCONTROLDETAILS_UNSIGNED new_music_volume[2];
-static HMIXER mixer_handle;
-static HWAVEOUT waveout_handle;
-static int sound_volume=0;
-static int music_volume=0;
-static int mixer_active=0;
-static unsigned mixer_parts=0;
+// Port: the original set the system-wide wave and CD volumes through the Windows mixer, and
+// never restored them. The port keeps both volumes in the game: the sound volume scales every
+// sample (Mix_MasterVolume), the music volume the soundtrack (Mix_VolumeMusic). Both run from
+// VOLUME_MIN to VOLUME_MAX, as the mixer controls did. The game never stored them, because it
+// read them back from the system mixer, so the port keeps them in the settings.
+//
+// Both default to half (-6 dB). The original's sound card mixed the CD audio with the samples in
+// analogue; here they share one digital mix, and at full volume a busy scene clips.
+
+static char key_sound_volume[] = "sound volume";
+static char key_music_volume[] = "music volume";
+static const int default_volume=VOLUME_MAX/2;
+static int sound_volume=default_volume;
+static int music_volume=default_volume;
 int Mixer::internal_change=0;
 
-#define MUSIC_VOLUME_ACTIVE 0x00000001
-#define SOUND_VOLUME_ACTIVE 0x00000002
-
-void Mixer::save_volumes(void)
+static int clamp_volume(int volume)
 {
-  if(mixer_parts&SOUND_VOLUME_ACTIVE) {
-    // save sound volume values
-    sound_volume_control_details.cbStruct=sizeof(sound_volume_control_details);
-    sound_volume_control_details.dwControlID=sound_volume_control.dwControlID;
-    sound_volume_control_details.cChannels=sound_line.cChannels;
-    sound_volume_control_details.cMultipleItems=0;
-    sound_volume_control_details.cbDetails=sizeof(MIXERCONTROLDETAILS_UNSIGNED);
-    sound_volume_control_details.paDetails=&saved_sound_volume;
-    MMRESULT result=mixerGetControlDetails((HMIXEROBJ)mixer_handle,&sound_volume_control_details,MIXER_OBJECTF_HMIXER|MIXER_GETCONTROLDETAILSF_VALUE);
-    if(result!=MMSYSERR_NOERROR) {
-      mixer_parts&=~SOUND_VOLUME_ACTIVE;
-      sound_volume=0;
-      return;
-    }
-    if(sound_line.cChannels==1) saved_sound_volume[1]=saved_sound_volume[0];
-    sound_volume=saved_sound_volume[0].dwValue>=saved_sound_volume[1].dwValue?saved_sound_volume[0].dwValue:saved_sound_volume[1].dwValue;
-  }
-  if(mixer_parts&MUSIC_VOLUME_ACTIVE) {
-    // save music volume values
-    music_volume_control_details.cbStruct=sizeof(music_volume_control_details);
-    music_volume_control_details.dwControlID=music_volume_control.dwControlID;
-    music_volume_control_details.cChannels=music_line.cChannels;
-    music_volume_control_details.cMultipleItems=0;
-    music_volume_control_details.cbDetails=sizeof(MIXERCONTROLDETAILS_UNSIGNED);
-    music_volume_control_details.paDetails=&saved_music_volume;
-    MMRESULT result=mixerGetControlDetails((HMIXEROBJ)mixer_handle,&music_volume_control_details,MIXER_OBJECTF_HMIXER|MIXER_GETCONTROLDETAILSF_VALUE);
-    if(result!=MMSYSERR_NOERROR) {
-      mixer_parts&=~MUSIC_VOLUME_ACTIVE;
-      music_volume=0;
-      return;
-    }
-    if(music_line.cChannels==1) saved_music_volume[1]=saved_music_volume[0];
-    music_volume=saved_music_volume[0].dwValue>=saved_music_volume[1].dwValue?saved_music_volume[0].dwValue:saved_music_volume[1].dwValue;
-  }
+  if(volume<VOLUME_MIN) return VOLUME_MIN;
+  if(volume>VOLUME_MAX) return VOLUME_MAX;
+  return volume;
 }
 
-void Mixer::restore_volumes(void)
+static int mix_level(int volume)
 {
-  if(mixer_parts&SOUND_VOLUME_ACTIVE) {
-    // restore sound volume values
-    sound_volume_control_details.cbStruct=sizeof(sound_volume_control_details);
-    sound_volume_control_details.dwControlID=sound_volume_control.dwControlID;
-    sound_volume_control_details.cChannels=sound_line.cChannels;
-    sound_volume_control_details.cMultipleItems=0;
-    sound_volume_control_details.cbDetails=sizeof(MIXERCONTROLDETAILS_UNSIGNED);
-    sound_volume_control_details.paDetails=&saved_sound_volume;
-    mixerSetControlDetails((HMIXEROBJ)mixer_handle,&sound_volume_control_details,MIXER_OBJECTF_HMIXER|MIXER_GETCONTROLDETAILSF_VALUE);
-  }
-  if(mixer_parts&MUSIC_VOLUME_ACTIVE) {
-    // restore music volume values
-    music_volume_control_details.cbStruct=sizeof(music_volume_control_details);
-    music_volume_control_details.dwControlID=music_volume_control.dwControlID;
-    music_volume_control_details.cChannels=music_line.cChannels;
-    music_volume_control_details.cMultipleItems=0;
-    music_volume_control_details.cbDetails=sizeof(MIXERCONTROLDETAILS_UNSIGNED);
-    music_volume_control_details.paDetails=&saved_music_volume;
-    mixerSetControlDetails((HMIXEROBJ)mixer_handle,&music_volume_control_details,MIXER_OBJECTF_HMIXER|MIXER_GETCONTROLDETAILSF_VALUE);
-  }
+  return (volume*MIX_MAX_VOLUME+VOLUME_MAX/2)/VOLUME_MAX;
 }
 
 void Mixer::init(DWORD line)
 {
-  MMRESULT result;
-  // get number of mixer devices available
-  mixer_active=mixerGetNumDevs();
-  // initialize mixer
-  if(mixer_active) {
-    mixer_parts=SOUND_VOLUME_ACTIVE|MUSIC_VOLUME_ACTIVE;
-    // at least one is available, we will always use first one
-    result=mixerOpen(&mixer_handle,0,(DWORD_PTR)Comm::hwnd,0,CALLBACK_WINDOW|MIXER_OBJECTF_MIXER);
-    if(result!=MMSYSERR_NOERROR) mixer_parts=0;
-    // retrieve information about music audio line
-    music_line.cbStruct=sizeof(music_line);
-    music_line.dwComponentType=line;
-    result=mixerGetLineInfo((HMIXEROBJ)mixer_handle,&music_line,MIXER_OBJECTF_HMIXER|MIXER_GETLINEINFOF_COMPONENTTYPE);
-    if(result!=MMSYSERR_NOERROR) mixer_parts&=~MUSIC_VOLUME_ACTIVE;
-    // retrieve information about sound audio line
-    sound_line.cbStruct=sizeof(sound_line);
-    sound_line.dwComponentType=MIXERLINE_COMPONENTTYPE_SRC_WAVEOUT;
-    result=mixerGetLineInfo((HMIXEROBJ)mixer_handle,&sound_line,MIXER_OBJECTF_HMIXER|MIXER_GETLINEINFOF_COMPONENTTYPE);
-    if(result!=MMSYSERR_NOERROR) mixer_parts&=~SOUND_VOLUME_ACTIVE;
-    // retrieve music volume control
-    memset(&controls,0,sizeof(controls));
-    controls.cbStruct=sizeof(controls);
-    controls.dwLineID=music_line.dwLineID;
-    controls.dwControlType=MIXERCONTROL_CONTROLTYPE_VOLUME;
-    controls.cControls=1;
-    controls.cbmxctrl=sizeof(music_volume_control);
-    controls.pamxctrl=&music_volume_control;
-    result=mixerGetLineControls((HMIXEROBJ)mixer_handle,&controls,MIXER_OBJECTF_HMIXER|MIXER_GETLINECONTROLSF_ONEBYTYPE);
-    if(result!=MMSYSERR_NOERROR) mixer_parts&=~MUSIC_VOLUME_ACTIVE;
-    // retrieve sound volume control
-    memset(&controls,0,sizeof(controls));
-    controls.cbStruct=sizeof(controls);
-    controls.dwLineID=sound_line.dwLineID;
-    controls.dwControlType=MIXERCONTROL_CONTROLTYPE_VOLUME;
-    controls.cControls=1;
-    controls.cbmxctrl=sizeof(sound_volume_control);
-    controls.pamxctrl=&sound_volume_control;
-    result=mixerGetLineControls((HMIXEROBJ)mixer_handle,&controls,MIXER_OBJECTF_HMIXER|MIXER_GETLINECONTROLSF_ONEBYTYPE);
-    if(result!=MMSYSERR_NOERROR) mixer_parts&=~SOUND_VOLUME_ACTIVE;
+  (void)line;  // the mixer line that carried the music (CD, line in or MIDI)
+  sound_volume=clamp_volume((int)Registry::get_int(sec_sos,key_sound_volume,default_volume));
+  music_volume=clamp_volume((int)Registry::get_int(sec_sos,key_music_volume,default_volume));
+  if(Sounds::active&&(Sounds::active_mode!=SOS_NONE)) {
+    Mix_MasterVolume(mix_level(sound_volume));
+    Mix_VolumeMusic(mix_level(music_volume));
   }
 }
 
-void Mixer::quit(void) 
+void Mixer::quit(void)
 {
-  if(mixer_active) {
-//    Mixer::restore_volumes();
-    mixerClose(mixer_handle);
-  }
-  mixer_active=0;
 }
-
 
 int Mixer::get_sound_volume(void)
 {
-  if(mixer_parts&SOUND_VOLUME_ACTIVE) return sound_volume;
-  else return 0;
+  return sound_volume;
 }
 
 int Mixer::get_music_volume(void)
 {
-  if(mixer_parts&MUSIC_VOLUME_ACTIVE) return music_volume;
-  else return 0;
+  return music_volume;
 }
-
 
 void Mixer::set_sound_volume(int volume)
 {
-  if(!(mixer_parts&SOUND_VOLUME_ACTIVE)) return;
-  if(volume>VOLUME_MAX) volume=VOLUME_MAX;
-  // calculate new sound volume values
-  sound_volume=volume;
-  if(saved_sound_volume[0].dwValue==saved_sound_volume[1].dwValue) {
-    new_sound_volume[0].dwValue=volume;
-    new_sound_volume[1].dwValue=volume;
-  } else {
-    int louder=saved_sound_volume[0].dwValue>=saved_sound_volume[1].dwValue?0:1;
-    new_sound_volume[louder].dwValue=volume;
-    new_sound_volume[1-louder].dwValue=(volume*saved_sound_volume[1-louder].dwValue)/VOLUME_MAX;
-  }
-  // set sound volume
-  sound_volume_control_details.cbStruct=sizeof(sound_volume_control_details);
-  sound_volume_control_details.dwControlID=sound_volume_control.dwControlID;
-  sound_volume_control_details.cChannels=sound_line.cChannels;
-  sound_volume_control_details.cMultipleItems=0;
-  sound_volume_control_details.cbDetails=sizeof(MIXERCONTROLDETAILS_UNSIGNED);
-  sound_volume_control_details.paDetails=&new_sound_volume;
-  internal_change=1;
-  MMRESULT result=mixerSetControlDetails((HMIXEROBJ)mixer_handle,&sound_volume_control_details,MIXER_OBJECTF_HMIXER|MIXER_GETCONTROLDETAILSF_VALUE);
-  if(result!=MMSYSERR_NOERROR) mixer_parts&=~SOUND_VOLUME_ACTIVE;
+  sound_volume=clamp_volume(volume);
+  Registry::set_int(sec_sos,key_sound_volume,sound_volume);
+  if(Sounds::active&&(Sounds::active_mode!=SOS_NONE)) Mix_MasterVolume(mix_level(sound_volume));
 }
 
 void Mixer::set_music_volume(int volume)
 {
-  if(!(mixer_parts&MUSIC_VOLUME_ACTIVE)) return;
-  // calculate new music volume values
-  music_volume=volume;
-  if(saved_music_volume[0].dwValue==saved_music_volume[1].dwValue) {
-    new_music_volume[0].dwValue=volume;
-    new_music_volume[1].dwValue=volume;
-  } else {
-    int louder=saved_music_volume[0].dwValue>=saved_music_volume[1].dwValue?0:1;
-    new_music_volume[louder].dwValue=volume;
-    new_music_volume[1-louder].dwValue=(volume*saved_music_volume[1-louder].dwValue)/VOLUME_MAX;
-  }
-  // set music volume
-  music_volume_control_details.cbStruct=sizeof(music_volume_control_details);
-  music_volume_control_details.dwControlID=music_volume_control.dwControlID;
-  music_volume_control_details.cChannels=music_line.cChannels;
-  music_volume_control_details.cMultipleItems=0;
-  music_volume_control_details.cbDetails=sizeof(MIXERCONTROLDETAILS_UNSIGNED);
-  music_volume_control_details.paDetails=&new_music_volume;
-  internal_change=1;
-  MMRESULT result=mixerSetControlDetails((HMIXEROBJ)mixer_handle,&music_volume_control_details,MIXER_OBJECTF_HMIXER|MIXER_GETCONTROLDETAILSF_VALUE);
-  if(result!=MMSYSERR_NOERROR) mixer_parts&=~MUSIC_VOLUME_ACTIVE;
+  music_volume=clamp_volume(volume);
+  Registry::set_int(sec_sos,key_music_volume,music_volume);
+  if(Sounds::active&&(Sounds::active_mode!=SOS_NONE)) Mix_VolumeMusic(mix_level(music_volume));
 }
-

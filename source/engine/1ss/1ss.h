@@ -38,6 +38,9 @@
 //max number of channels
 #define SOS_MAX_CHANNELS 16
 
+// Port: samples and music play through SDL_mixer (was DirectSound or WaveOut, and MCI CD audio).
+struct Mix_Chunk;
+
 class Sample {
 public:
   Sample();
@@ -51,8 +54,7 @@ public:
   int volume;
 private:
   char const* name;
-  void* samples;
-  IDirectSoundBuffer* buffer;
+  Mix_Chunk* chunk;  // was IDirectSoundBuffer* buffer, and void* samples for WaveOut
   WAVEFORMATEX format;
   unsigned size;
   unsigned time;
@@ -62,12 +64,11 @@ private:
   friend class Sounds;
 };
 
+// Port: the game's own sound and music volumes (was the system mixer's; see 1ss_mix.cpp).
 class Mixer {
 private:
   static void init(DWORD line);
   static void quit(void);
-  static void save_volumes(void);
-  static void restore_volumes(void);
   static int get_sound_volume(void);
   static int get_music_volume(void);
   static void set_sound_volume(int volume);
@@ -90,17 +91,18 @@ private:
   static void play(Sample* sample,int panning,int volume=VOLUME_MAX);
   static void stop(Sample* sample);
   static int playing(Sample* sample);
+  static void forget(Sample* sample);  // port: a freed sample leaves its channel
   static void quit(void);
-  static int active; 
+  static int active;
   static int active_mode;
   static int app_active;
-  static IDirectSound* sound_driver;
   friend class Sample;
   friend class CD;
   friend class Song;
   friend class Mixer;
 };
 
+// Port: the CD's audio tracks are FLAC files in the music directory (see 1ss_song.cpp).
 class CD {
 public:
   CD();
@@ -109,12 +111,15 @@ public:
   static void init(void);
   static void play(int track,int repeat=1);
   static void stop(void);
+  static void set_directory(const char* dir);  // port: before Cwe::init
 private:
+  static void pause(void);   // port: while the application is inactive
+  static void resume(void);
   static int current_track;
-  static UINT DeviceID;
   friend class Sounds;
 };
 
+// Port: MIDI songs were the shareware edition's music; not ported (1ss_song.cpp).
 class Song {
 public:
   Song();
@@ -123,7 +128,6 @@ public:
   static void stop(void);
 private:
   static char* song;
-  static UINT DeviceID;
   friend class Sounds;
 };
 

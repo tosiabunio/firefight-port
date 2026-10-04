@@ -1,199 +1,73 @@
 #include "1ss_hdrs.h"
+#include <math.h>
+#include <SDL.h>
+#include <SDL_mixer.h>
+
+// Port: SDL_mixer replaces DirectSound and WaveOut. The voice model is the original's: each
+// Sample is one voice (playing it again restarts it), on one of total_channels channels, and a
+// sample takes the channel of a playing one with the same or a lower priority when all are busy.
+// SDL_mixer channels stand for the DirectSound buffers' playing slots; SOS_WAVE uses channel 0.
 
 static Comm::wpp prev_win_proc=NULL;
-static IDirectSoundBuffer* primary_buffer;
 static Sample* channels[SOS_MAX_CHANNELS];
-static WAVEHDR waveout_header;
-static HWAVEOUT waveout_handle;
 static int total_channels;
-static int start_sound_volume;
-static int start_music_volume;
-static int song=0;
-static char* midi_song=NULL;
-static int mixer_active=0;
 static int priority=0;
 static int extra_debug=0;
 static unsigned handle=0;
 static unsigned start_time;
 static unsigned sample_time;
 static unsigned handle_seed=1;
-static HINSTANCE lib_handle=NULL;
-typedef HRESULT (WINAPI *DSC)(GUID FAR* lpGUID,LPDIRECTSOUND* ppDS,IUnknown FAR *pUnkOuter);
 
 int Sounds::extra_debug=0;
 int Sounds::active=0;
 int Sounds::active_mode;
 int Sounds::app_active=1;
-IDirectSound* Sounds::sound_driver;
+
+// Port: opens the default audio device at its own rate (was the DirectSound primary buffer,
+// whose format the mode chose, or the WaveOut device). Samples are converted to it when loaded.
+static int open_audio(void)
+{
+  if(SDL_InitSubSystem(SDL_INIT_AUDIO)!=0) {
+    WARNING("no sound: SDL audio failed (%s)",SDL_GetError());
+    return 0;
+  }
+  if((Mix_Init(MIX_INIT_FLAC)&MIX_INIT_FLAC)==0)
+    WARNING("no music: SDL_mixer has no FLAC support (%s)",Mix_GetError());
+  if(Mix_OpenAudioDevice(MIX_DEFAULT_FREQUENCY,AUDIO_S16SYS,2,1024,NULL,SDL_AUDIO_ALLOW_FREQUENCY_CHANGE)!=0) {
+    WARNING("no sound: the audio device does not open (%s)",Mix_GetError());
+    Mix_Quit();
+    SDL_QuitSubSystem(SDL_INIT_AUDIO);
+    return 0;
+  }
+  int frequency,channels;
+  Uint16 format;
+  Mix_QuerySpec(&frequency,&format,&channels);
+  ENGINFO("SDL_mixer: %s driver, %dHz, %d output channels",SDL_GetCurrentAudioDriver(),frequency,channels);
+  return 1;
+}
 
 void Sounds::init(int mode,int required_channels,DWORD _music_line)
 {
   try {
     DBG_CHECK(Comm::hwnd!=NULL);
-    if((mode==SOS_16_S_22)||(mode==SOS_16_S_11)||(mode==SOS_8_S_22)||(mode==SOS_8_S_11)) {
-      // the system uses Direct Sound
-      // load DSOUND.DLL
-      lib_handle=LoadLibrary("DSOUND.DLL");
-      if(lib_handle==NULL)
-        FAILURE2(SOS_DS_NOT_INSTALLED,"initialization of DirectSound failed (DSOUND.DLL load failed)");
-      // access Direct Sound Create function from DLL
-      DSC dsc=(DSC)GetProcAddress(lib_handle,"DirectSoundCreate");
-      if(dsc==NULL) FAILURE2(SOS_DS_NOT_INSTALLED,"initialization of DirectSound failed (GetProcAddress failed)");
-      // create Direct Sound object (sound driver)
-      if(dsc(NULL,&sound_driver,NULL)!=DS_OK)
-        FAILURE2(SOS_CANNOT_INITIALIZE,"initialization of DirectSound failed (DS object create failed)");
-      DSCAPS capabilities;
-      capabilities.dwSize=sizeof(capabilities);
-      // query Direct Sound object capabilities
-      if(sound_driver->GetCaps(&capabilities)==DS_OK) {
-        SYSINFO("Direct Sound system information:");
-#define FLAG(mask,text) if(capabilities.dwFlags&mask) SYSINFO(text)
-        FLAG(DSCAPS_CONTINUOUSRATE, "  supports continuous sample rate");
-        FLAG(DSCAPS_EMULDRIVER,     "  uses emulation driver");
-        FLAG(DSCAPS_CERTIFIED,      "  Microsoft certified");
-        FLAG(DSCAPS_PRIMARY16BIT,   "  primary 16-bit buffer");
-        FLAG(DSCAPS_PRIMARY8BIT,    "  primary 8-bit buffer");
-        FLAG(DSCAPS_PRIMARYSTEREO,  "  primary stereo buffer");
-        FLAG(DSCAPS_PRIMARYMONO,    "  primary mono buffer");
-        FLAG(DSCAPS_SECONDARY16BIT, "  hardware secondary 16-bit buffers");
-        FLAG(DSCAPS_SECONDARY8BIT,  "  hardware secondary 8-bit buffers");
-        FLAG(DSCAPS_SECONDARYSTEREO,"  hardware secondary stereo buffers");
-        FLAG(DSCAPS_SECONDARYMONO,  "  hardware secondary mono buffers");
-        SYSINFO("  sound card memory=%dkb(%dkb free)",kilo(capabilities.dwTotalHwMemBytes),kilo(capabilities.dwFreeHwMemBytes));
-        SYSINFO("  transfer rate=%dkb/s",capabilities.dwUnlockTransferRateHwBuffers);
-        SYSINFO("  cpu overhead=%d%%",capabilities.dwPlayCpuOverheadSwBuffers);
-      }
-      // set exclusive cooperative level (no cooperation at all :)
-      if(sound_driver->SetCooperativeLevel(Comm::hwnd,DSSCL_EXCLUSIVE)!=DS_OK) {
-        sound_driver->Release();
-        sound_driver=NULL;
-        FAILURE2(SOS_CANNOT_INITIALIZE,"initialization of DirectSound failed (cooperative level cannot be set)");
-      }
-      // prepare primary buffer description
-      DSBUFFERDESC primary_buffer_description;
-      primary_buffer_description.dwSize=sizeof(DSBUFFERDESC);
-      primary_buffer_description.dwFlags=DSBCAPS_PRIMARYBUFFER;
-      primary_buffer_description.dwBufferBytes=0;
-      primary_buffer_description.dwReserved=0;
-      primary_buffer_description.lpwfxFormat=NULL;
-      // create primary buffer
-      int res=sound_driver->CreateSoundBuffer(&primary_buffer_description,&primary_buffer,NULL);
-      if(res==DSERR_OUTOFMEMORY) {
-        sound_driver->Release();
-        sound_driver=NULL;
-        FAILURE2(SOS_OUT_OF_MEMORY,"initialization of DirectSound failed (create primary buffer failed - out of memory)");
-      }
-      if(res!=DS_OK) {
-        sound_driver->Release();
-        sound_driver=NULL;
-        FAILURE2(SOS_CANNOT_INITIALIZE,"initialization of DirectSound failed (create primary buffer failed)");
-      }
-      WAVEFORMATEX primary_buffer_format;
-      // change format of primary buffer to one of preffered formats
-      switch(mode) {
-      case SOS_16_S_22:
-        // change to 16-bit, stereo, 22.1 kHz
-        primary_buffer_format.wFormatTag=WAVE_FORMAT_PCM;
-        primary_buffer_format.nChannels=2;
-        primary_buffer_format.nSamplesPerSec=22050;
-        primary_buffer_format.nAvgBytesPerSec=22050*2*2;
-        primary_buffer_format.nBlockAlign=4;
-        primary_buffer_format.wBitsPerSample=16;
-        primary_buffer_format.cbSize=0;
-        if(primary_buffer->SetFormat(&primary_buffer_format)==DS_OK) {
-          ENGINFO("Direct Sound primary buffer: 16-bit, stereo, 22050Hz");
-          goto buffer_set;
-        }
-        // try another format if this one fails (no break!)
-      case SOS_16_S_11:
-        // change to 16-bit, stereo, 11.05 kHz
-        primary_buffer_format.wFormatTag=WAVE_FORMAT_PCM;
-        primary_buffer_format.nChannels=2;
-        primary_buffer_format.nSamplesPerSec=11025;
-        primary_buffer_format.nAvgBytesPerSec=11025*2*2;
-        primary_buffer_format.nBlockAlign=4;
-        primary_buffer_format.wBitsPerSample=16;
-        primary_buffer_format.cbSize=0;
-        if(primary_buffer->SetFormat(&primary_buffer_format)==DS_OK) {
-          ENGINFO("Direct Sound primary buffer: 16-bit, stereo, 11025Hz");
-          goto buffer_set;
-        }
-        // try another format if this one fails (no break!)
-      case SOS_8_S_22:
-        // change to 8-bit, stereo, 22.1 kHz
-        primary_buffer_format.wFormatTag=WAVE_FORMAT_PCM;
-        primary_buffer_format.nChannels=2;
-        primary_buffer_format.nSamplesPerSec=22050;
-        primary_buffer_format.nAvgBytesPerSec=22050*2;
-        primary_buffer_format.nBlockAlign=2;
-        primary_buffer_format.wBitsPerSample=8;
-        primary_buffer_format.cbSize=0;
-        if(primary_buffer->SetFormat(&primary_buffer_format)==DS_OK) {
-          ENGINFO("Direct Sound primary buffer: 8-bit, stereo, 22050Hz");
-          goto buffer_set;
-        }
-        // try another format if this one fails (no break!)
-      case SOS_8_S_11:
-        // change to 8-bit, stereo, 11.05 kHz
-        primary_buffer_format.wFormatTag=WAVE_FORMAT_PCM;
-        primary_buffer_format.nChannels=2;
-        primary_buffer_format.nSamplesPerSec=11025;
-        primary_buffer_format.nAvgBytesPerSec=11025*2;
-        primary_buffer_format.nBlockAlign=2;
-        primary_buffer_format.wBitsPerSample=8;
-        primary_buffer_format.cbSize=0;
-        if(primary_buffer->SetFormat(&primary_buffer_format)==DS_OK) {
-          ENGINFO("Direct Sound primary buffer: 8-bit, stereo, 11025Hz");
-          goto buffer_set;
-        }
-      default:
-        // device doesn't accept any preferred format, stays in its default (whatever it is)
-        MESSAGE("unable to set preferred buffer format");
-      }
-buffer_set:
-      // play primary buffer in loop
-      res=primary_buffer->Play(0,0,DSBPLAY_LOOPING);
-      if(res==DSERR_BUFFERLOST) {
-        primary_buffer->Restore();
-        res=primary_buffer->Play(0,0,DSBPLAY_LOOPING);
-      }
-      if(res!=DS_OK) {
-        primary_buffer->Release();
-        primary_buffer=NULL;
-        sound_driver->Release();
-        sound_driver=NULL;
-        FAILURE2(SOS_CANNOT_INITIALIZE,"initialization of DirectSound failed (primary buffer does not play)");
-      }
-      // initialize channels array
-      for(int i=0;i<SOS_MAX_CHANNELS;i++) channels[i]=NULL;
-    } else if(mode==SOS_WAVE) {
-      // the system uses WaveOut
-      // set wave out format (8-bit, mono, 11kHz)
-      WAVEFORMATEX waveout_format;
-      waveout_format.wFormatTag=WAVE_FORMAT_PCM;
-      waveout_format.nChannels=1;
-      waveout_format.nSamplesPerSec=11025;
-      waveout_format.nAvgBytesPerSec=11025;
-      waveout_format.nBlockAlign=1;
-      waveout_format.wBitsPerSample=8;
-      waveout_format.cbSize=0;
-      // initialize wave out device
-      MMRESULT res=waveOutOpen((LPHWAVEOUT)&waveout_handle,WAVE_MAPPER,&waveout_format,0,0,CALLBACK_NULL);
-      if(res!=MMSYSERR_NOERROR)
-        FAILURE2(SOS_CANNOT_INITIALIZE,"initialization of WaveOut failed");
-      memset(&waveout_header,0,sizeof(waveout_header));
-      waveOutReset(waveout_handle);
-      priority=0;
-      ENGINFO("WaveOut: single channel, mono sounds, 11025Hz");
-    } else if(mode==SOS_NONE) {
-      priority=0;
-    } else {
+    if((mode==SOS_16_S_22)||(mode==SOS_16_S_11)||(mode==SOS_8_S_22)||(mode==SOS_8_S_11)||(mode==SOS_WAVE)) {
+      // port: without an audio device the game runs silent (was a failure)
+      if(!open_audio()) mode=SOS_NONE;
+    } else if(mode!=SOS_NONE) {
       FAILURE("invalid intialization mode specified");
     }
+    priority=0;
+    for(int i=0;i<SOS_MAX_CHANNELS;i++) channels[i]=NULL;
     // init mixer
     if((required_channels<=0)||(required_channels>SOS_MAX_CHANNELS))
       FAILURE("invalid number of channels: %d (1..%d allowed)",required_channels,SOS_MAX_CHANNELS);
     total_channels=required_channels;
+    if(mode==SOS_WAVE) {
+      Mix_AllocateChannels(1);
+      ENGINFO("single channel (WaveOut mode)");
+    } else if(mode!=SOS_NONE) {
+      Mix_AllocateChannels(total_channels);
+    }
     ENGINFO("Number of active channels: %d",total_channels);
     // finish initialization and prepare quit handler
     Comm::quit_me(quit,"*sos","log mmu xio");
@@ -201,7 +75,6 @@ buffer_set:
     active_mode=mode;
     prev_win_proc=Comm::set_window_proc(window_proc);
     Mixer::init(_music_line);
-    Mixer::save_volumes();
   } catch (Failure) {
     FAILURE("initialization of sound system failed [Sounds::init]");
   }
@@ -213,21 +86,12 @@ void Sounds::quit(void)
   // stop CD
   CD::stop();
   if(active_mode!=SOS_NONE) {
-    if(active_mode!=SOS_WAVE) {
-      if(primary_buffer!=NULL) {
-        // stop then release primary buffer
-        primary_buffer->Stop();
-        primary_buffer->Release();
-      }
-      // release Direct Sound object
-      if(sound_driver!=NULL) sound_driver->Release();
-    } else {
-      waveOutReset(waveout_handle);
-      waveOutClose(waveout_handle);
-    }
-    // restore mixer settings
+    // port: was the release of the DirectSound objects or the WaveOut device
+    Mix_HaltChannel(-1);
     Mixer::quit();
-    if(lib_handle!=NULL) FreeLibrary(lib_handle);
+    Mix_CloseAudio();
+    Mix_Quit();
+    SDL_QuitSubSystem(SDL_INIT_AUDIO);
   }
   active=0;
 }
@@ -246,6 +110,31 @@ int VOLUME_FORMULA(int vol)
 {
   DBG_CHECK(((vol*100)/VOLUME_MAX)<=100);
   return logvol[(vol*100)/VOLUME_MAX];
+}
+
+// Port: DirectSound volumes and pans are attenuations in hundredths of a decibel; SDL_mixer takes
+// linear gains.
+static double gain(int hundredths)
+{
+  return pow(10.0,hundredths/2000.0);
+}
+
+// Port: was SetVolume and SetPan on the sample's buffer. A positive pan attenuates the left
+// channel, a negative one the right.
+static void set_volume_and_pan(int channel,int volume,int panning)
+{
+  Mix_Volume(channel,(int)(MIX_MAX_VOLUME*gain(VOLUME_FORMULA(volume))+0.5));
+  Uint8 left=255,right=255;
+  if(panning>0) left=(Uint8)(255*gain(-panning)+0.5);
+  if(panning<0) right=(Uint8)(255*gain(panning)+0.5);
+  Mix_SetPanning(channel,left,right);
+}
+
+// Port: was GetStatus()==DSBSTATUS_PLAYING on the channel's buffer. A paused channel counts as
+// playing, as a buffer did while the primary buffer was stopped.
+static int channel_playing(int channel)
+{
+  return Mix_Playing(channel)!=0;
 }
 
 int Sounds::playing(Sample* sample)
@@ -271,9 +160,7 @@ int Sounds::playing(Sample* sample)
        // handle identifies the sample occupying this channel
       if(channels[channel]->handle==sample->handle) {
         // check playing status
-        DWORD status;
-        channels[channel]->buffer->GetStatus(&status);
-        return status==DSBSTATUS_PLAYING;
+        return channel_playing(channel);
       }
     }
   }
@@ -308,13 +195,7 @@ void Sounds::play(Sample* sample,int panning,int volume)
       DBG_MESSAGE("higher priority detected");
       // new sample has higher priority than recently played sample
       if((active_mode==SOS_WAVE)&&(volume>19662)) {
-        if(priority>0) waveOutReset(waveout_handle);
-        waveout_header.lpData=(char*)sample->samples;
-        waveout_header.dwBufferLength=sample->size;
-        waveout_header.dwFlags=0;
-        waveOutPrepareHeader(waveout_handle,&waveout_header,sizeof(waveout_header));
-        waveOutWrite(waveout_handle,&waveout_header,sizeof(waveout_header));
-        waveOutUnprepareHeader(waveout_handle,&waveout_header,sizeof(waveout_header));
+        Mix_PlayChannel(0,sample->chunk,0);  // was waveOutReset and waveOutWrite
       }
       sample_time=sample->time;
       start_time=GetTickCount();
@@ -332,9 +213,7 @@ void Sounds::play(Sample* sample,int panning,int volume)
     // check if sample has already been played on some channel
     if(channels[channel]!=NULL) {
       if(channels[channel]->handle==sample->handle) {
-        DWORD status;
-        channels[channel]->buffer->GetStatus(&status);
-        if(status!=DSBSTATUS_PLAYING) {
+        if(!channel_playing(channel)) {
           channels[channel]->volume=0;
         }
         //check volume priority
@@ -346,9 +225,7 @@ void Sounds::play(Sample* sample,int panning,int volume)
     for(channel=0;channel<total_channels;channel++) {
       // free channel if sample has stopped
       if(channels[channel]!=NULL) {
-        DWORD status;
-        channels[channel]->buffer->GetStatus(&status);
-        if(status!=DSBSTATUS_PLAYING) {
+        if(!channel_playing(channel)) {
           channels[channel]=NULL;
         }
       }
@@ -359,7 +236,7 @@ void Sounds::play(Sample* sample,int panning,int volume)
       // no more free channels, replace sample with lower or same priority
       for(channel=0;channel<total_channels;channel++) {
         if(channels[channel]->priority<=sample->priority) {
-          channels[channel]->buffer->Stop();
+          Mix_HaltChannel(channel);
           channels[channel]=NULL;
           break;
         }
@@ -371,13 +248,9 @@ void Sounds::play(Sample* sample,int panning,int volume)
     //play sample on free channel [channel]
     channels[channel]=sample;
 play_on_channel:
-    channels[channel]->buffer->SetPan(panning);
-    channels[channel]->buffer->SetVolume(VOLUME_FORMULA(volume));
-    channels[channel]->buffer->SetCurrentPosition(0);
-    if(channels[channel]->buffer->Play(0,0,0)==DSERR_BUFFERLOST) {
-      if(channels[channel]->buffer->Restore()!=DS_OK) return;
-      channels[channel]->buffer->Play(0,0,0);
-    }
+    set_volume_and_pan(channel,volume,panning);
+    // was SetCurrentPosition(0) and Play, restoring a lost buffer
+    if(Mix_PlayChannel(channel,channels[channel]->chunk,0)<0) return;
     // store last volume played
     channels[channel]->volume=volume;
     // get unique play handle and encode channel number in it
@@ -397,7 +270,7 @@ void Sounds::stop(Sample* sample)
     break;
   case SOS_WAVE:
     if(sample->handle==handle) {
-      waveOutReset(waveout_handle);
+      Mix_HaltChannel(0);  // was waveOutReset
       priority=0;
     }
     break;
@@ -407,9 +280,20 @@ void Sounds::stop(Sample* sample)
     if(channels[channel]!=NULL) {
       if(channels[channel]->handle==sample->handle) {
         // handle identifies the sample occupying this channel, stop it
-        channels[channel]->buffer->Stop();
+        Mix_HaltChannel(channel);
         channels[channel]=NULL;
       }
+    }
+  }
+}
+
+// Port: Sample::free calls this, so that no channel refers to a sample whose chunk is gone.
+void Sounds::forget(Sample* sample)
+{
+  for(int channel=0;channel<SOS_MAX_CHANNELS;channel++) {
+    if(channels[channel]==sample) {
+      Mix_HaltChannel(channel);
+      channels[channel]=NULL;
     }
   }
 }
@@ -422,14 +306,14 @@ void Sounds::stop_all(void)
     priority=0;
     break;
   case SOS_WAVE:
-    waveOutReset(waveout_handle);
+    Mix_HaltChannel(0);  // was waveOutReset
     priority=0;
     break;
   default:
     // stop all samples on all channels
     for(int channel=0;channel<total_channels;channel++) {
       if(channels[channel]!=NULL) {
-        channels[channel]->buffer->Stop();
+        Mix_HaltChannel(channel);
         channels[channel]=NULL;
       }
     }
@@ -447,52 +331,27 @@ int Sounds::window_proc (int *result, HWND hwnd, UINT message, WPARAM wparam, LP
       {
         case WM_ACTIVATEAPP:
           app_active=LOWORD(wparam);
+          // port: the sounds and the music pause and resume (was a stop of the primary buffer
+          // and of the CD, which restarted its track from the beginning). The MCI notifications
+          // that looped the CD track and the system mixer's change messages are gone: SDL_mixer
+          // loops the music itself and the volumes are the game's own.
           if(app_active) {
-            // application has been activated, play current CD track from the beginning
-            if((active_mode!=SOS_NONE)&&(active_mode!=SOS_WAVE)) primary_buffer->Play(0,0,DSBPLAY_LOOPING);
-            CD::play(CD::current_track);
-            Song::play(Song::song);
+            // application has been activated
+            if((active_mode!=SOS_NONE)&&(active_mode!=SOS_WAVE)) Mix_Resume(-1);
+            CD::resume();
           } else {
-            // application has been deactivated, stop current CD track
-            int tmp=CD::current_track;
-            CD::stop();
-            CD::current_track=tmp;
-            char* stmp=Song::song;
-            Song::stop();
-            Song::song=stmp;
+            // application has been deactivated
+            CD::pause();
             // stop all sounds playing
             if(active_mode==SOS_WAVE) {
-              waveOutReset(waveout_handle);
+              Mix_HaltChannel(0);
               priority=0;
             }
-            if((active_mode!=SOS_NONE)&&(active_mode!=SOS_WAVE)) primary_buffer->Stop();
+            if((active_mode!=SOS_NONE)&&(active_mode!=SOS_WAVE)) Mix_Pause(-1);
           }
-          break;
-        case MM_MCINOTIFY:
-          if((lparam==(LONG)CD::DeviceID)&&(wparam==(WPARAM)MCI_NOTIFY_SUCCESSFUL)) {
-            DBG_MESSAGE("MM_MCINOTIFY+MCI_NOTIFY_SUCCESSFUL received");
-            // current CD track has been played to its end, restart it.
-            if(CD::current_track>0) CD::play(CD::current_track);
-            *result=0;
-            processed=1;
-          }
-          if((lparam==(LONG)Song::DeviceID)&&(wparam==(WPARAM)MCI_NOTIFY_SUCCESSFUL)) {
-            // current CD track has been played to its end, restart it.
-            Song::play(Song::song);
-            processed=1;
-            *result=0;
-            DBG_MESSAGE("MIDI song restarted");
-          }
-          break;
-        case MM_MIXM_CONTROL_CHANGE:
-          // other application has changed mixer settings
-          Mixer::save_volumes();
-//          if(!Mixer::internal_change) Mixer::save_volumes();
-//          Mixer::internal_change=0;
           break;
       }
     }
   }
   return(processed);
 }
-

@@ -295,6 +295,21 @@ Each phase ends with something runnable and an exit check. Phases 5–7 can over
   - Found so far: with sound off, the original already counts a sample's length by the wall clock (`GetTickCount`), so the messages advance in real time ([original-archive.md](original-archive.md#reference-screenshots-phase-3)).
   - The callers seen so far only change which message shows, volumes and one sound effect. `MManager::run` draws `RAND` twice every step whatever the messages do.
 - **Exit:** audio matches the original by ear: positioning, priorities, speech ducking and music per mission.
+- **Outcome** (2026-10-04). `1ss` runs on SDL2_mixer; the check by ear is still to do.
+  - **Samples:** the voice model is the original's, line for line: `total_channels` channels (8 by default), one voice per `Sample`, a replay restarting it unless the new volume is lower, and stealing the first channel with the same or a lower priority when all are busy.
+    - SDL_mixer channels take the place of the DirectSound buffers.
+    - The `logvol` volume and the pan are DirectSound attenuations in hundredths of a dB. They become linear gains for `Mix_Volume` and `Mix_SetPanning`; a positive pan attenuates the left channel.
+    - Samples are converted to the device's format when loaded (an in-memory WAV image for `Mix_LoadWAV_RW`). The device opens at its own rate; the mode's primary buffer format no longer matters.
+    - `sos_safe=1` (WaveOut) keeps its single voice and rules on one SDL_mixer channel. `sos_none=1` keeps the original's silent emulation, which headless runs use.
+    - Without an audio device the game runs silent with a warning (the original failed).
+  - **Music:** `CD::play(N)` streams `music/track{N+1:02}.flac`, looped when the original asked MCI for the notification that restarted the track. `CD::tracks` counts the files (8). `--music <dir>` overrides the default, `music/` next to the data directory. With `sos_none` nothing plays; the original still played the CD.
+  - **Focus:** losing it pauses the samples and the music, and getting it back resumes them. The original stopped the CD and restarted the track from its beginning.
+  - **Volumes:** the system-wide `Mixer` is gone. Its replacement keeps the game's sound volume (`Mix_MasterVolume`) and music volume (`Mix_VolumeMusic`), 0–`VOLUME_MAX` as before, in `settings.ini` (`sos/sound volume`, `sos/music volume`); the game had read them back from the system mixer, so it never stored them.
+    - Both default to half (−6 dB). The original's sound card mixed the CD in analogue; here music and samples share one digital mix.
+    - Measured on demo `level1` through the `disk` driver: at full volume 0.47% of the output samples clip (the effects alone 0.16%, as they saturated in DirectSound too); at half, none.
+  - **Removed:** the MIDI `Song` path (shareware only) is a stub. The DirectSound, MCI, mixer and wave-out stand-ins are gone from `compat/win32.h`.
+  - **`Sample::playing()`:** with sound on, a message lasts as long as its sample really plays, as in the original with a sound card. Demos stay in sync with sound on (`sound_play`).
+  - **Tests:** headless runs keep `sos_none=1`; `--sound` keeps the sound in a headless run. `sound_play` replays `level1` with the sound on through SDL's `disk` audio driver. It checks the start-up, the mission's track, that the output isn't silent, and the sync.
 
 ### Phase 7: network play over LAN and the internet (`1ee_netw`)
 - **ENet replaces DirectPlay.**

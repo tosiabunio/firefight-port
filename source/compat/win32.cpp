@@ -1,7 +1,7 @@
 // Definitions for the Win32 stand-ins declared in win32.h.
 //
-// DirectX is never loaded (LoadLibrary returns NULL), and MCI, the mixer and wave-out report that
-// no device is present. The clocks, GetUserName, SleepEx and VirtualAlloc (zero-filled) are real.
+// DirectX is never loaded (LoadLibrary returns NULL). The clocks, GetUserName, SleepEx and
+// VirtualAlloc (zero-filled) are real.
 
 #include <compat/win32.h>
 
@@ -30,10 +30,6 @@ DWORD milliseconds_since_start()
   const auto elapsed = std::chrono::steady_clock::now() - start_time;
   return (DWORD)std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count();
 }
-
-const MMRESULT MMSYSERR_INVALHANDLE = 5;
-const MMRESULT MMSYSERR_NODRIVER = 6;
-const MCIERROR MCIERR_DEVICE_NOT_INSTALLED = 256 + 50;
 
 } // namespace
 
@@ -100,39 +96,3 @@ LRESULT DefWindowProc(HWND, UINT, WPARAM, LPARAM) { return 0; }
 
 // --- multimedia -----------------------------------------------------------------------------------
 DWORD timeGetTime() { return milliseconds_since_start(); }
-
-
-
-MMRESULT waveOutOpen(LPHWAVEOUT handle, UINT, const WAVEFORMATEX *, DWORD_PTR, DWORD_PTR, DWORD)
-{
-  if (handle)
-    *handle = nullptr;
-  return MMSYSERR_NODRIVER;
-}
-MMRESULT waveOutClose(HWAVEOUT) { return MMSYSERR_INVALHANDLE; }
-MMRESULT waveOutReset(HWAVEOUT) { return MMSYSERR_INVALHANDLE; }
-MMRESULT waveOutPrepareHeader(HWAVEOUT, LPWAVEHDR, UINT) { return MMSYSERR_INVALHANDLE; }
-MMRESULT waveOutUnprepareHeader(HWAVEOUT, LPWAVEHDR, UINT) { return MMSYSERR_INVALHANDLE; }
-MMRESULT waveOutWrite(HWAVEOUT, LPWAVEHDR, UINT) { return MMSYSERR_INVALHANDLE; }
-
-UINT     mixerGetNumDevs() { return 0; }
-MMRESULT mixerOpen(HMIXER *mixer, UINT, DWORD_PTR, DWORD_PTR, DWORD)
-{
-  if (mixer)
-    *mixer = nullptr;
-  return MMSYSERR_NODRIVER;
-}
-MMRESULT mixerClose(HMIXER) { return MMSYSERR_INVALHANDLE; }
-MMRESULT mixerGetLineInfo(HMIXEROBJ, MIXERLINE *, DWORD) { return MMSYSERR_INVALHANDLE; }
-MMRESULT mixerGetLineControls(HMIXEROBJ, MIXERLINECONTROLS *, DWORD) { return MMSYSERR_INVALHANDLE; }
-MMRESULT mixerGetControlDetails(HMIXEROBJ, MIXERCONTROLDETAILS *, DWORD) { return MMSYSERR_INVALHANDLE; }
-MMRESULT mixerSetControlDetails(HMIXEROBJ, MIXERCONTROLDETAILS *, DWORD) { return MMSYSERR_INVALHANDLE; }
-
-MCIERROR mciSendCommand(MCIDEVICEID, UINT, DWORD_PTR, DWORD_PTR) { return MCIERR_DEVICE_NOT_INSTALLED; }
-
-BOOL mciGetErrorString(MCIERROR, LPSTR text, UINT size)
-{
-  if (size)
-    snprintf(text, size, "MCI is not available in this build");
-  return TRUE;
-}

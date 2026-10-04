@@ -1,15 +1,16 @@
 #include "1ss_hdrs.h"
+#include <SDL.h>
+#include <SDL_mixer.h>
 
 #define OLD_LOGGING_STYLE 0
 #define NEW_LOGGING_STYLE (1-OLD_LOGGING_STYLE)
 
 Sample::Sample()
 {
-  buffer=NULL;
+  chunk=NULL;
   handle=0;
   panning=PAN_CENTER;
   volume=VOLUME_MAX;
-  samples=NULL;
 }
 
 Sample::~Sample()
@@ -44,10 +45,37 @@ static struct {
 
 #pragma pack()
 
+static void put16(Uint8* p,unsigned v) { p[0]=(Uint8)v; p[1]=(Uint8)(v>>8); }
+static void put32(Uint8* p,unsigned v) { put16(p,v&0xFFFF); put16(p+2,v>>16); }
+
+// Port: reads the sample data into a WAV image for SDL_mixer, which converts it to the audio
+// device's format (was a DirectSound buffer in the sample's own format, or the data itself for
+// WaveOut).
+static Mix_Chunk* load_chunk(const WAVEFORMATEX& format,unsigned size)
+{
+  Uint8* wav=(Uint8*)SDL_malloc(44+size);
+  if(wav==NULL) FAILURE2(SOS_OUT_OF_MEMORY,"sample memory allocation failed");
+  memcpy(wav,"RIFF",4); put32(wav+4,36+size); memcpy(wav+8,"WAVEfmt ",8); put32(wav+16,16);
+  put16(wav+20,format.wFormatTag); put16(wav+22,format.nChannels);
+  put32(wav+24,format.nSamplesPerSec); put32(wav+28,format.nAvgBytesPerSec);
+  put16(wav+32,format.nBlockAlign); put16(wav+34,format.wBitsPerSample);
+  memcpy(wav+36,"data",4); put32(wav+40,size);
+  try {
+    File::read(wav+44,size);
+  } catch(Failure) {
+    SDL_free(wav);
+    throw;
+  }
+  Mix_Chunk* chunk=Mix_LoadWAV_RW(SDL_RWFromConstMem(wav,44+size),1);
+  SDL_free(wav);
+  if(chunk==NULL) FAILURE2(SOS_ERROR,"sample conversion failed (%s)",Mix_GetError());
+  return chunk;
+}
+
 void Sample::load(char const* long_name)
 {
   if(!Sounds::active) return;
-  DBG_CHECK(buffer==NULL);
+  DBG_CHECK(chunk==NULL);
   char filename[Text::max_label+1];
   DBG_CHECK(strlen(long_name)<=Text::max_label);
   strcpy(filename,long_name);
@@ -92,36 +120,14 @@ void Sample::load(char const* long_name)
     format.cbSize=0;
     time=(size*1000)/format.nAvgBytesPerSec;
     if(Sounds::active_mode==SOS_NONE) {
-      samples==NULL;
+      // no data needed (was "samples==NULL;", a comparison with no effect)
     } else if(Sounds::active_mode==SOS_WAVE) {
       if(format.nChannels!=1) FAILURE ("invalid sample format (not mono) for WaveOut");
       if(format.nSamplesPerSec!=11025) FAILURE ("invalid sample format (not 11025Hz) for WaveOut");
       if(format.wBitsPerSample!=8) FAILURE ("invalid sample format (not 8-bit) for WaveOut");
-      samples=Heap::alloc(size,"samples");
-      File::read(samples,size);
+      chunk=load_chunk(format,size);
     } else {
-      DSBUFFERDESC buffer_description;
-      buffer_description.dwSize=sizeof(DSBUFFERDESC);
-      buffer_description.dwFlags=DSBCAPS_CTRLVOLUME|DSBCAPS_CTRLPAN|DSBCAPS_LOCSOFTWARE;
-      buffer_description.dwBufferBytes=size;
-      buffer_description.dwReserved=0;
-      buffer_description.lpwfxFormat=&format;
-      int res=Sounds::sound_driver->CreateSoundBuffer(&buffer_description,&buffer,NULL);
-      if(res==DSERR_OUTOFMEMORY) FAILURE2(SOS_OUT_OF_MEMORY,"static sound buffer creation failed");
-      if(res!=DS_OK) FAILURE2(SOS_ERROR,"static sound buffer creation failed");
-      char* ptr1;
-      char* ptr2;
-      DWORD bytes1;
-      DWORD bytes2;
-      res=buffer->Lock(0,size,(LPVOID*)&ptr1,&bytes1,(LPVOID*)&ptr2,&bytes2,0);
-      if(res==DSERR_BUFFERLOST) {
-        buffer->Restore();
-        res=buffer->Lock(0,size,(LPVOID*)&ptr1,&bytes1,(LPVOID*)&ptr2,&bytes2,0);
-      }
-      if(res!=DS_OK) FAILURE2(SOS_ERROR,"sound buffer lock failed");
-      DBG_CHECK(ptr2==NULL);
-      File::read(ptr1,size);
-      buffer->Unlock((void*)ptr1,bytes1,(void*)ptr2,bytes2);
+      chunk=load_chunk(format,size);
     }
     char flag=File::info.flags[0]==0?'5':File::info.flags[0];
     File::close();
@@ -144,16 +150,12 @@ void Sample::load(char const* long_name)
 
 void Sample::free(void)
 {
-  if((Sounds::active_mode==SOS_WAVE)&&(samples!=NULL)) {
-    Heap::free(samples);
-    samples=NULL;
-  } else {
-    if((buffer!=NULL)&&(Sounds::active)) {
-      buffer->Stop();
-      buffer->Release();
-    }
-    buffer=NULL;
+  // port: was the release of the DirectSound buffer, or of the data for WaveOut
+  if((chunk!=NULL)&&(Sounds::active)) {
+    Sounds::forget(this);
+    Mix_FreeChunk(chunk);
   }
+  chunk=NULL;
 }
 
 void Sample::play(int _panning,int _volume)

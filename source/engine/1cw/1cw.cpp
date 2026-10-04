@@ -324,8 +324,7 @@ void Cwe::init (Cwe_param *param)
     //----------------------
     // Sos initialization
     //----------------------
-    // TODO(phase 6): sound stays inactive until 1ss runs on SDL_mixer (DirectSound is a stub).
-    if (true || Cmd_line::get_int("sos_none",0)==1)
+    if (Cmd_line::get_int("sos_none",0)==1)
       Sounds::init(0);
     else if (Cmd_line::get_int("sos_safe",0)==1)
       Sounds::init(1);
