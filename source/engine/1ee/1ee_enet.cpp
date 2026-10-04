@@ -19,8 +19,6 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <deque>
-
 namespace enet_transport
 {
 namespace
@@ -65,7 +63,12 @@ unsigned char info_bytes[info_len];
 char          own_name[name_len];
 ENetAddress   host_address;
 Slot          slots[max_players + 1];  // by player id
-std::deque<Message> inbox;
+// The messages received for this player, oldest first. Plain data only: the engine's quit
+// procedures (Net::quit) run after the static destructors, so nothing here may have one.
+const int     inbox_size = 1024;
+Message       inbox[inbox_size];
+int           inbox_head = 0;
+int           inbox_count = 0;
 
 void report(const char *format, ...)
 {
@@ -108,11 +111,16 @@ int present_count()
 
 void deliver(unsigned from, const unsigned char *data, size_t size)
 {
-  Message m;
+  if (inbox_count == inbox_size)
+  {
+    failed = "too many messages waiting";
+    return;
+  }
+  Message &m = inbox[(inbox_head + inbox_count) % inbox_size];
   m.from = from;
   m.size = (unsigned)size;
   memcpy(m.data, data, size);
-  inbox.push_back(m);
+  inbox_count++;
 }
 
 void host_receive(ENetPeer *peer, const unsigned char *data, size_t size)
@@ -457,19 +465,19 @@ bool send(unsigned to, const void *data, unsigned size)
 bool receive(void *data, unsigned *size, unsigned *from)
 {
   poll();
-  if (inbox.empty())
+  if (inbox_count == 0)
     return false;
-  const Message &m = inbox.front();
-  if (m.size > *size)
+  const Message &m = inbox[inbox_head];
+  bool fits = m.size <= *size;
+  if (fits)
   {
-    inbox.pop_front();
-    return false;
+    memcpy(data, m.data, m.size);
+    *size = m.size;
+    *from = m.from;
   }
-  memcpy(data, m.data, m.size);
-  *size = m.size;
-  *from = m.from;
-  inbox.pop_front();
-  return true;
+  inbox_head = (inbox_head + 1) % inbox_size;
+  inbox_count--;
+  return fits;
 }
 
 void leave(void)
@@ -489,6 +497,6 @@ void leave(void)
   host_peer = nullptr;
   is_host = is_started = connected = false;
   own_id = 0;
-  inbox.clear();
+  inbox_head = inbox_count = 0;
 }
 } // namespace enet_transport
