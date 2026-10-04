@@ -200,6 +200,15 @@ add_test(NAME net_play
           -DPORT=19962
           -P ${CMAKE_SOURCE_DIR}/tests/check_net.cmake)
 set_tests_properties(net_play PROPERTIES TIMEOUT 300)
+# The same, with the client finding the game by LAN discovery (--join lan).
+add_test(NAME net_lan
+  COMMAND ${CMAKE_COMMAND}
+          -DFIREFIGHT=$<TARGET_FILE:firefight> -DDATA=${FF_DATA_DIR}
+          -DPREF=${CMAKE_CURRENT_BINARY_DIR}/net_lan
+          -DSCRIPTS=${CMAKE_SOURCE_DIR}/tests/input
+          -DPORT=19964 -DJOIN=lan
+          -P ${CMAKE_SOURCE_DIR}/tests/check_net.cmake)
+set_tests_properties(net_lan PROPERTIES TIMEOUT 300)
 
 # Phase 4 input check: an input script starts the first mission from the title and flies it with
 # the keyboard, the mouse and a virtual game controller, switching with F11. The input states it

@@ -29,7 +29,8 @@
 //   --input <file>    play an input script: keys, mouse and a virtual game controller at given
 //                     frames (input_script.cpp)
 //   --host <players>  host a network game for 2-4 players and wait for them (net_host=<n>)
-//   --join <address>  join the network game hosted at that address (net_join=<address>)
+//   --join <address>  join the network game hosted at that address (net_join=<address>); lan
+//                     joins the first open game found on the LAN
 //   --port <port>     the network game's UDP port (net_port=<port>), default 19960
 //
 // Relative paths mean the current directory. Everything else is passed through as an original

@@ -3,12 +3,18 @@
 # they connected, both reached the mission, the per-frame sync check never failed, and both ended
 # normally.
 #
-#   cmake -DFIREFIGHT=<exe> -DDATA=<dir> -DPREF=<dir> -DSCRIPTS=<dir> -DPORT=<port> -P check_net.cmake
+#   cmake -DFIREFIGHT=<exe> -DDATA=<dir> -DPREF=<dir> -DSCRIPTS=<dir> -DPORT=<port> [-DJOIN=lan]
+#         -P check_net.cmake
+#
+# JOIN is what the client joins: 127.0.0.1 by default, or lan to find the game by LAN discovery.
 #
 # execute_process runs its commands at the same time (as a pipeline), which is how the two
 # peers run side by side; the client retries until the host is listening.
 
 cmake_minimum_required(VERSION 3.25)
+if(NOT DEFINED JOIN)
+  set(JOIN 127.0.0.1)
+endif()
 
 file(REMOVE_RECURSE "${PREF}")
 file(MAKE_DIRECTORY "${PREF}/host" "${PREF}/client")
@@ -16,7 +22,7 @@ set(common --data "${DATA}" --headless --fast --port ${PORT} --quit-frames 1200)
 execute_process(
   COMMAND "${FIREFIGHT}" ${common} --pref "${PREF}/host" --host 2
           --input "${SCRIPTS}/net_host.txt"
-  COMMAND "${FIREFIGHT}" ${common} --pref "${PREF}/client" --join 127.0.0.1
+  COMMAND "${FIREFIGHT}" ${common} --pref "${PREF}/client" --join ${JOIN}
           --input "${SCRIPTS}/net_client.txt"
   RESULTS_VARIABLE results
   OUTPUT_VARIABLE output
@@ -37,12 +43,16 @@ foreach(peer host client)
     message(SEND_ERROR "${peer} exited with ${result}")
     set(failed 1)
   endif()
+  set(found "")
   if(peer STREQUAL "host")
     set(connected "network: player 2 (")
   else()
     set(connected "network: joined as player 2")
+    if(JOIN STREQUAL "lan")
+      set(found "network: found")
+    endif()
   endif()
-  foreach(expected "${connected}" "all players connected" "reading directory: net1.dir"
+  foreach(expected ${found} "${connected}" "all players connected" "reading directory: net1.dir"
                    "INTERACTIVE section entered" "completed successfully")
     string(FIND "${text}" "${expected}" at)
     if(at EQUAL -1)

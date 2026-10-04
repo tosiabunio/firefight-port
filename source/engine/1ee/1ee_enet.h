@@ -50,6 +50,21 @@ namespace enet_transport
   bool send(unsigned to, const void *data, unsigned size);
   bool receive(void *data, unsigned *size, unsigned *from);
   void leave(void);
+
+  // LAN discovery: a client asks every host on the LAN (a UDP broadcast to the game port, and
+  // 127.0.0.1 for a game on the same computer) and collects the answers for timeout ms. A host
+  // answers on its game socket, from any state. Each game appears once, by its session token.
+  struct Found
+  {
+    char           address[64];  // the host's IP address, for join()
+    unsigned short port;
+    char           host[name_len];
+    int            joined;
+    int            players;
+    bool           started;
+    bool           compatible;   // same version
+  };
+  int discover(unsigned short port, unsigned timeout, Found *games, int max);
 }
 
 #endif

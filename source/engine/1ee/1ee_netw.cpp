@@ -109,9 +109,43 @@ void Net::game_create (int players_max, unsigned short port, char *player_name, 
   list_players();
 }
 //-----------------------------------------------------------------------------
+// Port: the address "lan" means the first open game found on the LAN (enet_transport::discover).
+// Asks in rounds of a second, keeping the window alive, until one answers or the timeout (ms).
+static void find_lan_game (unsigned short port, unsigned timeout, enet_transport::Found *chosen)
+{
+  MESSAGE("looking for a game on the LAN (port %d)", (int)port);
+  unsigned start = timeGetTime();
+  for (;;)
+  {
+    enet_transport::Found games[8];
+    int count = enet_transport::discover(port, 1000, games, 8);
+    for (int i=0; i<count; i++)
+    {
+      enet_transport::Found &g = games[i];
+      if (g.compatible && !g.started && g.joined<g.players)
+      {
+        MESSAGE("network: found %s's game at %s:%d, %d of %d players", g.host, g.address,
+                (int)g.port, g.joined, g.players);
+        *chosen = g;
+        return;
+      }
+    }
+    if (timeGetTime()-start > timeout)
+      FAILURE2(Eem_error::net_game_not_found, "network game: no open game found on the LAN");
+    Comm::process_messages();
+  }
+}
+//-----------------------------------------------------------------------------
 void Net::game_connect (const char *address, unsigned short port, char *player_name, unsigned timeout)
 {
   DBG_CHECK(status.is(net_Initialized));
+  enet_transport::Found game;
+  if (strcmpi(address,"lan")==0)
+  {
+    find_lan_game(port, timeout, &game);
+    address = game.address;
+    port = game.port;
+  }
   if (!enet_transport::join(address, port, player_name))
     FAILURE2(Eem_error::error_connecting, "network game: %s", enet_transport::failure());
   wait(timeout, started, Eem_error::net_game_not_found, "no game started at that address in time");

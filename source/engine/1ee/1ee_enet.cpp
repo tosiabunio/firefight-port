@@ -18,6 +18,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
+#include <time.h>
 
 namespace enet_transport
 {
@@ -33,6 +34,15 @@ enum
 };
 const int start_header = 1 + 1 + 1 + info_len + 1;
 const int start_entry  = 1 + name_len;
+
+// LAN discovery, outside ENet's protocol (the host's intercept answers it):
+//   query   "FFIGHT?", version
+//   answer  "FFIGHT!", version, token (4 bytes), players, joined, started, host name
+const unsigned char query_magic[7]  = {'F', 'F', 'I', 'G', 'H', 'T', '?'};
+const unsigned char answer_magic[7] = {'F', 'F', 'I', 'G', 'H', 'T', '!'};
+const int query_size  = 7 + 1;
+const int answer_size = 7 + 1 + 4 + 1 + 1 + 1 + name_len;
+const int max_found   = 16;
 
 struct Slot
 {
@@ -61,6 +71,7 @@ int           max = 0;
 bool          has_info = false;
 unsigned char info_bytes[info_len];
 char          own_name[name_len];
+uint32_t      token = 0;  // tells this game apart in discovery answers
 ENetAddress   host_address;
 Slot          slots[max_players + 1];  // by player id
 // The messages received for this player, oldest first. Plain data only: the engine's quit
@@ -239,6 +250,29 @@ void host_disconnect(ENetPeer *peer)
       send_packet(slots[other].peer, left, sizeof(left));
 }
 
+// The host's answer to a discovery query, sent from its game socket to whoever asked.
+int ENET_CALLBACK answer_query(ENetHost *host, ENetEvent *)
+{
+  if (host->receivedDataLength != (size_t)query_size || memcmp(host->receivedData, query_magic, 7) != 0)
+    return 0;
+  unsigned char answer[answer_size];
+  memcpy(answer, answer_magic, 7);
+  answer[7] = version;
+  answer[8] = (unsigned char)token;
+  answer[9] = (unsigned char)(token >> 8);
+  answer[10] = (unsigned char)(token >> 16);
+  answer[11] = (unsigned char)(token >> 24);
+  answer[12] = (unsigned char)max;
+  answer[13] = (unsigned char)present_count();
+  answer[14] = is_started ? 1 : 0;
+  memcpy(answer + 15, slots[1].name, name_len);
+  ENetBuffer buffer;
+  buffer.data = answer;
+  buffer.dataLength = sizeof(answer);
+  enet_socket_send(host->socket, &host->receivedAddress, &buffer, 1);
+  return 1;
+}
+
 void client_disconnect()
 {
   if (!connected)
@@ -307,6 +341,8 @@ bool host(unsigned short port, int players, const char *name, const unsigned cha
   memset(slots, 0, sizeof(slots));
   slots[1].present = true;
   copy_name(slots[1].name, name);
+  token = enet_time_get() ^ (uint32_t)time(nullptr) ^ (uint32_t)(uintptr_t)net;
+  net->intercept = answer_query;
   report("network: hosting a game for %d players on port %u", players, (unsigned)port);
   return true;
 }
@@ -498,5 +534,85 @@ void leave(void)
   is_host = is_started = connected = false;
   own_id = 0;
   inbox_head = inbox_count = 0;
+}
+
+int discover(unsigned short port, unsigned timeout, Found *games, int max_games)
+{
+  ENetSocket sock = enet_socket_create(ENET_SOCKET_TYPE_DATAGRAM);
+  if (sock == ENET_SOCKET_NULL)
+    return 0;
+  enet_socket_set_option(sock, ENET_SOCKOPT_NONBLOCK, 1);
+  enet_socket_set_option(sock, ENET_SOCKOPT_BROADCAST, 1);
+  ENetAddress any;
+  any.host = ENET_HOST_ANY;
+  any.port = ENET_PORT_ANY;
+  enet_socket_bind(sock, &any);
+
+  unsigned char query[query_size];
+  memcpy(query, query_magic, 7);
+  query[7] = version;
+  ENetAddress targets[2];
+  targets[0].host = ENET_HOST_BROADCAST;
+  targets[0].port = port;
+  enet_address_set_host_ip(&targets[1], "127.0.0.1");
+  targets[1].port = port;
+
+  uint32_t tokens[max_found];
+  int count = 0;
+  enet_uint32 start = enet_time_get();
+  enet_uint32 asked = 0;
+  bool first = true;
+  while (enet_time_get() - start < timeout)
+  {
+    if (first || enet_time_get() - asked >= 300)  // ask again: UDP may lose it
+    {
+      for (ENetAddress &target : targets)
+      {
+        ENetBuffer buffer;
+        buffer.data = query;
+        buffer.dataLength = sizeof(query);
+        enet_socket_send(sock, &target, &buffer, 1);
+      }
+      asked = enet_time_get();
+      first = false;
+    }
+    enet_uint32 condition = ENET_SOCKET_WAIT_RECEIVE;
+    if (enet_socket_wait(sock, &condition, 50) != 0 || !(condition & ENET_SOCKET_WAIT_RECEIVE))
+      continue;
+    for (;;)
+    {
+      unsigned char answer[answer_size + 1];
+      ENetBuffer buffer;
+      buffer.data = answer;
+      buffer.dataLength = sizeof(answer);
+      ENetAddress from;
+      int size = enet_socket_receive(sock, &from, &buffer, 1);
+      if (size <= 0)
+        break;
+      if (size != answer_size || memcmp(answer, answer_magic, 7) != 0)
+        continue;
+      uint32_t id = answer[8] | (answer[9] << 8) | (answer[10] << 16) | ((uint32_t)answer[11] << 24);
+      bool known = false;
+      for (int i = 0; i < count; i++)
+        known = known || tokens[i] == id;
+      if (known || count >= max_found || count >= max_games)
+        continue;
+      Found &game = games[count];
+      tokens[count] = id;
+      enet_address_get_host_ip(&from, game.address, sizeof(game.address));
+      game.port = from.port;
+      char name[name_len];
+      memcpy(name, answer + 15, name_len);
+      name[name_len - 1] = 0;
+      copy_name(game.host, name);
+      game.players = answer[12];
+      game.joined = answer[13];
+      game.started = answer[14] != 0;
+      game.compatible = answer[7] == version;
+      count++;
+    }
+  }
+  enet_socket_destroy(sock);
+  return count;
 }
 } // namespace enet_transport
