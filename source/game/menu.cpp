@@ -29,9 +29,14 @@ int Menu::vpalette_beforeregister=0;
 int Menu::enable_game_menus=0;
 
 // Port: the launcher is gone, so "EXIT TO LOADER" (title.tdf, which stays as shipped) now says
-// what the item does: QUIT GAME, and CONFIRM QUIT on the confirmation screen (game_quit).
+// what the item does: QUIT GAME, and CONFIRM QUIT on the confirmation screen (game_quit). On
+// macOS the help names Command-Q, which quits there (SDL's application menu sends the quit event
+// that closing the window sends); Option-X still opens the confirmation, as Alt-X does elsewhere.
 static char *port_label(const char *area,char *label)
 {
+#ifdef __APPLE__
+  if (strcmp(label,"ALT+X")==0) return (char*)"CMD+Q";
+#endif
   if (strcmp(label,"EXIT TO LOADER")!=0) return label;
   return (char*)(strcmpi(area,"game_quit")==0 ?"CONFIRM QUIT" :"QUIT GAME");
 }

@@ -361,7 +361,7 @@ Each phase ends with something runnable and an exit check. Phases 5–7 can over
   - **key binding editing** (the original only edited bindings in the launcher; `menu.cpp:1049-1097` only shows them);
   - pilot management;
   - **network host/join** (address, LAN list, relay session code, password).
-- **Done early** (2026-10-04): the launcher's "EXIT TO LOADER" menu items now say QUIT GAME, and CONFIRM QUIT on the confirmation screen; the F1 help says QUIT GAME too. `title.tdf` stays as shipped: `Menu` swaps the labels as it loads them (`port_label` in `menu.cpp`). The confirmation's title is an image that reads "ABORT?", shared with the abort-mission screen.
+- **Done early** (2026-10-04): the launcher's "EXIT TO LOADER" menu items now say QUIT GAME, and CONFIRM QUIT on the confirmation screen; the F1 help says QUIT GAME too, with CMD+Q instead of ALT+X on macOS. There Command-Q quits at once, like closing the window, while Option-X still opens the confirmation. `title.tdf` stays as shipped: `Menu` swaps the labels as it loads them (`port_label` in `menu.cpp`). The confirmation's title is an image that reads "ABORT?", shared with the abort-mission screen.
 - **Packaging:** CPack Windows zip/installer, a macOS `.app` (signing and notarisation only if it is distributed), a Linux tarball/AppImage. CI publishes the artifacts.
 - **Packaging, done early** (2026-10-04):
   - **Packages** (`cmake/FFPackaging.cmake`): a Windows zip, a Linux tar.gz and a macOS disk image, each with the game, `data/`, `music/`, the README and the license.
