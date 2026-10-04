@@ -594,8 +594,8 @@ Visible(*Mysprites::back,View::MYFIRST)
   }
   mx=world->get_level().plane[gamemanager->get_sublevel()][1].mulx;
   my=world->get_level().plane[gamemanager->get_sublevel()][1].muly;
-  wx=(int)(mx*world->get_x());
-  wy=(int)(my*world->get_y());
+  wx=(int)((double)mx*world->get_x());  // port: x87 kept the product exact
+  wy=(int)((double)my*world->get_y());  // port: x87 kept the product exact
 }
 
 Background::~Background(void)
@@ -610,8 +610,8 @@ Background::~Background(void)
 void Background::run(void)
 {
   int oldX=wx,oldY=wy;
-  wx=(int)(mx*world->get_x());
-  wy=(int)(my*world->get_y());
+  wx=(int)((double)mx*world->get_x());  // port: x87 kept the product exact
+  wy=(int)((double)my*world->get_y());  // port: x87 kept the product exact
 
   y+=wy-oldY;
   x+=wx-oldX;
@@ -728,15 +728,15 @@ void Fog::run(void)
 {
   if (first)
   {
-    wx=(int)(mx*world->get_x());
-    wy=(int)(my*world->get_y());
+    wx=(int)((double)mx*world->get_x());  // port: x87 kept the product exact
+    wy=(int)((double)my*world->get_y());  // port: x87 kept the product exact
     first=0;
   }
   int oldX=wx,oldY=wy;
   int t=world->get_x();
-  wx=(int)(mx*world->get_x());
+  wx=(int)((double)mx*world->get_x());  // port: x87 kept the product exact
   t=world->get_y();
-  wy=(int)(my*world->get_y());
+  wy=(int)((double)my*world->get_y());  // port: x87 kept the product exact
 
   y-=wy-oldY;
   x-=wx-oldX;
@@ -1356,14 +1356,14 @@ void Cloud::run(void)
 {
   if (first)
   {
-    wx=(int)(mx*world->get_x());
-    wy=(int)(my*world->get_y());
+    wx=(int)((double)mx*world->get_x());  // port: x87 kept the product exact
+    wy=(int)((double)my*world->get_y());  // port: x87 kept the product exact
     first=0;
   }
 
   int oldX=wx,oldY=wy;
-  wx=(int)(mx*world->get_x());
-  wy=(int)(my*world->get_y());
+  wx=(int)((double)mx*world->get_x());  // port: x87 kept the product exact
+  wy=(int)((double)my*world->get_y());  // port: x87 kept the product exact
 
   int _y=wy-oldY;
   int _x=wx-oldX;

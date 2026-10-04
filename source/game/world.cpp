@@ -2478,8 +2478,9 @@ int Header::header_run(void)
       Sound::st_play(&Mysound::titlemove);
       snd=1;
     }
-    mx+=((float)0.1*(float)mx);
-    my+=((float)0.1*(float)my);
+    // Port: in double, as the original's x87 code kept the sum unrounded (53-bit precision).
+    mx=(float)((double)mx+(double)(float)0.1*(double)mx);
+    my=(float)((double)my+(double)(float)0.1*(double)my);
     bx+=mx;
     by+=my;
   }
@@ -2487,7 +2488,7 @@ int Header::header_run(void)
 
   switch(level)
   {
-   case 0:  if (bx+Mysprites::backscreen[0].r<=Mp::SX)
+   case 0:  if ((double)bx+Mysprites::backscreen[0].r<=Mp::SX)  // port: x87 precision
              {
                time=0;
                mx=(float)0;
@@ -2498,7 +2499,7 @@ int Header::header_run(void)
                Sound::st_play(&Mysound::logo[1]);
              }
              break;
-    case 1:  if (by+Mysprites::backscreen[0].d<=Mp::SY)
+    case 1:  if ((double)by+Mysprites::backscreen[0].d<=Mp::SY)  // port: x87 precision
              {
                time=0;
                mx=(float)0.5;
@@ -2546,7 +2547,7 @@ void Header::header_draw(Screen& screen)
   int orgx=screen.ox;
   int orgy=screen.oy;
   screen.put((int)bx,(int)by,Mysprites::backscreen);
-  screen.put((int)(bx*vx),(int)(by*vy),Mysprites::titlescreen);
+  screen.put((int)((double)bx*vx),(int)((double)by*vy),Mysprites::titlescreen);  // port: x87 precision
   /*
   if (press)
   {
