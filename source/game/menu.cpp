@@ -28,6 +28,14 @@ int Menu::register_phase=0;
 int Menu::vpalette_beforeregister=0;
 int Menu::enable_game_menus=0;
 
+// Port: the launcher is gone, so "EXIT TO LOADER" (title.tdf, which stays as shipped) now says
+// what the item does: QUIT GAME, and CONFIRM QUIT on the confirmation screen (game_quit).
+static char *port_label(const char *area,char *label)
+{
+  if (strcmp(label,"EXIT TO LOADER")!=0) return label;
+  return (char*)(strcmpi(area,"game_quit")==0 ?"CONFIRM QUIT" :"QUIT GAME");
+}
+
 void Menu::init(char *_descript,char *_titles_in,char *_titles_out)
 {
   DBG_CHECK(!initialized);
@@ -84,7 +92,7 @@ void Menu::init(char *_descript,char *_titles_in,char *_titles_out)
   {
     DBG_CHECK(i<2*MAX_KEYS);
     DBG_CHECK(strlen(descript_text.string("labels",i))<MAX_KEYS_LEN);
-    strcpy(key_table[i],descript_text.string("labels",i));
+    strcpy(key_table[i],port_label("help",descript_text.string("labels",i)));
   }
   descript_text.endarea();
   initialized=1;
@@ -174,17 +182,18 @@ Menu::Menu(char *_label_name,MenuType _menutype)
   for (i=0;i<size;i++)
   {
     sscanf(descript_text.string("definition",2*i),"%c,%c,%c,%d,%d",&type,&menuinfo[i].this_letter,&menuinfo[i].next_letter,&menuinfo[i].x,&menuinfo[i].y);
+    char *label=port_label(label_name,descript_text.string("definition",2*i+1));  // port
     switch (type)
     {
-      case 't': items[i]=NEW(TextItem(descript_text.string("definition",2*i+1),descript_text),item_mbn);
+      case 't': items[i]=NEW(TextItem(label,descript_text),item_mbn);
                 break;
-      case 's': items[i]=NEW(SubItem(descript_text.string("definition",2*i+1),descript_text),item_mbn);
+      case 's': items[i]=NEW(SubItem(label,descript_text),item_mbn);
                 break;
-      case 'b': items[i]=NEW(ButtItem(descript_text.string("definition",2*i+1),descript_text),item_mbn);
+      case 'b': items[i]=NEW(ButtItem(label,descript_text),item_mbn);
                 break;
-      case 'r': items[i]=NEW(RButtItem(descript_text.string("definition",2*i+1),descript_text),item_mbn);
+      case 'r': items[i]=NEW(RButtItem(label,descript_text),item_mbn);
                 break;
-      case 'z': items[i]=NEW(ZippItem(descript_text.string("definition",2*i+1),descript_text),item_mbn);
+      case 'z': items[i]=NEW(ZippItem(label,descript_text),item_mbn);
                 break;
 #if HI_DEBUG
        default: FAILURE("Type of %d. item in \"%s\" area in descript_text is invalid.",i,label_name);
