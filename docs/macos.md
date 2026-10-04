@@ -15,7 +15,7 @@ git pull --ff-only
 cmake --workflow --preset macos-clang
 ```
 
-The run configures, builds Debug and Release, and runs every test in both. It must end with `100% tests passed` twice. The tests are `smoke`, `headless_run`, `golden_title`, `sprite_build` and `data_files`.
+The run configures, builds Debug and Release, and runs every test in both. It must end with `100% tests passed` twice. The tests are `smoke`, `headless_run`, `golden_title`, `sprite_build`, `input_play` and `data_files`.
 
 Then fast-forward `main`, if CI on the branch is green too (`gh run list --branch <branch>`):
 
@@ -38,6 +38,7 @@ Golden files describe the original game. Never regenerate them to make a Mac run
 | `sprite_build` | The sprite build differs from the original's caches: bounds, pixel data or palette tables. | The failing lines are in the test output. All lines are in `build/macos-clang/source/sprite_build/*.sorted.txt`. |
 | `golden_title` | Rendering differs. The title frames are bit-identical on every platform, for example after `-ffp-contract=off` stopped Clang fusing `a*b+c` on arm64. | The frames in `build/macos-clang/source/golden_title/`. Compare them with the same frames from a Linux or Windows build. |
 | `headless_run` | Start-up, the title loop or shutdown broke. | The log in the test output (the game echoes it to stderr). |
+| `input_play` | An input state differs: a key's scan code or text, the mouse position or buttons, or the joystick bits. The states don't depend on the simulation, so they are the same on every platform. | The first differing line is in the test output; all of them are in `build/macos-clang/source/input_play/input_states.txt`. |
 
 ## What needs the Windows PC
 

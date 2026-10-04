@@ -20,7 +20,7 @@ This is the subset of the original Fire Fight (Chaos Works, 1996) material neede
 
 ## Building
 
-The port is in progress (see `docs/porting-plan.md`). Phases 1–3 are done: the original game compiles on all three platforms, its runtime runs on SDL2, and it draws in an SDL window. Input, sound and network are still inert stubs, so for now `firefight` shows the title sequence and the attract demos. Useful options (all in `source/game/main.cpp`):
+The port is in progress (see `docs/porting-plan.md`). Phases 1–4 are in place: the original game compiles on all three platforms, its runtime runs on SDL2, it draws in an SDL window, and it takes keyboard, mouse and game controller input. Sound and network are still inert stubs, so for now the game is playable in single player without sound. F11 cycles the control sets (keyboard, mouse steering, game controller); with mouse steering the window captures the mouse while it has focus. Useful options (all in `source/game/main.cpp`):
 
 - `--fullscreen`: desktop full screen.
 - `--stretch`: 4:3 like a CRT; the default is square pixels.
@@ -28,6 +28,7 @@ The port is in progress (see `docs/porting-plan.md`). Phases 1–3 are done: the
 - `--fast`: no clock; one simulation step per frame.
 - `--demo level1`: play one recorded demo.
 - `--shot-every <n>` / `--shots <s>`: dump frames.
+- `--input <file>`: play an input script (keys, mouse, a virtual game controller); the format is in `source/game/input_script.cpp`.
 
 Settings, pilots, the log and frame dumps live in the SDL preferences directory (override with `--pref <dir>`).
 

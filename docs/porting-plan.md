@@ -199,7 +199,7 @@ Each phase ends with something runnable and an exit check. Phases 5–7 can over
     - `--fast` runs without the clock: one simulation step per frame, game time still 1/30 s per tick (`Eem::untimed`).
     - `--demo <name>` plays one recorded demo.
     - With both, every demo desynced early. Since the lores bounds fix, 7 of the 8 replay in sync to the end on Windows/MSVC, whose CRT `rand` is the MSVC LCG. `level4c` still desyncs, at check 0x1606. Other platforms need the phase 5 `rand` clone first.
-  - **Not ported:** sound stays inactive until phase 6 (the DirectSound stub would fail init). Mouse mapping waits for phase 4.
+  - **Not ported:** sound stays inactive until phase 6 (the DirectSound stub would fail init). Mouse mapping waits for phase 4 (done there).
 
 ### Phase 4: input; single player becomes playable
 - **Keyboard:**
@@ -210,6 +210,30 @@ Each phase ends with something runnable and an exit check. Phases 5–7 can over
 - **Mouse:** relative mode for mouse steering, scaled to logical coordinates.
 - **Joystick:** `SDL_GameController`, falling back to `SDL_Joystick`. Feed the original 6 digital axes (±) and 32 buttons, with the dead zone as a percentage.
 - **Exit:** a full mission can be played on keyboard, mouse and gamepad, and F11 cycles the control sets.
+- **Outcome** (2026-10-04). Input runs on SDL. The `input_play` test starts the first mission from the title and flies it with each control set in turn, switching with F11. Still to do: play a full mission by hand on keyboard, mouse and a real game controller.
+  - **Events:** `Comm::input_proc` gets every SDL event after the window procedure chain, and `Eem::sdl_event` hands it to `Kbd`, `Mouse` and `Joy`. The Windows hooks and the winmm joystick calls are gone from the drivers and from `compat/`.
+  - **Keyboard:**
+    - A table maps SDL scancodes to PC set-1 codes (E0 keys +128), so the stored bindings and the demos keep their codes. Pause is 45 and Num Lock E0 45, as Windows reported them.
+    - Auto-repeats are dropped; `last_key` filtered them in the original.
+    - The text in the player state comes from a fixed US table, which is what `MapVirtualKey` gave, plus the original shift table with its gaps (Shift+Space gives no character).
+  - **Mouse:**
+    - Coordinates are window coordinates (were screen coordinates). The clip rectangle is the picture's area in the window, which `VD_sdl::present` reports when it changes, so the original scaling to 320×200 is unchanged. Headless, it is the framebuffer.
+    - Moves are coalesced as Windows did. The position is pushed once per message pump and before each button.
+    - There are no double clicks, because the original window class had no `CS_DBLCLKS`.
+    - Mouse steering (`SysSet::action` calls `Mouse::set_relative`) puts SDL in relative mode while the window has focus. The pointer is hidden and stays on the picture, as in the full-screen original.
+    - The original's default 640×480 mode mapped the mouse over 480 lines for the 400 drawn, so vertical motion ran at 5/6 speed. The port maps over the picture, as the original's 640×400 mode did.
+  - **Joystick:**
+    - The first SDL game controller, else a plain joystick, is opened at start or when plugged in. Unplugging it releases its buttons.
+    - A controller reads as an Xbox pad did through winmm: X/Y the left stick, Z the triggers, R/U the right stick, buttons A, B, X, Y, LB, RB, Back, Start, LS, RS. Its D-pad also sets the X/Y bits.
+    - The dead zone keeps winmm's meaning: a percentage of the full range.
+    - The timer still polls it every tick. With `--fast`, which has no timer, `Eem::read` does.
+  - **Original bug fixed:** the joystick event halves were sign-extended `short`s. With button 16 or 32 down, every event flag was set, and the event passed for a key (writing out of bounds) or for a tick.
+  - **Test tools:**
+    - `--input <file>` (`input_script.cpp`) pushes SDL key, mouse and virtual game controller events at given frames.
+    - `input_dump=1` writes the local player's input state for every tick where it changes (`input_states.txt`).
+    - `input_play` compares that dump with `tests/golden/input_states.txt`. The states don't depend on the simulation, so they are the same on every platform, and they are exactly what demos and network play exchange.
+    - Headless runs ignore real joysticks and open only an input script's virtual controller.
+  - **macOS:** F11 is Show Desktop by default. Press fn+F11, or turn the shortcut off, to cycle the control sets.
 
 ### Phase 5: determinism and the demo regression suite
 - **Clone the old-toolchain behaviours in `compat/`:**

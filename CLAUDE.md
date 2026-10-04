@@ -20,7 +20,7 @@ Everything was selected by rule from the original archive. `README.md` documents
   - `tools/archive/ffarchive.py` and `crt_vectors.py` produce and check those files.
 - **On the Mac:** `docs/macos.md` covers checking a branch, what a failing test means there, and what must wait for the Windows PC.
 - **Port plan:** SDL2 + CMake, in phases with exit criteria, in `docs/porting-plan.md`. Follow its phase order and its determinism rules.
-- **Status: phase 3 done; the game shows in a window but has no input or sound yet.** The original sources build on every platform. Runtime (phase 2) and video (phase 3) are on SDL2. Sound, input and network still go through `source/compat/`, whose inert Win32/DirectX stand-ins phases 4–7 replace. Without input, the game runs its title loop and attract demos; sound is inactive until phase 6.
+- **Status: phase 4 in place; the game is playable on keyboard, mouse and game controller, without sound.** The original sources build on every platform. Runtime (phase 2), video (phase 3) and input (phase 4) are on SDL2. A full mission played by hand on each device is still to be confirmed. Sound and network still go through `source/compat/`, whose inert Win32/DirectX stand-ins phases 6–7 replace; sound is inactive until phase 6.
 
 ## Build
 
@@ -34,14 +34,15 @@ Everything was selected by rule from the original archive. `README.md` documents
     - `golden_title`: in `--fast` mode, every 20th of the first 200 title frames must match `tests/golden/title_frames.sha256`. The frames are bit-identical on all platforms. If rendering changes on purpose, regenerate the hashes from `--headless --fast --shot-every 20 --quit-frames 200` (`tests/check_frames.cmake`).
     - `sprite_build`: `check` mode loads every mission's level with `sprite_dump=1`. The phase bounds, pixel data CRCs and palette table CRCs must match `tests/golden/sprite_bounds.txt` and `sprite_data.txt`, which match the original's prebuilt caches. A changed dump must pass `tools/archive/ffarchive.py sprites` on the Windows PC before it replaces the golden files (`tests/check_sprites.cmake`).
     - `data_files`: every file in `data/` and `music/` must have its SHA-256 from `tests/golden/data_files.sha256`, with nothing missing or extra. This catches line-ending or encoding conversion (`tests/check_data.cmake`).
+    - `input_play`: `tests/input/mission1.txt` starts the first mission from the title and flies it with the keyboard, the mouse and a virtual game controller, switching with F11. The input states it produces (`input_dump=1`) must match `tests/golden/input_states.txt`. They don't depend on the simulation, so they are the same on every platform. After a deliberate change, check the new dump by hand before it replaces the golden file (`tests/check_input.cmake`).
 - **Windows on this machine:** MSVC is not on `PATH`. Run from an x64 Developer PowerShell, or call `C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Auxiliary\Build\vcvars64.bat` first. `VCPKG_ROOT` can be the bundled `…\BuildTools\VC\vcpkg`.
 - **Compile options:** `cmake/FFCompileOptions.cmake` sets them. `ff_common_options` (every target) adds `-fwrapv -fno-strict-aliasing -fsigned-char`; `ff_modern_options` (new code) adds strict warnings.
 - **Dependency targets:** `cmake/FFDependencies.cmake` normalises them to `ff::sdl2`, `ff::mixer` and `ff::enet`.
 - **Targets:** `tools/smoke/ff_smoke` is the dependency smoke test. `source/CMakeLists.txt` defines `compat`, `cwengine` (all engine modules), `regdata` and `firefight`. The original sources use `ff_legacy_options` (tolerates `char*` string literals and MSVC pragmas); new code uses `ff_modern_options`.
-- **Running:** `firefight [--data <dir>] [--pref <dir>] [options] [switch[=value] ...]`. `source/game/main.cpp` lists the options: `--headless`, `--fullscreen`, `--stretch` (4:3), `--fast` (no clock: one simulation step per frame), `--demo <name>`, `--quit-after <s>`, `--quit-frames <n>`, `--shots <s>`, `--shot-every <n>` (frame dumps).
+- **Running:** `firefight [--data <dir>] [--pref <dir>] [options] [switch[=value] ...]`. `source/game/main.cpp` lists the options: `--headless`, `--fullscreen`, `--stretch` (4:3), `--fast` (no clock: one simulation step per frame), `--demo <name>`, `--quit-after <s>`, `--quit-frames <n>`, `--shots <s>`, `--shot-every <n>` (frame dumps), `--input <file>` (an input script: keys, mouse and a virtual game controller at given frames; format in `source/game/input_script.cpp`).
   - Data: `--data`, else `data/` next to the executable, else the repository's `data/` (development builds).
   - Preferences: `--pref`, else `SDL_GetPrefPath("Chaos Works", "Fire Fight")`. It holds the log (`Firefght.log`, also echoed to stderr), `settings.ini` (the former registry), the pilot files, recorded demos and screenshots.
-  - Other arguments are the original engine switches (`debug=1`, `check`, ...).
+  - Other arguments are the original engine switches (`debug=1`, `check`, ...) and the port's test switches (`sprite_dump=1`, `input_dump=1`).
   - Sprites and palette tables are built from the FLC masters in memory on every start (about 1 s); nothing is written to `data/`.
 - **CI:** `.github/workflows/ci.yml` runs the workflow presets. Which platforms run:
   - branch pushes: Windows and Linux;
@@ -94,6 +95,7 @@ Modules are mostly static-class singletons with `init`/`quit`. Each header auto-
   - `Xio` compression (the demo files use it).
   - `Text`, the parser for every `area … endarea` / `key = value` data file.
 - **1ee** [eem]: input (keyboard, mouse, joystick, virtual keys), timer (main thread, serviced by the message pump), DirectPlay networking with sync checks, and demo record/playback.
+  - Input arrives as SDL events through `Comm::input_proc` (`Eem::sdl_event`). Keys keep the PC set-1 scan codes (E0 keys +128) that the bindings and demos use. Mouse coordinates are window coordinates, clipped to the picture's area (reported by `VD_sdl::present`); mouse steering turns on SDL relative mode. Joysticks are SDL game controllers (else plain joysticks), read as the original's 32 buttons and 6 digital axes.
 - **1sp** [spr]:
   - 8-bit palettized video on SDL (`VD_sdl` in `1sp_vdrv.cpp`: 640×400 framebuffer, palette → ARGB texture, letterboxed) and sprites (hires plus collision). Hires only, never upside down.
   - The blitter `_uniput` (`1sp_asm.cpp`, ported from `asm/1sp_aput.asm`; its collision scan order feeds the simulation) and the fonts (`1sp_font.cpp`, generated by `tools/fonts/convert_fonts.py`).
@@ -137,4 +139,4 @@ Modules are mostly static-class singletons with `init`/`quit`. Each header auto-
 - **Music:** song number N in `data/!global/missions.tdf` (`headersong`, `footersong`, `songs`, `netsongs`) means `music/track{N+1:02}.flac`. The original engine skipped the CD's data track.
 - **Platform-bound code to replace:**
   - `1ss`: DirectSound and MCI CD audio.
-  - `1ee`: Win32 input and DirectPlay.
+  - `1ee`: DirectPlay.
