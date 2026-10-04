@@ -165,6 +165,19 @@ foreach(demo IN ITEMS level1 level2 level3 level4 level1C level2C level3C level4
     TIMEOUT 300)
 endforeach()
 
+# Golden demos recorded with the port (tests/demos, made by tests/record_demo.cmake from the
+# input scripts next to them): missions and skills the original demos don't cover. They must
+# replay in sync to the end on every platform, the cross-platform determinism gate.
+foreach(demo IN ITEMS gray1 net3 green3 gray2)
+  add_test(NAME golden_${demo}
+    COMMAND firefight --data "${FF_DATA_DIR}" --pref "${CMAKE_CURRENT_BINARY_DIR}/golden_${demo}"
+            --headless --fast --demo "!${CMAKE_SOURCE_DIR}/tests/demos/${demo}.rec")
+  set_tests_properties(golden_${demo} PROPERTIES
+    PASS_REGULAR_EXPRESSION "in sync to the end"
+    FAIL_REGULAR_EXPRESSION "without object_deleted"
+    TIMEOUT 300)
+endforeach()
+
 # Phase 4 input check: an input script starts the first mission from the title and flies it with
 # the keyboard, the mouse and a virtual game controller, switching with F11. The input states it
 # produces (key scan codes and text, mouse position and buttons, joystick bits, virtual keys) must

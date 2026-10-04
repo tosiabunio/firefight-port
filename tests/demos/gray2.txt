@@ -1,0 +1,275 @@
+# Golden demo: mission 16 of missions_order, seed 4, 1800 frames of flight.
+# Written by tests/demos/flight.py; recorded by tests/record_demo.cmake.
+250 key Return down
+252 key Return up
+300 key Down down
+302 key Down up
+310 key Down down
+312 key Down up
+320 key Down down
+322 key Down up
+330 key Down down
+332 key Down up
+340 key Down down
+342 key Down up
+350 key Down down
+352 key Down up
+360 key Down down
+362 key Down up
+370 key Down down
+372 key Down up
+380 key Down down
+382 key Down up
+390 key Down down
+392 key Down up
+400 key Down down
+402 key Down up
+410 key Down down
+412 key Down up
+420 key Down down
+422 key Down up
+430 key Down down
+430 key Up down
+432 key Down up
+438 key Space down
+440 key Down down
+441 key Left down
+442 key Down up
+450 key Down down
+452 key Down up
+466 key Left up
+468 key Right down
+472 key Space up
+478 key Right up
+480 key PageUp down
+482 key PageUp up
+500 log recording mission 16
+500 key Return down
+502 key Return up
+506 key Left Ctrl down
+514 key Left Ctrl up
+529 key Space down
+539 key Left down
+547 key Right down
+550 key Up up
+558 key Space up
+561 key Right up
+569 key Left up
+569 key Up down
+593 key Space down
+606 key Space up
+613 key Left Shift down
+629 key Left Ctrl down
+634 key Right down
+634 key Z down
+635 key Left Ctrl up
+636 key Left Shift up
+639 key X down
+643 key Left down
+647 key Space down
+654 key Left up
+655 key Up up
+655 key X up
+664 key Right up
+664 key Z up
+686 key Space up
+688 key Up down
+709 key Right down
+715 key Left down
+716 key Right up
+717 key Space down
+729 key Left up
+736 key Space up
+749 key Left Ctrl down
+759 key Left Ctrl up
+761 key Right down
+768 key 6 down
+770 key 6 up
+780 key Right up
+785 key Space down
+795 key Space up
+806 key Left down
+817 key Space down
+831 key Left up
+838 key Space up
+849 key Up up
+863 key Space down
+865 key Z down
+874 key Up down
+890 key Z up
+900 key Right down
+901 key Space up
+913 key Right up
+918 key Left down
+925 key Left up
+932 key X down
+939 key Space down
+948 key X up
+972 key Space up
+973 key Up up
+985 key Up down
+1011 key Left Ctrl down
+1012 key Space down
+1014 key Left Shift down
+1019 key Right down
+1020 key Left Ctrl up
+1022 key Space up
+1036 key Return down
+1038 key Return up
+1041 key Right up
+1042 key Left down
+1054 key Left Shift up
+1057 key Left up
+1062 key Up up
+1062 key Space down
+1072 key Up down
+1075 key PageUp down
+1077 key PageUp up
+1081 key Space up
+1091 key Z down
+1106 key X down
+1108 key Z up
+1117 key X up
+1121 key Space down
+1123 key PageUp down
+1125 key PageUp up
+1141 key Right down
+1146 key Left down
+1161 key Space up
+1167 key Left up
+1168 key Right up
+1190 key Space down
+1223 key 2 down
+1224 key Space up
+1225 key 2 up
+1234 key Up up
+1238 key Left down
+1248 key Left up
+1251 key Right down
+1260 key Right up
+1261 key Up down
+1270 key Space down
+1275 key Left Ctrl down
+1281 key Left Ctrl up
+1307 key Space up
+1310 key 4 down
+1312 key 4 up
+1319 key Left down
+1325 key Right down
+1332 key Right up
+1332 key X down
+1339 key Left up
+1348 key Left Shift down
+1350 key X up
+1366 key Space down
+1370 key Z down
+1375 key Left Shift up
+1393 key Z up
+1395 key Return down
+1395 key Up up
+1397 key Return up
+1397 key Space up
+1414 key Left down
+1421 key Left up
+1421 key Space down
+1424 key Right down
+1430 key Up down
+1435 key Right up
+1440 key Space up
+1446 key 2 down
+1448 key 2 up
+1499 key Space down
+1505 key Up up
+1511 key 4 down
+1513 key 4 up
+1515 key Space up
+1520 key Left Ctrl down
+1522 key Up down
+1531 key Left down
+1540 key Left Ctrl up
+1545 key Left up
+1555 key Right down
+1562 key X down
+1563 key Space down
+1574 key Right up
+1582 key Space up
+1585 key Left down
+1588 key X up
+1599 key Left up
+1610 key Space down
+1628 key Space up
+1649 key Right down
+1659 key Right up
+1668 key Z down
+1670 key Left Shift down
+1672 key Space down
+1679 key Z up
+1701 key Space up
+1712 key Left down
+1715 key Left Shift up
+1715 key Up up
+1731 key Space down
+1739 key Left up
+1742 key Up down
+1744 key Right down
+1751 key Space up
+1762 key Right up
+1770 key Return down
+1772 key Return up
+1789 key Left Ctrl down
+1791 key X down
+1801 key Left Ctrl up
+1807 key Space down
+1808 key X up
+1817 key Space up
+1818 key Left down
+1847 key Left up
+1860 key Space down
+1871 key Space up
+1877 key Right down
+1885 key Z down
+1892 key Right up
+1894 key Up up
+1908 key Z up
+1912 key Up down
+1920 key Space down
+1935 key Space up
+1952 key Left down
+1963 key Left up
+1978 key Space down
+1983 key Left Ctrl down
+1989 key Left Ctrl up
+2003 key Right down
+2013 key Space up
+2014 key Right up
+2016 key Up up
+2052 key Up down
+2055 key Left down
+2056 key Space down
+2064 key X down
+2070 key 5 down
+2072 key 5 up
+2073 key Left up
+2075 key Space up
+2082 key X up
+2095 key Right down
+2103 key Right up
+2111 key Left Shift down
+2120 key Left Ctrl down
+2131 key Space down
+2133 key Left Shift up
+2134 key Left Ctrl up
+2139 key Up up
+2144 key Space up
+2150 key Right down
+2157 key Up down
+2171 key Z down
+2177 key Right up
+2188 key Z up
+2189 key Left down
+2192 key Space down
+2203 key Left up
+2208 key Space up
+2219 key Keypad - down
+2221 key Keypad - up
+2230 key Up up

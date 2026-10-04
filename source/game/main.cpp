@@ -19,8 +19,8 @@
 //   --fast            no clock: one simulation step per frame, as fast as possible (fast=1)
 //   --shot-every <n>  save every n-th frame as frame_<frame>.bmp (shot_every=<n>)
 //   --quit-frames <n> act as if the window were closed after n frames (quit_frames=<n>)
-//   --demo <name>     play one recorded demo (level1 ... level4C) instead of the title loop,
-//                     then quit (demo=<name>)
+//   --demo <name>     play one recorded demo (level1 ... level4C, or ! and the path of a demo
+//                     file) instead of the title loop, then quit
 //   --input <file>    play an input script: keys, mouse and a virtual game controller at given
 //                     frames (input_script.cpp)
 //
@@ -44,6 +44,10 @@
 
 int game_main(char *command_line);
 bool input_script_load(const char *file);
+
+// --demo's argument as given: the engine upper-cases its switches and splits them at spaces,
+// which a file path can't take (Game::go).
+const char *demo_argument = nullptr;
 
 namespace fs = std::filesystem;
 
@@ -142,7 +146,7 @@ int main(int argc, char *argv[])
     else if (arg == "--quit-frames" && i + 1 < argc)
       line += " quit_frames=" + std::string(argv[++i]);
     else if (arg == "--demo" && i + 1 < argc)
-      line += " demo=" + std::string(argv[++i]);
+      demo_argument = argv[++i];
     else if (arg == "--input" && i + 1 < argc)
       input_script = argv[++i];
     else if (arg == "--fullscreen")

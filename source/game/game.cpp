@@ -870,12 +870,13 @@ void Game::draw_demoplay(Screen &screen)
 
 void Game::go(void)
 {
-  // Port: demo=<name> plays one recorded demo (a name from demo.tdf's demo_list) instead of
-  // the title loop, then quits.
-  char *demo=Cmd_line::get_string("demo",NULL);
+  // Port: --demo <name> plays one recorded demo (a name from demo.tdf's demo_list, or ! and the
+  // path of a demo file) instead of the title loop, then quits (main.cpp).
+  extern const char *demo_argument;
+  const char *demo=demo_argument;
   if (demo)
   {
-    static char name[64];
+    static char name[_MAX_PATH+1];
     strncpy(name,demo,sizeof(name)-1);
     MESSAGE("playing demo %s",name);
     set_demo_properties(PLAY_FILENAME,name,0);
