@@ -25,7 +25,7 @@ jobs:
   #   manual run               -> everything
   # Day-to-day macOS testing happens on a local Mac.
   matrix:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04   # pinned like the Linux builds (ubuntu-latest moves to Ubuntu 26)
     outputs:
       include: ${{ steps.set.outputs.include }}
     steps:
@@ -52,7 +52,7 @@ jobs:
       matrix:
         include: ${{ fromJSON(needs.matrix.outputs.include) }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Install Linux packages
         if: runner.os == 'Linux'
@@ -69,11 +69,24 @@ jobs:
         if: runner.os == 'macOS'
         run: brew install ninja pkg-config autoconf automake libtool
 
+      # The x64 developer environment (vcvars64.bat) for the following steps: every variable it
+      # sets or changes goes to GITHUB_ENV. Done here because ilammy/msvc-dev-cmd, which did this,
+      # still runs on the deprecated Node.js 20.
       - name: Set up MSVC
         if: runner.os == 'Windows'
-        uses: ilammy/msvc-dev-cmd@v1
-        with:
-          arch: x64
+        shell: pwsh
+        run: |
+          $vswhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
+          $vs = & $vswhere -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
+          if (-not $vs) { throw "no Visual Studio with the x64 C++ tools" }
+          $before = @{}
+          Get-ChildItem env: | ForEach-Object { $before[$_.Name] = $_.Value }
+          cmd /c "call `"$vs\VC\Auxiliary\Build\vcvars64.bat`" >nul && set" | ForEach-Object {
+            if ($_ -match '^([^=]+)=(.*)$' -and $before[$Matches[1]] -ne $Matches[2]) {
+              Add-Content -Path $env:GITHUB_ENV -Value "$($Matches[1])=$($Matches[2])" -Encoding utf8
+            }
+          }
+          Write-Host "MSVC environment from $vs"
 
       - name: Set up vcpkg
         shell: bash
@@ -89,7 +102,7 @@ jobs:
           echo "VCPKG_BINARY_SOURCES=clear;files,$VCPKG_BINARY_CACHE,readwrite" >> "$GITHUB_ENV"
 
       - name: Restore vcpkg binary cache
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ${{ env.VCPKG_BINARY_CACHE }}
           key: vcpkg-${{ matrix.preset }}-${{ hashFiles('vcpkg.json', 'cmake/triplets/**') }}
@@ -100,7 +113,7 @@ jobs:
 
       - name: Upload vcpkg logs on failure
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: vcpkg-logs-${{ matrix.preset }}
           path: |

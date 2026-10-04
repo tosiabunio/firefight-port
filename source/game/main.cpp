@@ -28,7 +28,8 @@
 //   --input <file>    play an input script: keys, mouse and a virtual game controller at given
 //                     frames (input_script.cpp)
 //
-// Everything else is passed through as an original engine switch (debug=1, check, ...).
+// Relative paths mean the current directory. Everything else is passed through as an original
+// engine switch (debug=1, check, ...).
 // The exit code is 1 when the engine reported a critical error. With --demo it is 3 when the
 // replay went out of sync and 4 when it stopped before the end of the recording.
 
@@ -176,6 +177,21 @@ int main(int argc, char *argv[])
 
   const fs::path data = data_dir ? fs::u8path(data_dir) : default_data_dir();
   std::error_code ec;
+  // Relative paths on the command line mean the current directory, so make the preferences
+  // directory and a demo file absolute before changing to the data directory.
+  std::string pref_absolute, demo_absolute;
+  if (pref_dir)
+  {
+    fs::path p = fs::absolute(fs::u8path(pref_dir), ec);
+    if (!ec)
+      pref_dir = (pref_absolute = p.u8string()).c_str();
+  }
+  if (demo_argument && demo_argument[0] == '!')
+  {
+    fs::path p = fs::absolute(fs::u8path(demo_argument + 1), ec);
+    if (!ec)
+      demo_argument = (demo_absolute = "!" + p.u8string()).c_str();
+  }
   // The soundtrack, as an absolute path before changing to the data directory.
   fs::path music = music_dir ? fs::u8path(music_dir) : data / ".." / "music";
   music = fs::absolute(music, ec).lexically_normal();
