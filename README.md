@@ -46,13 +46,21 @@ If you hold rights to Fire Fight and object to this repository, write to me at *
 
 - **Single player** works: graphics, sound, the soundtrack, keyboard, mouse and game controllers.
 - **Network play** works on a local network. Internet play is not there yet.
-- **Not yet:** in-game menus for key bindings and network games (the original had a separate launcher for these), and ready-made downloads.
+- **Not yet:** in-game menus for key bindings and network games (the original had a separate launcher for these).
 
 The port's progress, and how it was done, is in [`docs/porting.md`](docs/porting.md).
 
-## Building and running
+## Download
 
-There are no ready-made downloads yet, so build the game from source. The repository contains everything the game needs, including its data and soundtrack.
+Ready-made packages for Windows, Linux and macOS are on the [Releases](https://github.com/tosiabunio/firefight-port/releases) page, from version 0.7.0. Each holds the game, its data and the soundtrack, about 260 MB.
+
+- **Windows 10 or 11 (64-bit):** unzip and run `firefight.exe`. Windows may warn about an unrecognised app: choose *More info*, then *Run anyway*.
+- **Linux (64-bit, glibc 2.39 or newer: Ubuntu 24.04, Fedora 40 and later):** unpack and run `./firefight`.
+- **macOS 11 or newer, Apple Silicon:** open the disk image and drag *Fire Fight* to *Applications*. The app is not notarised, so the first time macOS refuses to open it; allow it in *System Settings → Privacy & Security* (*Open Anyway*).
+
+## Building from source
+
+The repository contains everything the game needs, including its data and soundtrack.
 
 **You need** CMake 3.25 or newer, Ninja, a C++17 compiler, and [vcpkg](https://github.com/microsoft/vcpkg) with the `VCPKG_ROOT` environment variable pointing at it. vcpkg builds SDL2, SDL2_mixer and ENet on the first configure, which takes a few minutes.
 

@@ -362,6 +362,12 @@ Each phase ends with something runnable and an exit check. Phases 5–7 can over
   - pilot management;
   - **network host/join** (address, LAN list, relay session code, password).
 - **Packaging:** CPack Windows zip/installer, a macOS `.app` (signing and notarisation only if it is distributed), a Linux tarball/AppImage. CI publishes the artifacts.
+- **Packaging, done early** (2026-10-04):
+  - **Packages** (`cmake/FFPackaging.cmake`): a Windows zip, a Linux tar.gz and a macOS disk image, each with the game, `data/`, `music/`, the README and the license.
+    - Windows: the DLLs the game needs (found with `RUNTIME_DEPENDENCIES`) and the MSVC runtime (`InstallRequiredSystemLibraries`). The game is now a GUI program with the original icon; started from a terminal it attaches to that console (`win_console.cpp`).
+    - macOS: `Fire Fight.app` with `data/` and `music/` in its `Resources` (where `SDL_GetBasePath` points), an `.icns` scaled up from the original 32×32 icon, and an ad hoc signature for the whole bundle. It is not notarised.
+    - Linux: built on Ubuntu 24.04, so it needs glibc 2.39 or newer. An AppImage would reach older systems.
+  - **Releases:** a version tag runs `.github/workflows/release.yml`. On each system it builds the package, installs the same tree into a fresh directory, checks the data byte for byte, moves the repository's `data/` away and replays demo `level1` from the installed copy, then publishes the three packages with `.github/release-notes.md`. CI and the release share their setup in `.github/actions/setup`.
 
 ## Risks
 

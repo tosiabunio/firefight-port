@@ -21,7 +21,7 @@ The repository holds the original Fire Fight material needed to port the game to
 | 5 | Determinism and the demo regression suite | Done. All 8 original demos and 4 golden demos replay in sync on Windows, Linux and macOS |
 | 6 | Sound and the CD soundtrack (SDL2_mixer) | Done. Checked by ear on Windows |
 | 7 | Network play (ENet) | In progress. LAN play by address and by LAN discovery works; internet play, the relay server and the input delay are to do |
-| 8 | Replace the launcher (in-game options, key bindings, network menus); packaging | Not started |
+| 8 | Replace the launcher (in-game options, key bindings, network menus); packaging | Started: packages for the three systems and a release workflow. The menus are to do |
 
 The tests (`ctest`) check the dependencies, a headless run, the title frames, the sprite build against the original's caches, the MSVC 4 CRT clones, the original and golden demos, sound, network play, input and the data files. [`CLAUDE.md`](../CLAUDE.md) lists them.
 
@@ -46,7 +46,7 @@ The tests (`ctest`) check the dependencies, a headless run, the title frames, th
 
 ## Building, for development
 
-The [README](../README.md#building-and-running) has the requirements and the basic commands. The presets are `windows-msvc`, `linux-gcc`, `linux-clang` and `macos-clang`; each has `-debug` and `-release` build and test presets.
+The [README](../README.md#building-from-source) has the requirements and the basic commands. The presets are `windows-msvc`, `linux-gcc`, `linux-clang` and `macos-clang`; each has `-debug` and `-release` build and test presets.
 
 ```sh
 cmake --workflow --preset linux-gcc            # configure, build Debug + Release, run all tests
@@ -64,6 +64,8 @@ Options for testing (all in `source/game/main.cpp`):
 - `--shot-every <n>` / `--shots <s>`: dump frames to the preferences directory.
 - `--input <file>`: play an input script (keys, mouse, a virtual game controller at given frames; the format is in `source/game/input_script.cpp`).
 - `--quit-after <s>`, `--quit-frames <n>`: quit as if the window were closed.
+
+**Packages** (`cmake/FFPackaging.cmake`): `cpack --config build/<preset>/CPackConfig.cmake -C Release -B build/<preset>/package` makes a zip on Windows (with the DLLs and the MSVC runtime), a tar.gz on Linux and a disk image with `Fire Fight.app` on macOS (signed ad hoc, not notarised). Each holds the game, `data/`, `music/`, the README and the license; the game finds `data/` next to its executable, or in the app's `Resources` on macOS. Pushing a version tag (`v0.7.0`, matching `VERSION` in `CMakeLists.txt`) runs `.github/workflows/release.yml`: it builds, tests and publishes the three packages as a GitHub release.
 
 To see the smoke test's window and hear its audio, run it without `--headless`:
 

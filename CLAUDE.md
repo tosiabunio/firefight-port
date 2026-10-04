@@ -51,7 +51,8 @@ Everything was selected by rule from the original archive. `README.md` is about 
   - Preferences: `--pref`, else `SDL_GetPrefPath("Chaos Works", "Fire Fight")`. It holds the log (`Firefght.log`, also echoed to stderr), `settings.ini` (the former registry), the pilot files, recorded demos and screenshots.
   - Other arguments are the original engine switches (`debug=1`, `check`, ...) and the port's test switches (`sprite_dump=1`, `input_dump=1`).
   - Sprites and palette tables are built from the FLC masters in memory on every start (about 1 s); nothing is written to `data/`.
-- **CI:** `.github/workflows/ci.yml` runs the workflow presets. Which platforms run:
+- **Packages and releases:** `cmake/FFPackaging.cmake` (CPack): a Windows zip, a Linux tar.gz and a macOS disk image with `Fire Fight.app`, each with the game, `data/` and `music/`. A version tag `v<VERSION>` (the `VERSION` in `CMakeLists.txt`, now 0.7.0) runs `.github/workflows/release.yml`, which builds and tests the packages and publishes them as a GitHub release. On Windows the game is a GUI program (`WIN32_EXECUTABLE`) that attaches to the console of a terminal it was started from.
+- **CI:** `.github/workflows/ci.yml` runs the workflow presets; it shares its setup steps (build tools, MSVC environment, vcpkg and its cache) with the release workflow in `.github/actions/setup`. Which platforms run:
   - branch pushes: Windows and Linux;
   - pull requests: macOS only;
   - `main`, nightly and manual runs: everything.

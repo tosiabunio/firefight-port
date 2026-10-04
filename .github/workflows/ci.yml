@@ -12,10 +12,6 @@ concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
-env:
-  # Same commit as "builtin-baseline" in vcpkg.json.
-  VCPKG_COMMIT: 3cbc1db4d867ec83c89fba4c461321c11f78b5e3
-
 jobs:
   # Which platforms run when. macOS runner minutes cost a multiple of Linux minutes:
   #   push to a branch         -> Windows + Linux
@@ -54,59 +50,9 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      - name: Install Linux packages
-        if: runner.os == 'Linux'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends \
-            ninja-build pkg-config autoconf autoconf-archive automake libtool \
-            libx11-dev libxft-dev libxext-dev libxrandr-dev libxcursor-dev libxi-dev libxss-dev \
-            libxkbcommon-dev libwayland-dev libegl1-mesa-dev libdecor-0-dev \
-            libpulse-dev libpipewire-0.3-dev
-          cmake --version && ninja --version
-
-      - name: Install macOS packages
-        if: runner.os == 'macOS'
-        run: brew install ninja pkg-config autoconf automake libtool
-
-      # The x64 developer environment (vcvars64.bat) for the following steps: every variable it
-      # sets or changes goes to GITHUB_ENV. Done here because ilammy/msvc-dev-cmd, which did this,
-      # still runs on the deprecated Node.js 20.
-      - name: Set up MSVC
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: |
-          $vswhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
-          $vs = & $vswhere -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
-          if (-not $vs) { throw "no Visual Studio with the x64 C++ tools" }
-          $before = @{}
-          Get-ChildItem env: | ForEach-Object { $before[$_.Name] = $_.Value }
-          cmd /c "call `"$vs\VC\Auxiliary\Build\vcvars64.bat`" >nul && set" | ForEach-Object {
-            if ($_ -match '^([^=]+)=(.*)$' -and $before[$Matches[1]] -ne $Matches[2]) {
-              Add-Content -Path $env:GITHUB_ENV -Value "$($Matches[1])=$($Matches[2])" -Encoding utf8
-            }
-          }
-          Write-Host "MSVC environment from $vs"
-
-      - name: Set up vcpkg
-        shell: bash
-        run: |
-          VCPKG_ROOT="$RUNNER_TEMP/vcpkg"
-          VCPKG_BINARY_CACHE="$RUNNER_TEMP/vcpkg-cache"
-          echo "VCPKG_ROOT=$VCPKG_ROOT" >> "$GITHUB_ENV"
-          echo "VCPKG_BINARY_CACHE=$VCPKG_BINARY_CACHE" >> "$GITHUB_ENV"
-          git clone --filter=tree:0 https://github.com/microsoft/vcpkg.git "$VCPKG_ROOT"
-          git -C "$VCPKG_ROOT" checkout "$VCPKG_COMMIT"
-          if [[ "$RUNNER_OS" == "Windows" ]]; then "$VCPKG_ROOT/bootstrap-vcpkg.bat" -disableMetrics; else "$VCPKG_ROOT/bootstrap-vcpkg.sh" -disableMetrics; fi
-          mkdir -p "$VCPKG_BINARY_CACHE"
-          echo "VCPKG_BINARY_SOURCES=clear;files,$VCPKG_BINARY_CACHE,readwrite" >> "$GITHUB_ENV"
-
-      - name: Restore vcpkg binary cache
-        uses: actions/cache@v6
+      - uses: ./.github/actions/setup
         with:
-          path: ${{ env.VCPKG_BINARY_CACHE }}
-          key: vcpkg-${{ matrix.preset }}-${{ hashFiles('vcpkg.json', 'cmake/triplets/**') }}
-          restore-keys: vcpkg-${{ matrix.preset }}-
+          preset: ${{ matrix.preset }}
 
       - name: Configure, build and test (Debug + Release)
         run: cmake --workflow --preset ${{ matrix.preset }}

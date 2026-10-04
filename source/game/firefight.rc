@@ -1,0 +1,3 @@
+// Port: the Windows executable's icon, the original icon1.ico. (The original resource.rc also
+// holds the progress dialog the port dropped, and needs MFC's afxres.h.)
+1 ICON "icon1.ico"

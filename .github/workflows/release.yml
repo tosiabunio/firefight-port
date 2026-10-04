@@ -1,0 +1,103 @@
+name: Release
+
+# A version tag (v0.7.0, matching VERSION in CMakeLists.txt) builds the packages on Windows,
+# Linux and macOS, tests each one, and publishes them as a GitHub release. Run by hand
+# (workflow_dispatch), it builds and tests the packages without releasing; they are kept as the
+# run's artifacts.
+on:
+  push:
+    tags: ['v*']
+    branches: [packaging]  # temporary: to test this workflow before it is on main
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  package:
+    name: package ${{ matrix.preset }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { preset: windows-msvc, os: windows-latest }
+          - { preset: linux-gcc,    os: ubuntu-24.04 }
+          - { preset: macos-clang,  os: macos-latest }
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: ./.github/actions/setup
+        with:
+          preset: ${{ matrix.preset }}
+
+      - name: Check the version
+        if: startsWith(github.ref, 'refs/tags/v')
+        shell: bash
+        run: |
+          version=$(sed -n 's/^  VERSION \([0-9.]*\)$/\1/p' CMakeLists.txt)
+          if [[ "v$version" != "$GITHUB_REF_NAME" ]]; then
+            echo "The tag is $GITHUB_REF_NAME, but CMakeLists.txt says VERSION $version"
+            exit 1
+          fi
+
+      - name: Build
+        run: |
+          cmake --preset ${{ matrix.preset }}
+          cmake --build --preset ${{ matrix.preset }}-release
+
+      - name: Package
+        run: cpack --config build/${{ matrix.preset }}/CPackConfig.cmake -C Release -B build/${{ matrix.preset }}/package
+
+      # The same tree, installed into a fresh directory: its data must be the original bytes, and
+      # a demo must replay in sync from it. The repository's data/ is moved away first, so the
+      # game can't fall back on it.
+      - name: Test the package
+        shell: bash
+        run: |
+          stage="$RUNNER_TEMP/stage"
+          cmake --install build/${{ matrix.preset }} --config Release --prefix "$stage"
+          if [[ "$RUNNER_OS" == "macOS" ]]; then
+            root="$stage/Fire Fight.app/Contents/Resources"
+            game="$stage/Fire Fight.app/Contents/MacOS/firefight"
+          elif [[ "$RUNNER_OS" == "Windows" ]]; then
+            root="$stage"
+            game="$stage/firefight.exe"
+          else
+            root="$stage"
+            game="$stage/firefight"
+          fi
+          cmake -DROOT="$root" -DEXPECTED=tests/golden/data_files.sha256 -P tests/check_data.cmake
+          mv data "$RUNNER_TEMP/repository-data"
+          "$game" --headless --fast --demo level1 --pref "$RUNNER_TEMP/pref" > "$RUNNER_TEMP/run.log" 2>&1 || true
+          mv "$RUNNER_TEMP/repository-data" data
+          tail -5 "$RUNNER_TEMP/run.log"
+          grep -q "demo level1: in sync to the end" "$RUNNER_TEMP/run.log"
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: firefight-${{ matrix.preset }}
+          path: build/${{ matrix.preset }}/package/firefight-*.*
+          if-no-files-found: error
+          compression-level: 0
+
+  release:
+    needs: package
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/download-artifact@v8
+        with:
+          path: packages
+          merge-multiple: true
+
+      - name: Publish the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          sed "s/@VERSION@/$version/g" .github/release-notes.md > "$RUNNER_TEMP/notes.md"
+          ls -l packages
+          gh release create "$GITHUB_REF_NAME" packages/* --title "Fire Fight $version" --notes-file "$RUNNER_TEMP/notes.md"

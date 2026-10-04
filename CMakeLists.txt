@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.25)
 
 project(FireFight
-  VERSION 0.1.0
+  VERSION 0.7.0
   DESCRIPTION "Port of Fire Fight (Chaos Works, 1996) to SDL2"
   LANGUAGES C CXX)
 
@@ -29,4 +29,5 @@ add_subdirectory(tools/smoke)
 
 if(FF_BUILD_GAME)
   add_subdirectory(source)
+  include(FFPackaging)
 endif()

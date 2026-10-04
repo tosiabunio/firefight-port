@@ -106,6 +106,11 @@ target_compile_definitions(firefight PRIVATE UNPROTECT
   FF_DEFAULT_DATA_DIR="${FF_DATA_DIR}")
 target_link_libraries(firefight PRIVATE regdata cwengine)
 ff_legacy_options(firefight)
+if(WIN32)
+  # A GUI program, with the original icon; started from a terminal it uses that console.
+  target_sources(firefight PRIVATE game/win_console.cpp game/firefight.rc)
+  set_target_properties(firefight PROPERTIES WIN32_EXECUTABLE TRUE)
+endif()
 
 # Phase 2 exit check: boot headless against data/, run the title loop on the 30 Hz clock until
 # it starts an attract demo (after 20 s), then quit as if the window were closed. Rebuilds

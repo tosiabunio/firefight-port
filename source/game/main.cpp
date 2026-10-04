@@ -55,6 +55,9 @@
 
 int game_main(char *command_line);
 bool input_script_load(const char *file);
+#ifdef _WIN32
+void attach_parent_console();  // win_console.cpp
+#endif
 
 // --demo's argument as given: the engine upper-cases its switches and splits them at spaces,
 // which a file path can't take (Game::go).
@@ -130,6 +133,9 @@ static bool set_pref_dir(const char *dir)
 
 int main(int argc, char *argv[])
 {
+#ifdef _WIN32
+  attach_parent_console();
+#endif
 #ifdef _MSC_VER
   use_msvc4_crt_behaviour();
 #endif
