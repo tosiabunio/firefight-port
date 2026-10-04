@@ -111,7 +111,7 @@ Song::~Song()
 
 void Song::play(char* midi_file,int repeat)
 {
-  (void)midi_file,repeat;
+  (void)midi_file; (void)repeat;
 }
 
 void Song::stop(void)

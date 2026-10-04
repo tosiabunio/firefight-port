@@ -15,7 +15,7 @@ git pull --ff-only
 cmake --workflow --preset macos-clang
 ```
 
-The run configures, builds Debug and Release, and runs every test in both. It must end with `100% tests passed` twice. The tests are `smoke`, `headless_run`, `golden_title`, `sprite_build`, `crt_vectors`, the eight `demo_<name>`, the four `golden_<name>`, `input_play` and `data_files`.
+The run configures, builds Debug and Release, and runs every test in both. It must end with `100% tests passed` twice. The tests are `smoke`, `headless_run`, `golden_title`, `sprite_build`, `crt_vectors`, the eight `demo_<name>`, the four `golden_<name>`, `sound_play`, `input_play` and `data_files`.
 
 Then fast-forward `main`, if CI on the branch is green too (`gh run list --branch <branch>`):
 
@@ -39,6 +39,7 @@ Golden files describe the original game. Never regenerate them to make a Mac run
 | `golden_title` | Rendering differs. The title frames are bit-identical on every platform, for example after `-ffp-contract=off` stopped Clang fusing `a*b+c` on arm64. | The frames in `build/macos-clang/source/golden_title/`. Compare them with the same frames from a Linux or Windows build. |
 | `headless_run` | Start-up, the title loop or shutdown broke. | The log in the test output (the game echoes it to stderr). |
 | `demo_<name>`, `golden_<name>` | An original or golden demo went out of sync (`out of sync after N of M blocks`) or stopped early. All 8 replay in sync on every platform. | The log in the test output, with the state dump at the divergence. `docs/porting-plan.md`, phase 5, lists the suspects. |
+| `sound_play` | Demo `level1` with the sound on, through SDL's `disk` audio driver: the sound system didn't start, the soundtrack wasn't found or its track didn't play, the output was silent, or the replay went out of sync. | The log in the test output. The mixed output is `build/macos-clang/source/sound_play/sound.raw`. `no music: SDL_mixer has no FLAC support` means SDL2_mixer was built without the `libflac` feature (`vcpkg.json`). |
 | `input_play` | An input state differs: a key's scan code or text, the mouse position or buttons, or the joystick bits. The states don't depend on the simulation, so they are the same on every platform. | The first differing line is in the test output; all of them are in `build/macos-clang/source/input_play/input_states.txt`. |
 
 ## What needs the Windows PC
