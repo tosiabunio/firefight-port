@@ -2,14 +2,12 @@
 //
 // Phase 1 of the port (docs/porting-plan.md) made the original code compile and link on every
 // platform against these stand-ins; phases 2-7 rewrite the drivers on SDL2 and remove them.
-// This header replaces <windows.h>, <windowsx.h>, <commctrl.h>, <mmsystem.h> and <dplay.h> on
-// all platforms, Windows included, so every build sees the same stubs. What is left (phase 3
-// removed the window, GDI and DirectDraw parts, phase 6 DirectSound, MCI, the mixer and
-// wave-out) lives in win32.cpp:
-//   - DirectPlay calls are inert and report failure or "nothing there" (LoadLibrary returns
-//     NULL);
-//   - a few calls with an obvious portable meaning are implemented for real: the clocks
-//     (GetTickCount, timeGetTime), GetUserName, SleepEx and VirtualAlloc.
+// This header replaces <windows.h>, <windowsx.h>, <commctrl.h> and <mmsystem.h> on all
+// platforms, Windows included, so every build sees the same stubs. Phase 3 removed the window,
+// GDI and DirectDraw parts, phase 6 DirectSound, MCI, the mixer and wave-out, and phase 7
+// DirectPlay (only its player id type, DPID, is left). What remains is types and constants, and
+// a few calls with an obvious portable meaning, implemented for real in win32.cpp: the clocks
+// (GetTickCount, timeGetTime), GetUserName, SleepEx and VirtualAlloc.
 // Only what the original sources use is declared. Layouts follow the Win32 SDK where the code
 // depends on them; integer types have their Win32 widths (DWORD and LONG are 32-bit everywhere).
 // Each driver that is rewritten on SDL stops including this header; it goes away with the last.
@@ -75,7 +73,6 @@ typedef void      *HGDIOBJ;
 
 typedef LRESULT (CALLBACK *WNDPROC)(HWND, UINT, WPARAM, LPARAM);
 typedef BOOL    (CALLBACK *DLGPROC)(HWND, UINT, WPARAM, LPARAM);
-typedef intptr_t (WINAPI *FARPROC)(void);
 
 #define TRUE  1
 #define FALSE 0
@@ -282,98 +279,8 @@ typedef WAVEFORMATEX *LPWAVEFORMATEX;
 #define MIXERLINE_COMPONENTTYPE_SRC_COMPACTDISC (MIXERLINE_COMPONENTTYPE_SRC_FIRST + 5)
 #define MIXERLINE_COMPONENTTYPE_SRC_SYNTHESIZER (MIXERLINE_COMPONENTTYPE_SRC_FIRST + 7)
 
-// --- COM base --------------------------------------------------------------------------------
-struct IUnknown
-{
-  virtual HRESULT QueryInterface(REFIID riid, LPVOID *ppv) = 0;
-  virtual ULONG   AddRef() = 0;
-  virtual ULONG   Release() = 0;
-};
-
-
-// --- DirectPlay (DirectX 3) ---------------------------------------------------------------------
+// --- DirectPlay: the player id Net still uses --------------------------------------------------
 typedef DWORD DPID;
-typedef DPID *LPDPID;
-#define DPSHORTNAMELEN   20
-#define DPLONGNAMELEN    52
-#define DPSESSIONNAMELEN 32
-#define DPPASSWORDLEN    16
-#define DPUSERRESERVED   16
-struct DPSESSIONDESC
-{
-  DWORD dwSize;
-  GUID  guidSession;
-  DWORD dwSession;
-  DWORD dwMaxPlayers;
-  DWORD dwCurrentPlayers;
-  DWORD dwFlags;
-  char  szSessionName[DPSESSIONNAMELEN];
-  char  szUserField[DPUSERRESERVED];
-  DWORD dwReserved1;
-  char  szPassword[DPPASSWORDLEN];
-  DWORD dwReserved2;
-  DWORD dwUser1;
-  DWORD dwUser2;
-  DWORD dwUser3;
-  DWORD dwUser4;
-};
-typedef DPSESSIONDESC *LPDPSESSIONDESC;
-struct DPCAPS
-{
-  DWORD dwSize, dwFlags, dwMaxBufferSize, dwMaxQueueSize, dwMaxPlayers;
-  DWORD dwHundredBaud, dwLatency;
-};
-typedef DPCAPS *LPDPCAPS;
-struct DPMSG_GENERIC { DWORD dwType; };
-struct DPMSG_ADDPLAYER
-{
-  DWORD dwType, dwPlayerType;
-  DPID  dpId;
-  char  szLongName[DPLONGNAMELEN];
-  char  szShortName[DPSHORTNAMELEN];
-  DWORD dwCurrentPlayers;
-};
-struct DPMSG_DELETEPLAYER { DWORD dwType; DPID dpId; };
-
-typedef BOOL (CALLBACK *LPDPENUMDPCALLBACK)(LPGUID guid, LPSTR description, DWORD major, DWORD minor, LPVOID context);
-typedef BOOL (CALLBACK *LPDPENUMSESSIONSCALLBACK)(LPDPSESSIONDESC desc, LPVOID context, LPDWORD timeout, DWORD flags);
-typedef BOOL (CALLBACK *LPDPENUMPLAYERSCALLBACK)(DPID id, LPSTR friendly_name, LPSTR formal_name, DWORD flags, LPVOID context);
-
-struct IDirectPlay : IUnknown
-{
-  virtual HRESULT Close() = 0;
-  virtual HRESULT CreatePlayer(LPDPID id, LPSTR friendly_name, LPSTR formal_name, HANDLE *event) = 0;
-  virtual HRESULT DestroyPlayer(DPID id) = 0;
-  virtual HRESULT EnableNewPlayers(BOOL enable) = 0;
-  virtual HRESULT EnumPlayers(DWORD session, LPDPENUMPLAYERSCALLBACK callback, LPVOID context, DWORD flags) = 0;
-  virtual HRESULT EnumSessions(LPDPSESSIONDESC desc, DWORD timeout, LPDPENUMSESSIONSCALLBACK callback, LPVOID context, DWORD flags) = 0;
-  virtual HRESULT GetCaps(LPDPCAPS caps) = 0;
-  virtual HRESULT Open(LPDPSESSIONDESC desc) = 0;
-  virtual HRESULT Receive(LPDPID from, LPDPID to, DWORD flags, LPVOID data, LPDWORD size) = 0;
-  virtual HRESULT Send(DPID from, DPID to, DWORD flags, LPVOID data, DWORD size) = 0;
-};
-typedef IDirectPlay *LPDIRECTPLAY;
-
-#define DP_OK                    S_OK
-#define FF_DPERR(code)           ((HRESULT)(0x88770000u | (code)))
-#define DPERR_BUFFERTOOSMALL     FF_DPERR(30)
-#define DPERR_NOCONNECTION       FF_DPERR(100)
-#define DPERR_NOMESSAGES         FF_DPERR(190)
-#define DPERR_NOPLAYERS          FF_DPERR(210)
-#define DPERR_NOSESSIONS         FF_DPERR(220)
-#define DPERR_USERCANCEL         FF_DPERR(270)
-#define DPOPEN_OPENSESSION       0x00000001
-#define DPOPEN_CREATESESSION     0x00000002
-#define DPSEND_TRYONCE           0x00000004
-#define DPRECEIVE_TOPLAYER       0x00000002
-#define DPENUMSESSIONS_AVAILABLE 0x00000001
-#define DPESC_TIMEDOUT           0x00000001
-#define DPCAPS_NAMESERVICE       0x00000001
-#define DPCAPS_NAMESERVER        0x00000002
-#define DPCAPS_GUARANTEED        0x00000004
-#define DPSYS_ADDPLAYER          0x0003
-#define DPSYS_DELETEPLAYER       0x0005
-#define DPSYS_SESSIONLOST        0x0031
 
 // --- functions (stubs, see win32.cpp) -----------------------------------------------------------
 // kernel
@@ -384,9 +291,6 @@ UINT    GetDriveType(LPCSTR root);
 BOOL    GetUserName(LPSTR buffer, LPDWORD size);
 LPVOID  VirtualAlloc(LPVOID address, size_t size, DWORD type, DWORD protect);
 BOOL    VirtualFree(LPVOID address, size_t size, DWORD type);
-HMODULE LoadLibrary(LPCSTR name);
-BOOL    FreeLibrary(HMODULE module);
-FARPROC GetProcAddress(HMODULE module, LPCSTR name);
 DWORD   WaitForSingleObject(HANDLE handle, DWORD milliseconds);
 DWORD   SleepEx(DWORD milliseconds, BOOL alertable);
 // windows and messages

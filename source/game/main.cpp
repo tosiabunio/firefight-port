@@ -3,7 +3,8 @@
 //
 //   firefight [--data <dir>] [--pref <dir>] [--music <dir>] [--headless] [--sound]
 //             [--quit-after <s>] [--fullscreen] [--stretch] [--shots <s>] [--fast]
-//             [--shot-every <n>] [--quit-frames <n>] [--demo <name>] [--input <file>] [switch ...]
+//             [--shot-every <n>] [--quit-frames <n>] [--demo <name>] [--input <file>]
+//             [--host <players> | --join <address>] [--port <port>] [switch ...]
 //
 //   --data <dir>      directory holding cwe.ini and the *.dir manifests. Default: "data" next
 //                     to the executable, else the repository's data/ (development builds),
@@ -27,6 +28,9 @@
 //                     file) instead of the title loop, then quit
 //   --input <file>    play an input script: keys, mouse and a virtual game controller at given
 //                     frames (input_script.cpp)
+//   --host <players>  host a network game for 2-4 players and wait for them (net_host=<n>)
+//   --join <address>  join the network game hosted at that address (net_join=<address>)
+//   --port <port>     the network game's UDP port (net_port=<port>), default 19960
 //
 // Relative paths mean the current directory. Everything else is passed through as an original
 // engine switch (debug=1, check, ...).
@@ -161,6 +165,12 @@ int main(int argc, char *argv[])
       demo_argument = argv[++i];
     else if (arg == "--input" && i + 1 < argc)
       input_script = argv[++i];
+    else if (arg == "--host" && i + 1 < argc)
+      line += " net_host=" + std::string(argv[++i]);
+    else if (arg == "--join" && i + 1 < argc)
+      line += " net_join=" + std::string(argv[++i]);
+    else if (arg == "--port" && i + 1 < argc)
+      line += " net_port=" + std::string(argv[++i]);
     else if (arg == "--fullscreen")
       line += " fullscreen=1";
     else if (arg == "--stretch")

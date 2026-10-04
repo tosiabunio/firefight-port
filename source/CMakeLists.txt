@@ -21,6 +21,7 @@ add_library(cwengine STATIC
   engine/1ee/1ee_kbrd.cpp
   engine/1ee/1ee_main.cpp
   engine/1ee/1ee_mous.cpp
+  engine/1ee/1ee_enet.cpp
   engine/1ee/1ee_netw.cpp
   engine/1ee/1ee_timr.cpp
   engine/1ee/1ee_virt.cpp
@@ -187,6 +188,18 @@ add_test(NAME sound_play
           -DPREF=${CMAKE_CURRENT_BINARY_DIR}/sound_play
           -P ${CMAKE_SOURCE_DIR}/tests/check_sound.cmake)
 set_tests_properties(sound_play PROPERTIES TIMEOUT 300)
+
+# Phase 7 network check: a host and a client on this machine play a two-player game over ENet,
+# each with an input script (accept the level in the lobby, then fly). Both must reach the mission,
+# never fail the per-frame sync check, and end normally (tests/check_net.cmake).
+add_test(NAME net_play
+  COMMAND ${CMAKE_COMMAND}
+          -DFIREFIGHT=$<TARGET_FILE:firefight> -DDATA=${FF_DATA_DIR}
+          -DPREF=${CMAKE_CURRENT_BINARY_DIR}/net_play
+          -DSCRIPTS=${CMAKE_SOURCE_DIR}/tests/input
+          -DPORT=19962
+          -P ${CMAKE_SOURCE_DIR}/tests/check_net.cmake)
+set_tests_properties(net_play PROPERTIES TIMEOUT 300)
 
 # Phase 4 input check: an input script starts the first mission from the title and flies it with
 # the keyboard, the mouse and a virtual game controller, switching with F11. The input states it

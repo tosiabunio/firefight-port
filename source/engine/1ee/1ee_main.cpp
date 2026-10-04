@@ -134,111 +134,57 @@ void Eem::sdl_event (const SDL_Event &event)
   Joy::sdl_event(event);
 }
 //---------------------------------------------------------------------------
+// Port: the session comes from the command line (main.cpp): net_host=<players> hosts a game for
+// 2-4 players, net_join=<address> joins one, net_port=<port> overrides Net::default_port. The
+// launcher wrote the session as registry values before ([eem] net mode, game id, provider and
+// game GUIDs). The player name is still [eem] player name, else the user name, and the host's game
+// rules are still [eem] game info; without it every player uses RegData's defaults.
 void Eem::init_multi ()
 {
   char        game_info[Net::game_info_len];
   char        player_name[Net::player_name_len]; 
-  char        game_name[Net::game_name_len]; 
-  const char *temp;
   unsigned    size;
-  unsigned    game_id = 0;
-  unsigned    timeout = def_connection_timeout;
-  unsigned    retries = def_connection_retries;
-  GUID        prov_guid; 
-  GUID        game_guid; 
+  char        address[256] = "";
+  int         host_players = Cmd_line::get_int("net_host",0);
+  if (const char *join = Cmd_line::get_string("net_join",NULL))  // a buffer the next call reuses
+    strncpy(address, join, sizeof(address)-1);
+  unsigned short port = (unsigned short)Cmd_line::get_int("net_port",Net::default_port);
 
-  try
-  {
-    const char *netmode = Registry::get_string(sec_eem, key_eem_net_mode, val_eem_server);  
-    BOOL res;
-    if (strcmpi(netmode, val_eem_server)==0)
-    {
-      status.set(eem_Server);
-      temp = Registry::get_string(sec_eem, key_eem_game_name, "sample game");
-      strncpy(game_name, temp, Net::game_name_len-1);
-      size = Net::game_info_len;
-      res = Registry::get_binary(sec_eem, key_eem_game_info, game_info, &size);
-      if (!res) 
-        FAILURE("Invalid game info [Eem::init]");
-      players_max = Registry::get_int(sec_eem, key_eem_players_num, 0);
-      if (players_max==0) 
-        FAILURE("Invalid number of players [Eem::init]");
-    }
-    else if (strcmpi(netmode, val_eem_client)==0)
-    {
-      game_id = Registry::get_int(sec_eem, key_eem_game_id, 0xFFFFFFFF);
-      if (game_id==0xFFFFFFFF) 
-        FAILURE("Invalid game id [Eem::init]");
-      players_max = 4;
-    }
-    else
-      FAILURE("Invalid net mode [Eem::init]"); 
-    char uname[MAX_COMPUTERNAME_LENGTH];
-    DWORD i=MAX_COMPUTERNAME_LENGTH;
-    if ( !GetUserName( uname, &i )) 
-      strncpy( uname, "<unknown>", MAX_COMPUTERNAME_LENGTH-1);
-    temp = Registry::get_string(sec_eem, key_eem_player_name, uname);
-    strncpy(player_name, temp, Net::player_name_len-1);
-    timeout = Registry::get_int(sec_eem, key_eem_timeout, def_connection_timeout);
-    retries = Registry::get_int(sec_eem, key_eem_retries, def_connection_retries);
-    size=sizeof(GUID);
-    res = Registry::get_binary(sec_eem, key_eem_provider, (char*)(&prov_guid), &size);
-    if (res) 
-      Registry::get_binary(sec_eem, key_eem_game, (char*)(&game_guid), &size);
-    if (!res) 
-      FAILURE("Invalid GUID detected [Eem::init]");
-  }
-  catch (Failure)
-  {
-    WARNING("Error retrieving registry data");
-    FAILURE2(Eem_error::invalid_registry, "Run game loader again to correct invalid entries.");
-  }
+  memset(player_name, 0, sizeof(player_name));
+  char uname[MAX_COMPUTERNAME_LENGTH];
+  DWORD i=MAX_COMPUTERNAME_LENGTH;
+  if ( !GetUserName( uname, &i )) 
+    strncpy( uname, "<unknown>", MAX_COMPUTERNAME_LENGTH-1);
+  strncpy(player_name, Registry::get_string(sec_eem, key_eem_player_name, uname), Net::player_name_len-1);
+  unsigned timeout = Registry::get_int(sec_eem, key_eem_timeout, def_connection_timeout);
+  unsigned retries = Registry::get_int(sec_eem, key_eem_retries, def_connection_retries);
+
   Net::init (status.is(eem_Debug)?1:0);
-  Net::Provider *providers = Net::list_providers();
-  Net::open (game_guid, &prov_guid);
-  unsigned count;
-  int result;
-  if (status.is (eem_Server))
+  if (host_players)
   {
+    status.set(eem_Server);
+    players_max = host_players;
+    size = Net::game_info_len;
+    BOOL has_info = Registry::get_binary(sec_eem, key_eem_game_info, game_info, &size) &&
+                    size==Net::game_info_len;
     MESSAGE("creating game");
-    Net::game_create(players_max, (char*)game_name, (char*)player_name, 
-                                   game_info, timeout*1000*retries);
+    Net::game_create(players_max, port, player_name, has_info?game_info:NULL, timeout*1000*retries);
     MESSAGE("game created, all players connected");
   }
   else
   {
-    MESSAGE("looking for the network game");
-    BOOL game_found = FALSE;
-    unsigned retr=0;
-    count = 0;
-    result = Net::res_OK;
-    do 
-    {
-      Net::Game *games = Net::list_games(&count, &result, timeout*1000, NULL);
-      retr++;
-      if (count > 0)
-      {
-        for (int i=0; i<(int)count; i++)
-          if (games[i].id == game_id)
-          {
-            Net::game_connect(games[i].id, (char*)player_name, timeout*1000*retries);
-            players_max = Net::get_current_game()->max_players;
-            Registry::set_binary(sec_eem, key_eem_game_info, 
-              (char*)(Net::get_current_game()->info), Net::game_info_len);
-            game_found=TRUE;
-            break;
-          }
-      }
-      Comm::process_messages();
-    } while (!game_found);
-    if (!game_found)
-      FAILURE2(Eem_error::net_game_not_found, "Game not found!");
+    MESSAGE("joining the network game at %s", address);
+    Net::game_connect(address, port, player_name, timeout*1000*retries);
+    players_max = Net::get_current_game()->max_players;
+    if (Net::get_current_game()->has_info)
+      Registry::set_binary(sec_eem, key_eem_game_info, Net::get_current_game()->info, Net::game_info_len);
     else
-      MESSAGE("game found, all players connected");
+      Registry::delete_entry(sec_eem, key_eem_game_info);
+    MESSAGE("game joined, all players connected");
   }
+  unsigned count;
+  int result;
   Net::list_players(&count, &result);
-  if (status.is(eem_Server))
-    Net::game_lock();
 }
 //---------------------------------------------------------------------------
 void Eem::init (int size, int frequency, int network_supported, int check_sync, 
@@ -262,21 +208,26 @@ void Eem::init (int size, int frequency, int network_supported, int check_sync,
 
     if (debug)
       status.set(eem_Debug);
-    if (compress_packets)
-      status.set(eem_PktCompress);
+    // Port: no RLE8 packet compression (cwe.ini asks for it). Its compressor reads past its
+    // source and its decompressor writes without bounds, and the packets are small anyway.
+    (void)compress_packets;
     if (check_sync)
       status.set(eem_CheckSync);
 
     if (network_supported)
     {
-      const char *gamemode = Registry::get_string(sec_eem, key_eem_play_mode, val_eem_play_single);  
-      if (strcmpi(gamemode, val_eem_play_multi)==0)
+      // Port: a network game is hosted or joined from the command line (init_multi); the
+      // launcher chose it with [eem] play mode before.
+      if (Cmd_line::get_int("net_host",0)||Cmd_line::get_string("net_join",NULL))
         status.set(eem_Multi);
-      else if (strcmpi(gamemode, val_eem_play_single)!=0)
-        WARNING("registry data corrupted - invalid game mode [Eem::init]"); 
     }
     if (status.is(eem_Multi))
       init_multi();
+    // Port: a headless run has no window to gain focus, so in a network game it counts as active:
+    // a frame still waiting for the others returns to the caller, which keeps drawing, as with
+    // the focused window (WM_ACTIVATEAPP below sets eem_InNetActive for a window).
+    if (status.is(eem_Multi)&&Cmd_line::get_int("headless",0))
+      status.set(eem_InNetActive);
 
     players=NEW(Array<Eem::Player>(), "Eem::players");
     players->alloc (Net::max_enum_players+1, "Eem::players");
@@ -299,6 +250,7 @@ void Eem::init (int size, int frequency, int network_supported, int check_sync,
     {
       (*players)[i].states.alloc (buffer_delay*4,"Eem::players.states");
       (*players)[i].sync_queue.alloc(buffer_delay*4, "Eem::player.sync_queue");
+      (*players)[i].pending.alloc(buffer_delay*8, "Eem::player.pending");  // port
       if (status.is(eem_Multi))
       {
         (*players)[i].id = plist[i-1].id;
@@ -400,6 +352,7 @@ void Eem::quit (void)
   {
     (*players)[i].states.free();
     (*players)[i].sync_queue.free();
+    (*players)[i].pending.free();  // port
   }
   players->free();
   delete(players);
@@ -669,7 +622,10 @@ void Eem::start(void)
   memset(&user_block,0,sizeof(User_block));
 
   if (status.is(eem_Multi))
+  {
     serie++;
+    apply_pending();  // port: messages that arrived before this peer started the series
+  }
 
   host_player = 0xFFFFFFFF;
   if (status.is(eem_DemoPlay))
@@ -986,6 +942,7 @@ void  Eem::send_state(void)
   {
     DBG_MESSAGE("user block send");
     user_block.type = pkt_UserBlock;
+    user_block.serie = serie;  // port
     if (status.is(eem_PktCompress))
     {
       dest_size = rle_8_compress (outbuf, (unsigned char*)(&user_block), sizeof(User_block));
@@ -1018,6 +975,59 @@ void  Eem::send_state(void)
       Net::send(outbuf, dest_size, (*players)[i].id);
 }
 //---------------------------------------------------------------------------
+// Port: a message from player pos, checked before use. It is used in its own series; one of a later
+// series is left for apply_pending, because a peer may start the next series first (the original's
+// 300 ms purge in Eem::stop used to hide that); one of an earlier series is dropped.
+int Eem::apply_message(int pos, unsigned char *msg, unsigned size)
+{
+  if ((msg[0]==pkt_UserBlock)&&(size==sizeof(User_block)))
+  {
+    signed char ahead = (signed char)(((User_block*)msg)->serie-serie);
+    if (ahead>0)
+      return msg_Later;
+    if (ahead<0)
+      return msg_Dropped;
+    memcpy((unsigned char*)(&((*players)[pos].user_block)), msg, size);
+    (*players)[pos].status.set(pl_UserBlock);
+    DBG_MESSAGE("user block received, player %d", pos);
+    return msg_Used;
+  }
+  if ((msg[0]==pkt_States)&&(size==sizeof(Player_state)))
+  {
+    Player_state &pst = *((Player_state*)(msg));
+    signed char ahead = (signed char)(pst.serie-serie);
+    if (ahead>0)
+      return msg_Later;
+    if (ahead<0)
+    {
+      DBG_MESSAGE ("purging old message: player:%d  msg:%d  serie:%d (current:%d)", 
+                   (int)pos, (int)pst.chknumber, (int)pst.serie, (int)serie);
+      return msg_Dropped;
+    }
+    if (((pst.flags&(flag_Server))!=0))
+      server_player = pos;
+    if ((*players)[pos].states.getfree()==0)
+      FAILURE("buffer overflow for remote player [Eem::receive_states]");
+    (*players)[pos].states.push(pst);
+    return msg_Used;
+  }
+  WARNING("message of type %d and %d bytes from player %d ignored", (int)msg[0], (int)size, pos);
+  return msg_Dropped;
+}
+//---------------------------------------------------------------------------
+// Port: after starting a series, the messages that were waiting for it.
+void Eem::apply_pending(void)
+{
+  for (int i=1; i<=players_max; i++)
+    while ((*players)[i].pending.getquantity()>0)
+    {
+      Pending *p = (*players)[i].pending.peek();
+      if (apply_message(i, p->data, p->size)==msg_Later)
+        break;
+      (*players)[i].pending.popempty();
+    }
+}
+//---------------------------------------------------------------------------
 void  Eem::receive_states(void)
 {
    if (!status.is(eem_Multi))
@@ -1036,8 +1046,6 @@ void  Eem::receive_states(void)
       int pos = get_player_pos(from);
       if (pos==-1)
         FAILURE("message from unexpected player received [Eem::receive_states]");
-      if ((*players)[pos].states.getfree()==0)
-        FAILURE("buffer overflow for remote player [Eem::receive_states]");
       if (!is_present(pos))
       {
         WARNING("message from deleted player received [Eem::receive_states]");
@@ -1052,25 +1060,17 @@ void  Eem::receive_states(void)
         memcpy(dest_buf, inbuf, size);
         dest_size = size;
       }
-      if (dest_buf[0]==pkt_UserBlock)
+      // Port: a message of a later series waits in pending, and so does everything after it from
+      // that player (messages arrive in order).
+      Queue<Pending> &pending = (*players)[pos].pending;
+      if ((pending.getquantity()>0)||(apply_message(pos, dest_buf, dest_size)==msg_Later))
       {
-        memcpy((unsigned char*)(&((*players)[pos].user_block)), dest_buf, dest_size);
-        (*players)[pos].status.set(pl_UserBlock);
-        DBG_MESSAGE("user block received, player %d", pos);
+        if (pending.getfree()==0)
+          FAILURE("too many messages of a later series [Eem::receive_states]");
+        Pending *p = pending.pushempty();
+        p->size = dest_size;
+        memcpy(p->data, dest_buf, dest_size);
       }
-      else if (dest_buf[0]==pkt_States)
-      {
-        Player_state &pst = *((Player_state*)(dest_buf));
-        if (((pst.flags&(flag_Server))!=0))
-          server_player = pos;
-        if (pst.serie==serie)
-          (*players)[pos].states.push(pst);
-        else
-          DBG_MESSAGE ("purging old message: player:%d  msg:%d  serie:%d (current:%d)", 
-                       (int)pos, (int)pst.chknumber, (int)pst.serie, (int)serie);
-      }
-      else
-        FAILURE("incorrect packet type  [Eem::receive_states]");
     }
     else
     {
@@ -1100,6 +1100,7 @@ void  Eem::receive_states(void)
           {
             (*players)[i].status.set (pl_Deleted);
             (*players)[i].states.purge();
+            (*players)[i].pending.purge();  // port
             Player_state *pst = (*players)[i].states.pushempty();
             memset(pst, 0, sizeof(Player_state));
             if (server_player==i)
@@ -1111,6 +1112,7 @@ void  Eem::receive_states(void)
                 {
                   (*players)[j].status.set (pl_Deleted);
                   (*players)[j].states.purge();
+                  (*players)[j].pending.purge();  // port
                   Player_state *pst = (*players)[j].states.pushempty();
                   memset(pst, 0, sizeof(Player_state));
                 }

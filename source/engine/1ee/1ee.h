@@ -68,49 +68,31 @@ struct Eem_error
 // Net
 //===========================================================================
 
-typedef BOOL(*Timeout_function)(void);
-
+// Port: Net carries the engine's messages over ENet (1ee_enet.h) instead of DirectPlay. A session
+// is hosted or joined by address, from the command line (Eem::init_multi). Messages are reliable
+// and in order, so the original's resend layer (sequence numbers, CRC, requests, pings, purges)
+// is gone. Player ids are 1 for the host and 2..4 for the clients.
 class Net
 {
-private:
-  enum 
-  {
-    buffer_size     = 120,
-    max_resends     = 3,
-    req_array_size  = 120,
-    res_array_size  = 120,
-    rec_buf_size    = 4096
-  };
 public:
   enum 
   {
     game_name_len       = 32,
     game_info_len       = 28,
-    provider_name_len   = 80, 
     player_name_len     = 52,
-    max_enum_providers  = 10, 
     max_enum_players    =  4,   
-    max_enum_games      = 10,
-    max_packet_size    = 255
+    max_packet_size    = 255,
+    default_port       = 19960
   };
   enum
   {
-    res_OK              = 0,
-    res_enum_overflow   = 1,
-    res_enum_timeout    = 2,
-    res_enum_error      = 3
+    res_OK              = 0
   }; 
   struct Game
   {
-    DWORD id;
     DWORD max_players;
-    char  name[game_name_len];
+    BOOL  has_info;  // port: FALSE when the host has no game info (RegData's defaults apply)
     char  info[game_info_len];
-  };
-  struct Provider
-  {
-    GUID id;
-    char name[provider_name_len]; 
   };
   struct Player
   {
@@ -118,118 +100,36 @@ public:
     char name[player_name_len]; 
   };
 private:
-#pragma pack(push, msg, 1)
-  struct Msg_header
-  {
-    unsigned short crc16;
-    unsigned char  number;
-    unsigned char  old_number;
-    unsigned char  size;
-    unsigned char  msg_type;
-  };
-  struct Msg                 
-  {
-    Msg_header  header;
-    unsigned char data[max_packet_size];
-  };  
-  struct Buffer
-  {
-    Queue<Msg>            in;
-    Queue<Msg>            out;
-    DPID                  player;
-    unsigned char         last_in;
-    unsigned char         last_out;
-    unsigned char         msg_counter;    
-    Queue<unsigned char>  requests;
-    Queue<unsigned char>  resends;
-  };
-#pragma pack (pop, msg)
-private:
-  static HANDLE event;
-  static char     rec_buf[rec_buf_size];
-  static unsigned rec_size;
-  static DPID     rec_from;
+  static Bitflag status;
+  static Array<Player> players;
+  static int     players_qty;
+  static Game    current_game;
+  static Player  current_player;
   static unsigned diag_total_out;
   static unsigned diag_total_in;
-  static unsigned diag_resend;
-  static unsigned diag_max_packet;
-  static unsigned diag_total_size;
-  static unsigned diag_max_buf_usage;
-  static unsigned diag_trans_errors;
-  static unsigned diag_corrupted_packets;
-private:
-  static Array<Game>     games;    
-  static Array<Provider> providers;
-  static Array<Player>   players;
-
-  static Bitflag status;
-  static int     games_qty;
-  static int     providers_qty;
-  static int     players_qty;
-  static GUID    game_guid;
-  static int     enum_error;
-  static LPDIRECTPLAY  driver;
-  static Game          current_game;
-  static Player        current_player;
-  static BOOL          session_OK;
-  static DPCAPS        dpcaps;
-  static DPSESSIONDESC current_session;
-  static int           enum_retries; 
-  static int           enum_timeout; 
-
-  static Array<Buffer>   *msgbuf;
-
-  static void quit (void);         
-
-  static BOOL PASCAL enum_players   (DPID id, LPSTR friendly, LPSTR formal, DWORD flags, LPVOID user);
-  static BOOL PASCAL enum_games     (LPDPSESSIONDESC game, LPVOID user, LPDWORD timeout, DWORD flags);
-  static BOOL PASCAL enum_providers (LPGUID id, LPSTR name, DWORD major_v, DWORD minor_v, LPVOID user);
-
-  static int get_buf_pos (DPID player);
-  static int get_player_pos (DPID player);
-
-  static void         api_send (void *buffer, unsigned size, DPID to);
-  static BOOL      api_receive (void);
-
-  static void           resend (unsigned char number, int pos);
-  static void          request (int pos);
-  static void     queue_resend (unsigned char number, int pos);
-  static void      dump_buffer (int pos);
-  static void resolve_requests (Msg *msg, int pos);
-  static void  resolve_resends (Msg *msg, int pos);
-  static BOOL  perform_resends (void);
-  static void clear_in_buffers (void);
-
+  static void quit (void);
+  static void wait (unsigned timeout, int (*done)(void), int error, const char *what);
 public:
-  
-  static void ping    (void);
-  static void purge   (void);
+  static void ping  (void) {}  // port: ENet keeps the link alive and reliable
+  static void purge (void) {}
 
   static void init (int debug);
-  static void open (GUID game, GUID *provider);
   static void close (void);
 
-  static void game_create  (int max_players, char *name, char *player_name, char* game_info, unsigned timeout);
-  static void game_connect (DWORD game_id, char *player_name, unsigned timeout);
+  static void game_create  (int max_players, unsigned short port, char *player_name, char *game_info, unsigned timeout);
+  static void game_connect (const char *address, unsigned short port, char *player_name, unsigned timeout);
   static void game_destroy (void);
-  
-  static void game_lock (void);
-  static void game_unlock (void);
+  static void game_lock (void) {}  // port: the host refuses players once the game has started
 
   static void send     (void *buffer, unsigned size, DPID to);
   static BOOL receive  (void *buffer, unsigned *size, DPID *from);
 
-  static Game     *list_games     (unsigned *count=NULL, int *result=NULL, int timeout=5000, 
-                                   int retries=0, Timeout_function function=NULL);
-  static Provider *list_providers (unsigned *count=NULL, int *result=NULL);
   static Player   *list_players   (unsigned *count=NULL, int *result=NULL);
 
   static Game     *get_current_game(void);
   static Player   *get_current_player(void);
-  static inline unsigned get_players_num(void) {return (players_qty);};
-  static inline BOOL     is_session_ok(void) {return (session_OK);};
-  static inline int      get_max_players () {return (current_game.max_players);};
-  static BOOL   is_initialised ();
+  static unsigned  get_players_num(void);
+  static BOOL      is_initialised ();
 };
 
 //===========================================================================
@@ -683,8 +583,14 @@ private:
     unsigned char type;
     unsigned char size;
     unsigned char data[USER_BLOCK_DATA_SIZE];
+    unsigned char serie;  // port: the series it belongs to, as in Player_state (apply_message)
   };
  #pragma pack(pop, st)
+  struct Pending  // port: a message of a later series, kept until this peer starts it
+  {
+    unsigned      size;
+    unsigned char data[Net::max_packet_size];
+  };
   struct Player
   {
     unsigned id;
@@ -693,6 +599,7 @@ private:
     Queue <Player_state>  states;
     Queue <unsigned>      sync_queue;
     User_block            user_block; 
+    Queue <Pending>       pending;  // port
   };
 
   static User_block user_block;
@@ -774,6 +681,9 @@ public:
   // Port: blocks replayed and recorded in the last demo played (for the demo tests).
   static void  demo_progress(unsigned *played, unsigned *blocks);
 
+  enum { msg_Used, msg_Later, msg_Dropped };                              // port
+  static int  apply_message(int pos, unsigned char *msg, unsigned size);  // port
+  static void apply_pending(void);                                        // port
   static void user_block_send(unsigned char *buffer, unsigned size);
   static BOOL user_block_receive(unsigned char *buffer, unsigned *size);
   static BOOL user_block_available();

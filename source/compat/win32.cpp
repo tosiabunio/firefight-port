@@ -1,7 +1,6 @@
 // Definitions for the Win32 stand-ins declared in win32.h.
 //
-// DirectX is never loaded (LoadLibrary returns NULL). The clocks, GetUserName, SleepEx and
-// VirtualAlloc (zero-filled) are real.
+// The clocks, GetUserName, SleepEx and VirtualAlloc (zero-filled) are real.
 
 #include <compat/win32.h>
 
@@ -68,9 +67,6 @@ BOOL VirtualFree(LPVOID address, size_t, DWORD type)
   return TRUE;
 }
 
-HMODULE LoadLibrary(LPCSTR) { return nullptr; }
-BOOL    FreeLibrary(HMODULE) { return TRUE; }
-FARPROC GetProcAddress(HMODULE, LPCSTR) { return nullptr; }
 DWORD   WaitForSingleObject(HANDLE, DWORD) { return WAIT_OBJECT_0; }
 
 DWORD SleepEx(DWORD milliseconds, BOOL)

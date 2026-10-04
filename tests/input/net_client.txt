@@ -1,0 +1,14 @@
+# Input script for the net_play test (tests/check_net.cmake), client side (player 2).
+# The lobby: Return accepts the level under the cursor; both players keep the first one.
+100 key Return down
+102 key Return up
+200 key Return down
+202 key Return up
+
+# The mission (deathmatch WAR): fly forward, turn right, then fire.
+420 key Up down
+480 key Right down
+520 key Right up
+650 key Up up
+700 key Space down
+760 key Space up
