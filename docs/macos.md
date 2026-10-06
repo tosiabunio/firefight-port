@@ -48,6 +48,7 @@ Open `http://localhost:8000/` (or the GitHub Pages site, https://tosiabunio.gith
 - [ ] **Function keys:** F1 shows the help, F5 and F11 switch the control set, and the browser does nothing with them (no reload, no full screen).
 - [ ] **Saving:** a changed volume, and a pilot's progress, are still there after a reload.
 - [ ] **Quitting:** Esc → Mission → Quit Game ends on the page's "The game has ended." with Play again.
+- [ ] **The Asyncify build:** `?asyncify` loads the build for browsers without JSPI (the console says `Fire Fight: the Asyncify build`). Replay `?asyncify&demo=level1&fast`, and end a mission with ABORT MISSION. In the Debug build (`build/web-emscripten/web/Debug`), a suspension inside a `catch` block traps with `RuntimeError: unreachable`.
 
 The game pauses whenever its page loses the focus, as on the desktop. Record the results in `docs/porting-plan.md` (phase 9, step 2's progress).
 

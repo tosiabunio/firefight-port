@@ -377,7 +377,7 @@ Added 2026-10-06, after a code survey, and **done next, before the rest of phase
 - **Order of work:**
   1. The Node build and its tests (see Tests). They show whether the simulation stays bit-exact in WebAssembly before anything else is built.
   2. Single player in the browser, with JSPI.
-  3. The Asyncify fallback, if older browsers are to be supported.
+  3. The Asyncify fallback for browsers without JSPI (done in step 3, see Progress).
   4. Network play, together with phase 7's relay server.
 - **Why it is within reach:**
   - No threads and no assembly are left. The timers run on the main thread (phase 2) and the blitter is C++ (phase 3).
@@ -400,6 +400,7 @@ Added 2026-10-06, after a code survey, and **done next, before the rest of phase
   - **Asyncify fallback** for browsers without JSPI (Safari before 27, older iOS): `-sASYNCIFY` works everywhere, but makes the code larger and slower (Emscripten's estimate is about 50%), which this game can afford.
     - Asyncify can't suspend inside a `catch` block when exceptions are native. After the last mission, the end credits run from one: `Game::play`'s `catch (TerminateMission)` (`game.cpp:484`) calls `GameManager::end_level`, which plays `Header::footer()` (`gman.cpp:322`).
     - The fix: the handler sets a flag, and its work moves after the `catch`. The other handlers seen so far only clean up; check all 35.
+    - Done in step 3. Every mission's end, not only the last, ran its screens from that `catch`. Moving the work after the `catch` statement wasn't enough: the compiler put the code that only the handlers reach inside their wasm `catch` block. See Progress.
 - **Files:**
   - `data/` (47 MB, 22 MB compressed) goes into one preloaded package (`--preload-file`), which the page downloads with a progress bar before the game starts. Per-world packages, mounted with the mission, can come later if the first start is too slow.
   - The preferences directory (settings, pilots, recorded demos) lives in IndexedDB (`IDBFS`), synced after each write: `Registry`, the pilot files and demo recording. The log stays in memory and goes to the browser console.
@@ -434,7 +435,7 @@ Added 2026-10-06, after a code survey, and **done next, before the rest of phase
   - Browsers slow the timers of hidden tabs down to about once a second, while network play must keep simulating without drawing (phase 2's rule). Measure how a hidden tab affects the other players.
 - **Exit, single player:** in current Chrome, Firefox and Safari, served from a static host, the title, the attract demos and a full mission play on keyboard, mouse and a game controller, with sound and music, and the settings and pilots survive a reload. The Node runs of the demo and golden tests pass in CI.
 - **Exit, network play** (with phase 7's relay server): a browser and a desktop player play through the relay for 30 minutes without a sync failure.
-- **Open question:** JSPI only, or an Asyncify build as well.
+- **Decided in step 3:** both. The page loads the JSPI build where the browser has JSPI and the Asyncify build elsewhere.
 - **Progress** (2026-10-06): step 1 is done. **The simulation is bit-exact in WebAssembly.** Built with Emscripten 6.0.11 and run under Node.js 24, all 8 original demos and the 4 golden demos replay in sync to the end, in Debug and Release. `golden_title`, `sprite_build`, `crt_vectors`, `headless_run` and `data_files` pass too. The game and engine code needed no change.
   - **Build:** the `node-emscripten` preset. `cmake/FFEmscripten.cmake` holds the Emscripten options, and `FFDependencies.cmake` maps the SDK's SDL2 and SDL2_mixer ports to `ff::sdl2` and `ff::mixer` (`ff::enet` is empty). `1ee_enet_none.cpp` stands in for the ENet transport. The smoke test and packaging stay desktop-only.
   - **Node settings:**
@@ -470,6 +471,19 @@ Added 2026-10-06, after a code survey, and **done next, before the rest of phase
   - **Focus:** losing the focus pauses the game (standby), as on the desktop. In an automated browser whose window isn't in front, a synthetic `focus` event on `window` resumes it.
   - **Checked by hand since** (macOS): mouse steering, the sound and the music, in Chrome and in Safari 27. The demos replay in sync from GitHub Pages too (`?demo=level1&fast`: in sync to the end).
   - **Still to check for the exit:** a game controller, F1, F5, F11 and Esc, Firefox, and a full mission. The checklist for each browser is in `docs/macos.md` ("Checking the browser build").
+- **Progress** (2026-10-06): step 3 is done. **An Asyncify build is the fallback for browsers without JSPI.** In Chrome, forced with `?asyncify`, it replays `level1` in sync to the end, Debug and Release. The Debug build, whose Asyncify checks trap on a forbidden suspension, played the title, mission 1, ABORT MISSION and its end screens, and QUIT GAME, and exited cleanly.
+  - **Two executables, one code:** `firefight` (JSPI) and `firefight-asyncify` link the same objects (the `firefight_game` object library). JSPI and Asyncify are link options only, so the code is compiled once. The Asyncify build's `.wasm` is 2.5 MB against 1.76 MB, 43% larger. `-sASYNCIFY_STACK_SIZE=1MB` holds the call stack saved at each wait (the default is 4 KB).
+  - **The data package is shared:** `file_packager` makes `firefight.data` and its loader `firefight-data.js`, and the page loads them before either game. The games link with `-sFORCE_FILESYSTEM`, which the loader needs.
+  - **The page** loads the JSPI build when `WebAssembly.Suspending` exists. Otherwise it loads the Asyncify build when `WebAssembly.Tag` exists, that is, with WebAssembly exceptions in the legacy format the SDK emits by default (Chrome 95, Firefox 100, Safari 15.2). Otherwise it shows a message. `?asyncify` forces the Asyncify build, and the page drops it from the game's arguments.
+  - **Catch blocks:**
+    - Binaryen's Asyncify rewrites `try` bodies so they can suspend and resume, but not `catch` bodies.
+    - With assertions (Debug), a suspension inside a `catch` traps. In Release it goes unnoticed and corrupts the resume: code ran twice (the startup log twice), and the exit crashed.
+    - Every mission end ran `GameManager::end_level` and `Game::loop_quit`, both of which wait for frames, from `Game::play`'s handlers.
+    - Recording the handler and acting after the `try` statement was not enough. The code reachable only from the handlers still went into the wasm `catch` block, as `wasm-dis` showed.
+    - Now `Game::play_mission` (`noinline`) holds the `try`, its handlers only return which exception ended the mission, and `Game::play` does the work in its own frame. The other 34 handlers only free memory and rethrow `Failure`, log, or do nothing.
+  - **Exit:** under Asyncify, `main` returns to the page at its first sleep, and Emscripten doesn't act on its real return later. So `main` ends with `exit()` in both browser builds. That runs the static destructors and the quits, and calls `Module.onExit`.
+  - **Speed:** in fast mode both builds keep up with Chrome's 120 Hz display (36.4 s for `level1`), so the Asyncify build has headroom over the game's 30 fps.
+  - **Warning:** every link prints `ASYNCIFY=1 is not compatible with -fwasm-exceptions`. It is Emscripten's general warning about the `catch` limit above.
 
 ## Risks
 
@@ -485,7 +499,7 @@ Added 2026-10-06, after a code survey, and **done next, before the rest of phase
 | Untrusted packets from the internet | Crashes or exploits through the 1996 parser | Validate before parsing, rate limits, parser fuzzing in CI |
 | Relay server hosting | Running cost; availability | A tiny stateless forwarder on a cheap VPS. LAN and direct connections still work without it |
 | Simulation differs in WebAssembly | Browser games desync, alone and against desktop players | Checked: under Node every original and golden demo replays in sync (phase 9). CI keeps checking |
-| No JSPI in older browsers (Safari before 27, older iOS) | The browser build doesn't start there | An Asyncify build as a fallback, once the end credits run outside their `catch` |
+| No JSPI in older browsers (Safari before 27, older iOS) | The browser build doesn't start there | Done: an Asyncify build as the fallback (step 3). It needs WebAssembly exceptions: Chrome 95, Firefox 100, Safari 15.2 |
 | Browser-reserved shortcuts (Ctrl+W with the default Fire2 and WASD) | A player closes the tab mid-mission | A `beforeunload` prompt while the game runs (done). Later perhaps Keyboard Lock in fullscreen, or other default keys in the web build |
 | Browser download size (data 22 MB compressed, music 232 MB as FLAC) | A slow first start | Music as Ogg, downloaded in the background; per-world data packages if needed |
 | Timers throttled in hidden browser tabs | A hidden tab stalls a network game | Measure in phase 9; warn the player |

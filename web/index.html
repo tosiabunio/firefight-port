@@ -106,10 +106,15 @@ function show(text, withButtons) {
 }
 
 // Options from the URL become command-line arguments (source/game/main.cpp lists them):
-// ?demo=level1&stretch gives --demo level1 --stretch.
+// ?demo=level1&stretch gives --demo level1 --stretch. ?asyncify is the page's own: it picks the
+// Asyncify build even where JSPI works.
+const pageOptions = ['asyncify'];
+
 function argumentsFromUrl() {
   const args = [];
   for (const [key, value] of new URLSearchParams(location.search)) {
+    if (pageOptions.includes(key))
+      continue;
     args.push('--' + key);
     if (value !== '')
       args.push(value);
@@ -200,18 +205,33 @@ function offerRestart() {
   again.focus();
 }
 
-// JSPI (WebAssembly.Suspending) lets the game wait for the browser: Chrome and Edge 137+,
-// Firefox 153+, Safari 27.
-if (typeof WebAssembly === 'object' && typeof WebAssembly.Suspending === 'function') {
-  const script = document.createElement('script');
-  script.src = 'firefight.js';
-  script.async = true;
-  script.onerror = () => show('The game does not load.', false);
-  document.body.appendChild(script);
+// The game waits for the browser with JSPI (WebAssembly.Suspending: Chrome and Edge 137+,
+// Firefox 153+, Safari 27+), or else with the Asyncify build, larger and slower, which needs only
+// WebAssembly exceptions (WebAssembly.Tag: Chrome 95+, Firefox 100+, Safari 15.2+). The data
+// package's loader comes first; both are classic scripts, run in order.
+function loadScripts(names) {
+  for (const name of names) {
+    const script = document.createElement('script');
+    script.src = name;
+    script.async = false;
+    script.onerror = () => show('The game does not load.', false);
+    document.body.appendChild(script);
+  }
+}
+
+const hasWasm = typeof WebAssembly === 'object';
+const hasJspi = hasWasm && typeof WebAssembly.Suspending === 'function';
+const hasExceptions = hasWasm && typeof WebAssembly.Tag === 'function';
+if (hasJspi && !new URLSearchParams(location.search).has('asyncify')) {
+  console.log('Fire Fight: the JSPI build');
+  loadScripts(['firefight-data.js', 'firefight.js']);
+} else if (hasExceptions) {
+  console.log('Fire Fight: the Asyncify build');
+  loadScripts(['firefight-data.js', 'firefight-asyncify.js']);
 } else {
   progressBar.hidden = true;
-  show('This browser cannot run Fire Fight yet. It needs WebAssembly JSPI: Chrome or Edge 137, ' +
-       'Firefox 153, Safari 27, or newer.', false);
+  show('This browser cannot run Fire Fight. It needs WebAssembly exceptions: Chrome 95, ' +
+       'Firefox 100, Safari 15.2, or newer.', false);
 }
 </script>
 </body>

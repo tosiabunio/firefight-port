@@ -445,14 +445,38 @@ int Game::header_single(void)
 
 static int demo_sync_failed=0;  // port: the last demo replay diverged (Eem_demo_sync_failure)
 
-void Game::play(void)
+// Port: what ended the mission is handled outside the catch blocks (was in them). The browser's
+// Asyncify build can't suspend inside a catch block, and ending a mission shows screens
+// (GameManager::end_level), which wait for frames. Code that only the handlers reach is compiled
+// into their catch block even when it follows the try statement, so the mission runs in a
+// function of its own, which returns what ended it, and Game::play does the rest in its own frame.
+// The exceptions carry no data.
+enum { by_net_sync, by_demo_sync, by_mission_end, by_game_end, by_close };
+
+#ifdef _MSC_VER
+__declspec(noinline)
+#else
+__attribute__((noinline))
+#endif
+int Game::play_mission(void)
 {
   try
   {
     Game::loop_init();
     Game::main_loop();
   }
-  catch (Eem_net_sync_failure)
+  catch (Eem_net_sync_failure)  {return by_net_sync;}
+  catch (Eem_demo_sync_failure) {return by_demo_sync;}
+  catch (TerminateMission)      {return by_mission_end;}
+  catch (TerminateGame)         {return by_game_end;}
+  catch (Closed)                {}
+  return by_close;  // main_loop only ends with an exception
+}
+
+void Game::play(void)
+{
+  int ended=play_mission();
+  if (ended==by_net_sync)
   {
     MESSAGE("NETWORK: Eem network synchronization failure caught.");
     if (!Mp::SYNCFAILABORT)
@@ -475,13 +499,13 @@ void Game::play(void)
       FAILURE("NETWORK: Terminated. Leaving now.");
     }
   }
-  catch (Eem_demo_sync_failure)
+  else if (ended==by_demo_sync)
   {
     MESSAGE("NETWORK: Eem demo synchronization failure caught.");
     demo_sync_failed=1;  // port: see Game::go
     Game::loop_quit();
   }
-  catch (TerminateMission)
+  else if (ended==by_mission_end)
   {
     if (!Mp::BUILDSPRITESMODE)
     {
@@ -489,15 +513,15 @@ void Game::play(void)
     }
     Game::loop_quit();
   }
-  catch (TerminateGame)
+  else if (ended==by_game_end)
   {
     Game::loop_quit();
-    throw;
+    throw TerminateGame();  // was throw;
   }
-  catch (Closed)
+  else
   {
     Game::loop_quit();
-    throw;
+    throw Closed();  // was throw;
   }
 }
 

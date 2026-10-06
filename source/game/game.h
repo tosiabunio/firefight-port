@@ -92,6 +92,7 @@ class Game
   static void draw_demorecord(Screen &screen);
   static void draw_demoplay(Screen &screen);
   static void play(void);
+  static int  play_mission(void);  // port: see Game::play
   static void play_demo(void);
   static void record_demo(void);
   static void main_loop(void);

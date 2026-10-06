@@ -226,5 +226,12 @@ int main(int argc, char *argv[])
   }
 
   game_main(&line[0]);
-  return critical_error_occurred ? 1 : Comm::exit_code;
+  int exit_code = critical_error_occurred ? 1 : Comm::exit_code;
+#ifdef FF_BROWSER
+  // The Asyncify build returns from main to the page at its first sleep, and Emscripten doesn't
+  // see the real return later. exit() runs the static destructors and the quits, and tells the
+  // page (Module.onExit), in both browser builds.
+  exit(exit_code);
+#endif
+  return exit_code;
 }

@@ -1,9 +1,9 @@
 # The Emscripten build (phase 9): the game as WebAssembly. FF_WEB_PLATFORM says where it runs:
 #   node  headless under Node.js, on the host's file system. The tests run this build, so they
 #         show whether the simulation stays bit-exact in WebAssembly.
-#   web   in a web browser (FF_BROWSER): a page, the game, its data as one preloaded package and
-#         the music as Ogg Vorbis, all static files in web/<config> of the build directory (see
-#         source/CMakeLists.txt). No tests: the node build runs them.
+#   web   in a web browser (FF_BROWSER): a page, the game with JSPI and with Asyncify, its data
+#         as one preloaded package and the music as Ogg Vorbis, all static files in web/<config>
+#         of the build directory (see source/CMakeLists.txt). No tests: the node build runs them.
 
 set(FF_WEB_PLATFORM "node" CACHE STRING "Where the Emscripten build runs (node or web)")
 set_property(CACHE FF_WEB_PLATFORM PROPERTY STRINGS node web)
@@ -30,12 +30,13 @@ if(FF_WEB_PLATFORM STREQUAL "node")
     -sNODE_HOST_ENV=1) # the host's environment (cwdiags=extended)
 else()
   add_compile_definitions(FF_BROWSER)
+  # The game keeps its blocking loops. JSPI or Asyncify (one executable each, see
+  # source/CMakeLists.txt) suspends it while the browser shows a frame, plays the sound and
+  # delivers input (compat/browser.cpp, SDL_Delay).
   add_link_options(
     -sENVIRONMENT=web
-    # The game keeps its blocking loops: JSPI suspends the whole wasm stack while the browser
-    # shows a frame, plays the sound and delivers input (compat/browser.cpp, SDL_Delay).
-    -sJSPI=1
     -sINVOKE_RUN=0  # the page starts the game on a click: sound, pointer lock and full screen need one
+    -sFORCE_FILESYSTEM=1  # the data package is loaded by its own script (file_packager)
     # FS: the log is /tmp/Firefght.log, for Module.FS.readFile in the browser's console.
     -sEXPORTED_RUNTIME_METHODS=callMain,FS
     -lidbfs.js)     # the preferences directory, kept in IndexedDB (web/pre.js)

@@ -75,7 +75,8 @@ target_link_libraries(regdata PUBLIC cwengine)
 ff_legacy_options(regdata)
 
 # --- firefight: the game ------------------------------------------------------------------
-add_executable(firefight
+# The game's code is an object library, so the browser build can link it into two executables.
+add_library(firefight_game OBJECT
   game/main.cpp
   game/alien.cpp
   game/alienwea.cpp
@@ -106,12 +107,16 @@ add_executable(firefight
   game/tools.cpp
   game/view.cpp
   game/world.cpp)
-target_include_directories(firefight PRIVATE game)
+target_include_directories(firefight_game PRIVATE game)
 # UNPROTECT: no CD-ROM check (the original retail builds except "Production" defined it too).
-target_compile_definitions(firefight PRIVATE UNPROTECT
+target_compile_definitions(firefight_game PRIVATE UNPROTECT
   # Development fallback for the data directory (see game/main.cpp).
   FF_DEFAULT_DATA_DIR="${FF_DATA_DIR}")
-target_link_libraries(firefight PRIVATE regdata cwengine)
+target_link_libraries(firefight_game PUBLIC regdata cwengine)
+ff_legacy_options(firefight_game)
+
+add_executable(firefight)
+target_link_libraries(firefight PRIVATE firefight_game)
 ff_legacy_options(firefight)
 if(WIN32)
   # A GUI program, with the original icon; started from a terminal it uses that console.
@@ -122,18 +127,44 @@ endif()
 # --- the browser build (phase 9) ----------------------------------------------------------
 # Static files in web/<config> of the build directory, ready for any static web server:
 #   index.html                     the page (web/index.html), which starts the game on a click
-#   firefight.js, firefight.wasm   the game
-#   firefight.data                 data/ as one package, preloaded by the page, mounted at /data
+#   firefight.js, firefight.wasm   the game, with JSPI (Chrome and Edge 137+, Firefox 153+,
+#                                  Safari 27+)
+#   firefight-asyncify.js, .wasm   the game with Asyncify instead, for browsers without JSPI
+#   firefight-data.js, .data       data/ as one package, mounted at /data; the page loads it
+#                                  before either game
 #   music/track02.ogg ...          the soundtrack as Ogg Vorbis, transcoded from music/*.flac
 #                                  with oggenc (vorbis-tools); the page downloads it after the data
 # It has no tests: the node build runs them.
 if(FF_BROWSER)
   set(FF_WEB_DIR "${CMAKE_BINARY_DIR}/web/$<CONFIG>")
-  set_target_properties(firefight PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${FF_WEB_DIR}")
-  target_link_options(firefight PRIVATE
-    "SHELL:--preload-file '${FF_DATA_DIR}@/data'"
-    "SHELL:--pre-js '${CMAKE_SOURCE_DIR}/web/pre.js'")
-  set_property(TARGET firefight APPEND PROPERTY LINK_DEPENDS "${CMAKE_SOURCE_DIR}/web/pre.js")
+
+  # The same code twice. JSPI lets the browser suspend the whole wasm stack at the game's waits.
+  # Asyncify rewrites the code to unwind and rewind its own stack instead: larger and slower,
+  # but it runs in any browser with WebAssembly exceptions. It can't suspend inside a catch
+  # block, so no catch block may wait for a frame or sleep (Game::play_mission).
+  add_executable(firefight-asyncify)
+  target_link_libraries(firefight-asyncify PRIVATE firefight_game)
+  target_link_options(firefight PRIVATE -sJSPI=1)
+  target_link_options(firefight-asyncify PRIVATE -sASYNCIFY=1
+    -sASYNCIFY_STACK_SIZE=1MB)  # the call stack saved at each wait; the default is 4 KB
+  foreach(game IN ITEMS firefight firefight-asyncify)
+    set_target_properties(${game} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${FF_WEB_DIR}")
+    target_link_options(${game} PRIVATE "SHELL:--pre-js '${CMAKE_SOURCE_DIR}/web/pre.js'")
+    set_property(TARGET ${game} APPEND PROPERTY LINK_DEPENDS "${CMAKE_SOURCE_DIR}/web/pre.js")
+  endforeach()
+
+  # The data package, shared by both games: firefight.data and its loader, firefight-data.js.
+  find_program(FF_FILE_PACKAGER NAMES file_packager file_packager.bat
+    PATHS "${EMSCRIPTEN_ROOT_PATH}/tools" NO_DEFAULT_PATH REQUIRED)
+  file(GLOB_RECURSE FF_DATA_FILES "${FF_DATA_DIR}/*")
+  add_custom_command(OUTPUT "${FF_WEB_DIR}/firefight.data" "${FF_WEB_DIR}/firefight-data.js"
+    COMMAND "${CMAKE_COMMAND}" -E make_directory "${FF_WEB_DIR}"
+    COMMAND "${FF_FILE_PACKAGER}" "${FF_WEB_DIR}/firefight.data"
+            --preload "${FF_DATA_DIR}@/data" --js-output=${FF_WEB_DIR}/firefight-data.js --quiet
+    DEPENDS ${FF_DATA_FILES}
+    COMMENT "Packaging data/ for the browser"
+    VERBATIM)
+  add_custom_target(web_data ALL DEPENDS "${FF_WEB_DIR}/firefight.data")
 
   # About 104 kbit/s at quality 3: 27 MB for the 35 minutes, instead of 232 MB of FLAC.
   find_program(FF_OGGENC oggenc)
@@ -160,7 +191,6 @@ if(FF_BROWSER)
   # The data package's size, the sum of the files in data/. The page measures the download with it:
   # a server that compresses the package reports the compressed length, which the loader takes
   # for the total while it counts the uncompressed bytes.
-  file(GLOB_RECURSE FF_DATA_FILES "${FF_DATA_DIR}/*")
   set(FF_WEB_DATA_SIZE 0)
   foreach(file IN LISTS FF_DATA_FILES)
     file(SIZE "${file}" size)

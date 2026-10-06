@@ -61,7 +61,7 @@ Ready-made packages for Windows, Linux and macOS are on the [Releases](https://g
 
 ### In a web browser
 
-Play at [tosiabunio.github.io/firefight-port](https://tosiabunio.github.io/firefight-port/), with nothing to install. It needs a browser with WebAssembly JSPI: Chrome or Edge 137, Firefox 153 or Safari 27, or newer. Older browsers get a message instead of the game. The first visit downloads about 50 MB; the soundtrack comes in the background, so the game can start before all of it has arrived.
+Play at [tosiabunio.github.io/firefight-port](https://tosiabunio.github.io/firefight-port/), with nothing to install. It runs best in Chrome or Edge 137, Firefox 153 or Safari 27, or newer. Older browsers, back to Chrome 95, Firefox 100 and Safari 15.2, get a larger and slower version of the game, so far tried only in Chrome. The first visit downloads about 50 MB; the soundtrack comes in the background, so the game can start before all of it has arrived.
 
 The web version is new. It runs the same code as the desktop version, built as WebAssembly.
 
