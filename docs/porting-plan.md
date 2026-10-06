@@ -1,12 +1,13 @@
 # Fire Fight port plan: SDL2 + CMake, cross-platform
 
-Status: **accepted.** Decisions recorded 2026-10-03 (see [Decisions](#decisions)). Based on a code survey of this repo. File references are relative to `source/`.
+Status: **accepted.** Decisions recorded 2026-10-03 and 2026-10-06 (see [Decisions](#decisions)). Based on a code survey of this repo. File references are relative to `source/`.
 
 ## Goals
 
 - **Gameplay:** v1.1 retail gameplay, faithful down to the simulation, on **Windows (x64), Linux (x86-64) and macOS (Apple Silicon)**.
 - **Art and audio:** hires art only (640×400, square pixels by default), with the CD soundtrack from `music/`.
 - **Multiplayer:** up to 4 players over **LAN and the internet**.
+- **Browser** (added 2026-10-06): the same game in current web browsers through WebAssembly, single player first (phase 9, the next phase).
 - **Fidelity bar: aim for bit-exact.** The 8 original attract-mode demos (`data/demo/*.rec`) should replay to the end **in sync** on every platform. This test only works if the simulation is bit-exact, and bit-exactness is also what makes cross-platform network play possible. A divergence is acceptable only if it is proven to come from a 1.0 → 1.1 gameplay change in the original code. Any such divergence is documented, and the port-recorded golden demos take over as the gate.
 
 **Non-goals (for now):** new art, widescreen or higher internal resolution, rewriting gameplay, the shareware edition, lores mode, the level editor.
@@ -29,7 +30,7 @@ Status: **accepted.** Decisions recorded 2026-10-03 (see [Decisions](#decisions)
 
 | Item | Choice |
 |---|---|
-| Language | C++17 (`std::filesystem`, `static_assert`). Compiled as 64-bit only |
+| Language | C++17 (`std::filesystem`, `static_assert`). Compiled as 64-bit only on the desktop; the browser build (phase 9) is 32-bit wasm32 |
 | Build | CMake ≥ 3.21 with `CMakePresets.json`: `windows-msvc`, `linux-gcc`, `linux-clang`, `macos-clang`, each in debug and release |
 | Targets | Windows x64, Linux x86-64, macOS **arm64 only** (`CMAKE_OSX_ARCHITECTURES=arm64`, deployment target macOS 11, the first Apple Silicon release). No universal binary |
 | Dependencies | vcpkg manifest mode (`vcpkg.json`, pinned baseline): `sdl2`, `sdl2-mixer` (with FLAC), `enet`, and optionally `miniupnpc` for automatic port mapping. Plain `find_package` also works for distro packages on Linux |
@@ -46,7 +47,7 @@ SDL2 is the stated target. The platform code will sit only in the engine drivers
 
 ## Phases
 
-Each phase ends with something runnable and an exit check. Phases 5–7 can overlap once phase 4 is done.
+Each phase ends with something runnable and an exit check. Phases 5–7 can overlap once phase 4 is done. **Phase 9 (the browser) comes next, before the rest of phases 7 and 8** (decision 6). Its network play waits for phase 7's relay server.
 
 ### Phase 0: build skeleton and CI
 - Top-level `CMakeLists.txt` with targets:
@@ -326,6 +327,7 @@ Each phase ends with something runnable and an exit check. Phases 5–7 can over
      - Host and clients connect outbound only, so no port forwarding is needed.
      - Players join with a short session code.
      - This also covers hosts behind carrier-grade NAT, where neither direct option works.
+     - It also accepts WebSocket connections, for the browser build (phase 9).
 - **Latency:**
   - The original lockstep tolerates at most 4 frames (~132 ms) of delay, which suits a LAN but not internet round trips plus the extra relay hop.
   - **Make the input delay a session parameter.** The host chooses it from round-trip times measured at join, and every peer uses the same value.
@@ -370,6 +372,67 @@ Each phase ends with something runnable and an exit check. Phases 5–7 can over
     - Linux: built on Ubuntu 24.04, so it needs glibc 2.39 or newer. An AppImage would reach older systems.
   - **Releases:** a version tag runs `.github/workflows/release.yml`. On each system it builds the package, installs the same tree into a fresh directory, checks the data byte for byte, moves the repository's `data/` away and replays demo `level1` from the installed copy, then publishes the three packages with `.github/release-notes.md`. CI and the release share their setup in `.github/actions/setup`.
 
+### Phase 9: the browser (WebAssembly)
+Added 2026-10-06, after a code survey, and **done next, before the rest of phases 7 and 8** (decision 6). The same sources are built with Emscripten and played in a web browser: single player now, network play once phase 7's relay server exists.
+- **Order of work:**
+  1. The Node build and its tests (see Tests). They show whether the simulation stays bit-exact in WebAssembly before anything else is built.
+  2. Single player in the browser, with JSPI.
+  3. The Asyncify fallback, if older browsers are to be supported.
+  4. Network play, together with phase 7's relay server.
+- **Why it is within reach:**
+  - No threads and no assembly are left. The timers run on the main thread (phase 2) and the blitter is C++ (phase 3).
+  - The simulation is integer arithmetic. The only libm call left is `pow` for the sound volumes (`1ss.cpp`), so Emscripten's libm can't change the outcome. WebAssembly doubles are IEEE 754 with no extended precision and no fused multiply-add, as on SSE2, and on arm64 with `-ffp-contract=off`.
+  - The compat clones and `Stale_memory` don't depend on the target.
+  - Files are stdio, which Emscripten's virtual file system serves.
+  - Every event pump goes through `Comm::process_messages`, every frame through `VD_sdl::present` and every idle wait through `Comm::wait_messages`.
+  - wasm32 is a 32-bit target, like the original. It will be the port's first 32-bit build, so the layout `static_assert`s get their first test there.
+- **Toolchain:**
+  - Emscripten, with a `web-emscripten` preset (Emscripten's toolchain file, Ninja Multi-Config).
+  - SDL2 and SDL2_mixer come from Emscripten's own ports, not vcpkg; `FFDependencies.cmake` maps them to `ff::sdl2` and `ff::mixer`. Emscripten's SDL2_mixer (2.8.0) plays Ogg and MP3 but not FLAC (see Music).
+  - No ENet. Until the WebSocket transport, the web build links a stand-in for `1ee_enet.cpp` whose `host`, `join` and `discover` fail, so `--host` and `--join` end with a message.
+  - C++ exceptions are native WebAssembly exceptions (`-fwasm-exceptions`). The control flow depends on them, and Emscripten doesn't catch exceptions by default.
+  - Memory growth on (`-sALLOW_MEMORY_GROWTH`).
+- **Main loop: keep the blocking loops, suspend the stack.**
+  - The game runs nested blocking loops: title, menus, mission screen, mission, statistics, credits. A browser only shows a frame, plays sound and delivers input when the page's code returns to it. Rewriting the loops around `emscripten_set_main_loop` would turn the original control flow inside out, so don't.
+  - Build with **JSPI** (`-sJSPI`) instead. It lets the browser suspend the whole wasm stack and resume it later. It ships in Chrome and Edge 137+, Firefox 153+ and Safari 27.
+  - Yield once per frame, after `SDL_RenderPresent` in `VD_sdl::present` (`emscripten_sleep(0)`), and now and then during the sprite build, so the page can show progress.
+  - Idle waits (`Eem::read` → `Comm::wait_messages` → `SDL_WaitEventTimeout`) end in `SDL_Delay`, which SDL2 turns into `emscripten_sleep` when stack switching is on. Check that it does so under JSPI.
+  - **Asyncify fallback** for browsers without JSPI (Safari before 27, older iOS): `-sASYNCIFY` works everywhere, but makes the code larger and slower (Emscripten's estimate is about 50%), which this game can afford.
+    - Asyncify can't suspend inside a `catch` block when exceptions are native. After the last mission, the end credits run from one: `Game::play`'s `catch (TerminateMission)` (`game.cpp:484`) calls `GameManager::end_level`, which plays `Header::footer()` (`gman.cpp:322`).
+    - The fix: the handler sets a flag, and its work moves after the `catch`. The other handlers seen so far only clean up; check all 35.
+- **Files:**
+  - `data/` (47 MB, 22 MB compressed) goes into one preloaded package (`--preload-file`), which the page downloads with a progress bar before the game starts. Per-world packages, mounted with the mission, can come later if the first start is too slow.
+  - The preferences directory (settings, pilots, recorded demos) lives in IndexedDB (`IDBFS`), synced after each write: `Registry`, the pilot files and demo recording. The log stays in memory and goes to the browser console.
+  - Screenshots and recorded demos can be offered as downloads.
+- **Music:**
+  - The web package carries the 8 tracks as Ogg Vorbis, transcoded when it is built: 35 minutes, about 25–33 MB instead of 232 MB of FLAC. The repository keeps the FLAC files, and `data_files` doesn't change.
+  - `CD::play` (`1ss_song.cpp`) also looks for `track{N+1:02}.ogg`. SDL_mixer detects the format from the content, so only the name changes.
+  - The tracks download in the background after the start, so the game never waits for music. A track that hasn't arrived yet starts when it does.
+- **Browser behaviour:**
+  - **A click to start.** Sound, pointer lock (mouse steering's relative mode) and fullscreen each need a user gesture, so the page opens on a "click to play" screen.
+  - **Ctrl+W closes the tab**, and a page can't prevent it. Fire2 is Left Ctrl by default (`1regdata.cpp:173`), and W thrusts (phase 4's WASD). Choose a remedy in this phase: a "leave the page?" prompt (`beforeunload`) while a mission runs, Chromium's Keyboard Lock in fullscreen, or another Fire2 default in the web build.
+  - **Esc** also leaves pointer lock and fullscreen. Check what the game still receives.
+  - **Function keys:** F1 (help), F5 and F11 (control sets) have browser meanings. SDL suppresses the browser's action while the canvas has focus; check each key, as on macOS for F11.
+  - **QUIT GAME** has no window to close. It ends on a page that offers to start again.
+  - **Game controllers** come through the Gamepad API (SDL's Emscripten joystick driver). Touch screens are a non-goal.
+  - **Options from the URL** (`?demo=level1`, `?stretch`) become command-line arguments, for tests and attract-mode links. Until phase 8's menus, they also stand in for the display options, as the command line does on the desktop.
+- **Tests:**
+  - **First on Node.js, before any browser work.** A headless build runs under Node on the real file system (`-sNODERAWFS`, the repository's `data/`), and CTest runs it through Emscripten's cross-compiling emulator. It needs no stack switching: nothing is shown, and SDL's waits spin.
+    - It must pass `headless_run`, `golden_title`, `sprite_build`, `crt_vectors`, `input_play`, every `demo_<name>` and every `golden_<name>`. That answers the main question, whether the simulation is bit-exact in WebAssembly, before anything else is built.
+    - The `net_*` tests don't carry over (no ENet). `sound_play` does only if Emscripten's SDL has the `disk` audio driver.
+  - **CI:** a Linux job with the Emscripten SDK builds the web preset and runs the Node tests on branch pushes.
+  - **In browsers,** by hand at first: a mission on keyboard, mouse and a game controller in current Chrome, Firefox and Safari. A headless Chrome replaying a demo from the URL could automate this later.
+- **Hosting:** static files only: the page, the `.wasm`, the data package and the music. With no threads there is no `SharedArrayBuffer`, so no cross-origin isolation headers are needed. The release workflow can publish the web package beside the other three, and any static host can serve it.
+- **Network play** (needs phase 7's relay server):
+  - A browser has no UDP sockets, can't accept connections and can't broadcast, so ENet, hosting on a listening port and LAN discovery don't carry over.
+  - A WebSocket version of the transport, behind the same interface (`1ee_enet.h`), connects to the relay. The transport already sends everything on one reliable, ordered channel, which is what a WebSocket gives.
+  - The relay accepts both ENet and WebSocket connections, so browser and desktop players can share a game. A browser can still be the session's host (player 1), because the relay carries the traffic.
+  - A page served over HTTPS may only open secure WebSockets (`wss://`), so the relay needs a TLS certificate.
+  - Browsers slow the timers of hidden tabs down to about once a second, while network play must keep simulating without drawing (phase 2's rule). Measure how a hidden tab affects the other players.
+- **Exit, single player:** in current Chrome, Firefox and Safari, served from a static host, the title, the attract demos and a full mission play on keyboard, mouse and a game controller, with sound and music, and the settings and pilots survive a reload. The Node runs of the demo and golden tests pass in CI.
+- **Exit, network play** (with phase 7's relay server): a browser and a desktop player play through the relay for 30 minutes without a sync failure.
+- **Open questions:** JSPI only, or an Asyncify build as well; the Ctrl+W remedy; where the web version is hosted.
+
 ## Risks
 
 | Risk | Impact | Mitigation |
@@ -383,11 +446,16 @@ Each phase ends with something runnable and an exit check. Phases 5–7 can over
 | Internet latency and jitter | Lockstep stalls | Session-wide input delay chosen from measured round trips. The frame cap already slows the game rather than desyncing it |
 | Untrusted packets from the internet | Crashes or exploits through the 1996 parser | Validate before parsing, rate limits, parser fuzzing in CI |
 | Relay server hosting | Running cost; availability | A tiny stateless forwarder on a cheap VPS. LAN and direct connections still work without it |
+| Simulation differs in WebAssembly | Browser games desync, alone and against desktop players | The Node runs of the demo and golden tests, before any browser work (phase 9) |
+| No JSPI in older browsers (Safari before 27, older iOS) | The browser build doesn't start there | An Asyncify build as a fallback, once the end credits run outside their `catch` |
+| Browser-reserved shortcuts (Ctrl+W with the default Fire2 and WASD) | A player closes the tab mid-mission | A `beforeunload` prompt, Keyboard Lock in fullscreen, or other default keys in the web build |
+| Browser download size (data 22 MB compressed, music 232 MB as FLAC) | A slow first start | Music as Ogg, downloaded in the background; per-world data packages if needed |
+| Timers throttled in hidden browser tabs | A hidden tab stalls a network game | Measure in phase 9; warn the player |
 | Private-repo CI minutes (macOS multiplier) | Cost | macOS on `main`/nightly; daily testing on the local Mac; Linux for most checks |
 
 ## Decisions
 
-Recorded 2026-10-03.
+Recorded 2026-10-03; decision 6 on 2026-10-06.
 
 | # | Question | Decision | Effect on the plan |
 |---|---|---|---|
@@ -396,3 +464,4 @@ Recorded 2026-10-03.
 | 3 | Default presentation | **Square pixels** | 640×400 letterboxed with integer scaling. 4:3 stretch remains an option |
 | 4 | macOS | **Apple Silicon only; a local Mac is available** | arm64-only builds, macOS 11+. Day-to-day testing on the Mac, CI on `main`/nightly |
 | 5 | Launcher replacement | **In-game options** | Phase 8 menus: video, audio, key bindings, pilots, network host/join |
+| 6 | Browser build | **WebAssembly, next, before the rest of phases 7 and 8** | Phase 9: single player in the browser first. Network play in the browser waits for phase 7's relay server, which also takes WebSocket connections. Until phase 8's menus, URL options stand in for the display options |

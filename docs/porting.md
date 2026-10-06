@@ -22,6 +22,7 @@ The repository holds the original Fire Fight material needed to port the game to
 | 6 | Sound and the CD soundtrack (SDL2_mixer) | Done. Checked by ear on Windows |
 | 7 | Network play (ENet) | In progress. LAN play by address and by LAN discovery works; internet play, the relay server and the input delay are to do |
 | 8 | Replace the launcher (in-game options, key bindings, network menus); packaging | Started: packages for the three systems and a release workflow. The menus are to do |
+| 9 | The browser: a WebAssembly build (Emscripten) | Next, before the rest of phases 7 and 8 |
 
 The tests (`ctest`) check the dependencies, a headless run, the title frames, the sprite build against the original's caches, the MSVC 4 CRT clones, the original and golden demos, sound, network play, input and the data files. [`CLAUDE.md`](../CLAUDE.md) lists them.
 
