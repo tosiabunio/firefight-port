@@ -21,12 +21,12 @@ Everything was selected by rule from the original archive. `README.md` is about 
   - `tools/archive/ffarchive.py` and `crt_vectors.py` produce and check those files.
 - **On the Mac:** `docs/macos.md` covers checking a branch, what a failing test means there, and what must wait for the Windows PC.
 - **Port plan:** SDL2 + CMake, in phases with exit criteria, in `docs/porting-plan.md`. Follow its phase order and its determinism rules.
-- **Status: phases 1–6 done; the game is playable on keyboard, mouse and game controller, with sound and the CD soundtrack.** The original sources build on every platform. Runtime (phase 2), video (phase 3), input (phase 4) and sound (phase 6, SDL2_mixer) are on SDL2. A full mission played by hand on each device is still to be confirmed; the sound was checked by ear on Windows. **All 8 original demos replay in sync to the end on Windows, Linux and macOS**, and so do four golden demos recorded with the port (phase 5). Network play (phase 7) runs over ENet on a LAN, by address or LAN discovery (`--host`, `--join <address>|lan`); internet play, the relay server and the input delay are still to do. **Now: the browser build (phase 9, WebAssembly), before the rest of phases 7 and 8.** The Node build (`node-emscripten`) replays every original and golden demo in sync and matches the title frames and the sprite build, so the simulation is bit-exact in WebAssembly; the browser build is next.
+- **Status: phases 1–6 done; the game is playable on keyboard, mouse and game controller, with sound and the CD soundtrack.** The original sources build on every platform. Runtime (phase 2), video (phase 3), input (phase 4) and sound (phase 6, SDL2_mixer) are on SDL2. A full mission played by hand on each device is still to be confirmed; the sound was checked by ear on Windows. **All 8 original demos replay in sync to the end on Windows, Linux and macOS**, and so do four golden demos recorded with the port (phase 5). Network play (phase 7) runs over ENet on a LAN, by address or LAN discovery (`--host`, `--join <address>|lan`); internet play, the relay server and the input delay are still to do. **Now: the browser build (phase 9, WebAssembly), before the rest of phases 7 and 8.** The Node build (`node-emscripten`) replays every original and golden demo in sync and matches the title frames and the sprite build, so the simulation is bit-exact in WebAssembly. The browser build (`web-emscripten`, step 2) plays the title, the attract demos and a mission in Chrome, with the music, and keeps the settings and pilots in IndexedDB; the mouse, game controllers, sound by ear, Firefox and Safari are still to check.
 
 ## Build
 
 - **Build system:** CMake (≥ 3.25) with presets, Ninja Multi-Config, and vcpkg manifest mode (`vcpkg.json`, pinned baseline; `VCPKG_ROOT` must be set).
-- **Presets:** `windows-msvc`, `linux-gcc`, `linux-clang`, `macos-clang` (arm64 only, macOS 11+), and `node-emscripten`: the game as WebAssembly, headless under Node.js, for the tests (phase 9). It needs no vcpkg, only the Emscripten SDK (`EMSDK` set by its `emsdk_env`; CI pins 6.0.11) and CMake and Ninja on `PATH`. `cmake/FFEmscripten.cmake` has its options.
+- **Presets:** `windows-msvc`, `linux-gcc`, `linux-clang`, `macos-clang` (arm64 only, macOS 11+), `node-emscripten`: the game as WebAssembly, headless under Node.js, for the tests (phase 9), and `web-emscripten`: the browser build, with no tests. They need no vcpkg, only the Emscripten SDK (`EMSDK` set by its `emsdk_env`; CI pins 6.0.11) and CMake and Ninja on `PATH`; the browser build also uses `oggenc` (vorbis-tools) for the music. `cmake/FFEmscripten.cmake` has their options.
   - Build presets are `<preset>-debug` and `<preset>-release`; test presets use the same names.
   - All-in-one: `cmake --workflow --preset <preset>` (configure, build Debug and Release, run all tests).
   - Single test: `ctest --preset <preset>-debug -R smoke`. Tests:
@@ -52,9 +52,15 @@ Everything was selected by rule from the original archive. `README.md` is about 
   - Preferences: `--pref`, else `SDL_GetPrefPath("Chaos Works", "Fire Fight")`. It holds the log (`Firefght.log`, also echoed to stderr), `settings.ini` (the former registry), the pilot files, recorded demos and screenshots.
   - Other arguments are the original engine switches (`debug=1`, `check`, ...) and the port's test switches (`sprite_dump=1`, `input_dump=1`).
   - Sprites and palette tables are built from the FLC masters in memory on every start (about 1 s); nothing is written to `data/`.
+- **In a browser** (`web-emscripten`, phase 9): `build/web-emscripten/web/<config>/` holds static files, the page (`web/index.html`), the game, the data as one preloaded package and the music as Ogg Vorbis. Serve it with any static server (`python3 -m http.server -d build/web-emscripten/web/Release`). It needs JSPI: Chrome or Edge 137+, Firefox 153+, Safari 27.
+  - The page starts the game on a click (sound, pointer lock and full screen need one). URL options become arguments: `?demo=level1&fast`.
+  - JSPI suspends the game while the browser works. `browser_next_frame()` (`compat/browser.h`) waits for the next animation frame after each present, and SDL_Delay sleeps.
+  - The preferences directory is `/libsdl/...`, kept in IndexedDB. Code that writes to it calls `browser_pref_written()`. The log is `/tmp/Firefght.log` (`Module.FS` in the console).
+  - The game pauses when its page loses the focus, as on the desktop.
+  - `web/pre.js` downloads the music after the start. Until a track arrives its file is empty, and `CD::play` waits for it.
 - **Packages and releases:** `cmake/FFPackaging.cmake` (CPack): a Windows zip, a Linux tar.gz and a macOS disk image with `Fire Fight.app`, each with the game, `data/` and `music/`. A version tag `v<VERSION>` (the `VERSION` in `CMakeLists.txt`, now 0.7.0) runs `.github/workflows/release.yml`, which builds and tests the packages and publishes them as a GitHub release. On Windows the game is a GUI program (`WIN32_EXECUTABLE`) that attaches to the console of a terminal it was started from.
 - **CI:** `.github/workflows/ci.yml` runs the workflow presets; it shares its setup steps (build tools, MSVC environment, vcpkg and its cache) with the release workflow in `.github/actions/setup`. Which platforms run:
-  - branch pushes: Windows and Linux, including `node-emscripten` on Linux;
+  - branch pushes: Windows and Linux, including on Linux the Emscripten job, which runs the `node-emscripten` tests and builds `web-emscripten`;
   - pull requests: macOS only;
   - `main`, nightly and manual runs: everything.
 
@@ -70,13 +76,14 @@ Everything was selected by rule from the original archive. `README.md` is about 
 
 | Path | Contents |
 |---|---|
-| `source/compat/` | Port layer: `crt.h` (MSVC CRT extensions), `msvc4.h` (MSVC 4 `rand`/`qsort`) and `win32.h` (Win32 stand-ins, used on every platform, Windows included). Original sources include these instead of `<windows.h>`, `<io.h>` and friends. Drivers stop using `win32.h` as they move to SDL |
+| `source/compat/` | Port layer: `crt.h` (MSVC CRT extensions), `msvc4.h` (MSVC 4 `rand`/`qsort`), `browser.h` (what the browser build needs from its page; no-ops elsewhere) and `win32.h` (Win32 stand-ins, used on every platform, Windows included). Original sources include these instead of `<windows.h>`, `<io.h>` and friends. Drivers stop using `win32.h` as they move to SDL |
 | `source/game/` | Game code. Every `.cpp` includes only `headers.h`, which pulls in the engine and all game headers in dependency order. Add new headers there |
 | `source/engine/<module>/` | CW engine libraries; `1sp/asm/` holds the TASM blitters |
 | `source/engine/common/` | `first.h` and `1cw_strg.h` |
 | `source/regdata/` | `RegData`, the settings model shared with the (absent) launcher. Its `headers.h` has MFC parts behind `#ifdef _MFC_VER` |
 | `data/` | Game data in the engine's loose-file layout (`*.dir` manifests at the root) |
 | `music/` | `track02.flac` … `track09.flac` |
+| `web/` | The browser build's page (`index.html`, filled in by CMake) and `pre.js`, which Emscripten puts at the start of the game's script (preferences in IndexedDB, music download) |
 
 Include paths for a build: `source`, `source/game`, `source/regdata`, `source/engine/common` and every `source/engine/<module>`.
 
@@ -99,7 +106,7 @@ Modules are mostly static-class singletons with `init`/`quit`. Each header auto-
   - The quit manager runs the final quits after all static destructors (`Comm_init` in `1lg.h`). Anything a quit procedure touches must outlive static destruction.
 - **1mm** [mmu]: guarded `Heap` (zero-filled `malloc` blocks with per-block owner names), `Heap_object`, `Fast_heap`.
 - **1ba** [bas]: basic containers (`Bitflag`, `Bit`, `Pointer`, hash arrays).
-- **1rg** [reg]: `Registry` (now `settings.ini` in the preferences directory) and `Cmd_line`.
+- **1rg** [reg]: `Registry` (now `settings.ini` in the preferences directory, written at quit; in the browser at every change) and `Cmd_line`.
 - **1io** [xio/txt]:
   - `File` virtual filesystem on stdio. `File::access_on("update,global,params", ...)` merges the listed manifests (`<name>.dir`) in memory. The original `.vol` volume support is gone.
   - `Xio` compression (the demo files use it).
@@ -116,7 +123,7 @@ Modules are mostly static-class singletons with `init`/`quit`. Each header auto-
   - Sprite build from FLC masters into memory (`1sp_lmai.cpp`, `1sp_lreb.cpp`, `1sp_ldsa.cpp`), including the lores bounds (`Lsprite::measure`: lores is measured, never built). Phase bounds are simulation state: level-object culling and builders, and on-screen tests. **Palette index 255 is the transparent key colour.**
 - **1ss** [sos]: samples and the CD soundtrack on SDL2_mixer.
   - Samples keep the original voice model: 8 channels (up to 16), one voice per sample, stealing by the manifest priority. DirectSound's volumes and pans (hundredths of a dB) become linear gains. `sos_safe=1` is the old single-voice WaveOut mode; `sos_none=1` is silent (headless runs).
-  - `CD` streams `music/track{N+1:02}.flac` for CD track N. Losing focus pauses samples and music.
+  - `CD` streams `music/track{N+1:02}.flac` (or `.ogg`, the browser build's) for CD track N. Losing focus pauses samples and music.
   - `Mixer` holds the game's sound and music volumes (it used to change the system-wide mixer). They are saved in `settings.ini` (`sos/sound volume`, `sos/music volume`) and default to half: music and samples share one digital mix, which clips at full volume.
 - **1cw** [cwe]: `Cwe::init` reads `cwe.ini` and starts every other module.
 

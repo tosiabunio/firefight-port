@@ -1224,10 +1224,12 @@ void Game::draw_progress(void)
 }
 
 //GAME PROGRESS (API)
-// Port: the Win32 progress dialog shown during startup is gone; the stages go to the log.
+// Port: the Win32 progress dialog shown during startup is gone; the stages go to the log, and in
+// the browser to the page.
 void progress_text (char *text)
 {
   MESSAGE("%s",text);
+  browser_status(text);
 }
 
 void progress_start(int range,HINSTANCE hinstance)

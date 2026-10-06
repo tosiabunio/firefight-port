@@ -22,7 +22,7 @@ The repository holds the original Fire Fight material needed to port the game to
 | 6 | Sound and the CD soundtrack (SDL2_mixer) | Done. Checked by ear on Windows |
 | 7 | Network play (ENet) | In progress. LAN play by address and by LAN discovery works; internet play, the relay server and the input delay are to do |
 | 8 | Replace the launcher (in-game options, key bindings, network menus); packaging | Started: packages for the three systems and a release workflow. The menus are to do |
-| 9 | The browser: a WebAssembly build (Emscripten) | In progress, before the rest of phases 7 and 8. Under Node.js all 8 original demos and the 4 golden demos replay in sync, and the title frames and the sprite build match; the browser is to do |
+| 9 | The browser: a WebAssembly build (Emscripten) | In progress, before the rest of phases 7 and 8. Under Node.js all 8 original demos and the 4 golden demos replay in sync, and the title frames and the sprite build match. In Chrome the title, the attract demos and a mission play on the keyboard, with the music, and the settings and pilots survive a reload. The mouse, game controllers, sound by ear, Firefox and Safari are still to check |
 
 The tests (`ctest`) check the dependencies, a headless run, the title frames, the sprite build against the original's caches, the MSVC 4 CRT clones, the original and golden demos, sound, network play, input and the data files. [`CLAUDE.md`](../CLAUDE.md) lists them.
 
@@ -37,6 +37,7 @@ The tests (`ctest`) check the dependencies, a headless run, the title frames, th
 | `source/compat/` | Port layer: MSVC CRT extensions, clones of MSVC 4's `rand` and `qsort`, and the remaining Win32 stand-ins |
 | `data/` | Retail game data, laid out exactly as the `*.dir` manifests expect (see below) |
 | `music/` | The CD soundtrack, `track02.flac` … `track09.flac` (lossless rips of the CD tracks) |
+| `web/` | The browser build's page (`index.html`) and the script it adds to the game (`pre.js`) |
 | `docs/` | This document, the plan, the archive notes, the Mac notes and the screenshots |
 | `CMakeLists.txt`, `CMakePresets.json`, `vcpkg.json`, `cmake/` | Build system |
 | `tests/` | Test scripts, input scripts, golden files and golden demos |
@@ -50,6 +51,14 @@ The tests (`ctest`) check the dependencies, a headless run, the title frames, th
 The [README](../README.md#building-from-source) has the requirements and the basic commands. The presets are `windows-msvc`, `linux-gcc`, `linux-clang` and `macos-clang`; each has `-debug` and `-release` build and test presets.
 
 `node-emscripten` builds the game as WebAssembly and runs its tests under Node.js (phase 9). It needs the Emscripten SDK (CI uses 6.0.11): `EMSDK` set by its `emsdk_env` script, and CMake and Ninja on the `PATH`. It needs no vcpkg.
+
+`web-emscripten` builds the game for a web browser (phase 9), with the same SDK. `cmake --workflow --preset web-emscripten` builds Debug and Release; it has no tests, because the Node build runs them. The music is encoded with `oggenc` from vorbis-tools; without it the build has no music. The result is a directory of static files, `build/web-emscripten/web/<config>/`: the page (`index.html`), the game (`firefight.js` and `.wasm`), the data as one package (`firefight.data`) and the music as Ogg Vorbis (`music/`, 27 MB). Any static web server can serve it:
+
+```sh
+python3 -m http.server -d build/web-emscripten/web/Release   # then open http://localhost:8000/
+```
+
+The browser needs JSPI: Chrome or Edge 137+, Firefox 153+, Safari 27 or newer. Options in the URL become command-line options: `?demo=level1&fast` plays one demo, as fast as the display allows, and ends. The log goes to the browser's console, and the whole of it is in `Module.FS.readFile('/tmp/Firefght.log', {encoding: 'utf8'})`. The settings, pilots and recorded demos are kept in the site's IndexedDB. The game pauses when its page loses the focus, as it does when its window does on the desktop.
 
 ```sh
 cmake --workflow --preset linux-gcc            # configure, build Debug + Release, run all tests
@@ -115,6 +124,17 @@ build/linux-gcc/tools/smoke/Debug/ff_smoke --music music/track02.flac --wav 'dat
    ```
 
    **Expected:** a 640×400 window with moving diagonal colour bands for a few seconds. After it closes, you hear a short beep, then a quarter of a second of the title music. The terminal lists each check and ends with `PASSED (0 failed checks)`. The first lines report the SDL, SDL_mixer and ENet versions and the video/audio drivers in use (`cocoa` and `coreaudio`).
+
+6. Optionally, the WebAssembly builds (phase 9): the Emscripten SDK at CI's version, and the Ogg Vorbis encoder for the browser build's music:
+
+   ```sh
+   git clone --depth 1 https://github.com/emscripten-core/emsdk.git ~/emsdk
+   ~/emsdk/emsdk install 6.0.11 && ~/emsdk/emsdk activate 6.0.11
+   brew install vorbis-tools
+   source ~/emsdk/emsdk_env.sh                 # in each new shell, before these presets
+   cmake --workflow --preset node-emscripten   # the tests under Node.js
+   cmake --workflow --preset web-emscripten    # the browser build (see "Building, for development")
+   ```
 
 ## Provenance and version
 

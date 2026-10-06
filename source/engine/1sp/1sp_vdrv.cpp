@@ -1,5 +1,6 @@
 #include "1sp_hdrs.h"
 #include "1sp_vide.h"
+#include <compat/browser.h>
 #include <SDL.h>
 
 //----- komunikaty -----------------------------------------------------------
@@ -226,6 +227,8 @@ void    VD_sdl::present (void)
       Comm::reinit_mouse(&rc,screen_sx,screen_sy);
     }
   }
+  // In a browser the frame shows only when the game waits for the next one.
+  browser_next_frame();
 }
 
 // Saves the frame as it would be shown (after the palette) when Video::shot_interval is due.

@@ -111,9 +111,14 @@ void Cwe::init (Cwe_param *param)
     //-------------------
     // LOG initialization
     //-------------------
-    // Port: the log goes to the preferences directory (was TEMP).
+    // Port: the log goes to the preferences directory (was TEMP). In the browser, where that
+    // directory is kept in IndexedDB, it stays in memory; the console shows it.
     char tmp[1024];
+#ifdef FF_BROWSER
+    sprintf(tmp, "/tmp/%s", param->log_file?param->log_file:cwe_log_file);
+#else
     sprintf(tmp, "%s%s", Comm::pref_path, param->log_file?param->log_file:cwe_log_file);
+#endif
     Log::init(tmp);
     //------------------------
     // Command line processing

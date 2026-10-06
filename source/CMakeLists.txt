@@ -3,6 +3,7 @@
 
 # --- compat: CRT shims and the Win32/DirectX stand-ins (see compat/win32.h) --------------
 add_library(compat STATIC
+  compat/browser.cpp
   compat/crt.cpp
   compat/msvc4.cpp
   compat/win32.cpp)
@@ -116,6 +117,51 @@ if(WIN32)
   # A GUI program, with the original icon; started from a terminal it uses that console.
   target_sources(firefight PRIVATE game/win_console.cpp game/firefight.rc)
   set_target_properties(firefight PROPERTIES WIN32_EXECUTABLE TRUE)
+endif()
+
+# --- the browser build (phase 9) ----------------------------------------------------------
+# Static files in web/<config> of the build directory, ready for any static web server:
+#   index.html                     the page (web/index.html), which starts the game on a click
+#   firefight.js, firefight.wasm   the game
+#   firefight.data                 data/ as one package, preloaded by the page, mounted at /data
+#   music/track02.ogg ...          the soundtrack as Ogg Vorbis, transcoded from music/*.flac
+#                                  with oggenc (vorbis-tools); the page downloads it after the data
+# It has no tests: the node build runs them.
+if(FF_BROWSER)
+  set(FF_WEB_DIR "${CMAKE_BINARY_DIR}/web/$<CONFIG>")
+  set_target_properties(firefight PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${FF_WEB_DIR}")
+  target_link_options(firefight PRIVATE
+    "SHELL:--preload-file '${FF_DATA_DIR}@/data'"
+    "SHELL:--pre-js '${CMAKE_SOURCE_DIR}/web/pre.js'")
+  set_property(TARGET firefight APPEND PROPERTY LINK_DEPENDS "${CMAKE_SOURCE_DIR}/web/pre.js")
+
+  # About 104 kbit/s at quality 3: 27 MB for the 35 minutes, instead of 232 MB of FLAC.
+  find_program(FF_OGGENC oggenc)
+  file(GLOB FF_FLAC_TRACKS "${FF_MUSIC_DIR}/track*.flac")
+  set(FF_WEB_TRACKS "")
+  set(FF_WEB_MUSIC "")
+  if(FF_OGGENC)
+    foreach(flac IN LISTS FF_FLAC_TRACKS)
+      get_filename_component(track "${flac}" NAME_WE)
+      set(ogg "${FF_WEB_DIR}/music/${track}.ogg")
+      add_custom_command(OUTPUT "${ogg}"
+        COMMAND "${FF_OGGENC}" -Q -q 3 -o "${ogg}" "${flac}"
+        DEPENDS "${flac}"
+        COMMENT "Encoding ${track} as Ogg Vorbis"
+        VERBATIM)
+      list(APPEND FF_WEB_MUSIC "${ogg}")
+      list(APPEND FF_WEB_TRACKS "'${track}.ogg'")
+    endforeach()
+  else()
+    message(WARNING "oggenc (vorbis-tools) not found: the browser build has no music")
+  endif()
+  add_custom_target(web_music ALL DEPENDS ${FF_WEB_MUSIC})
+
+  # The page, with the version and the track list.
+  list(JOIN FF_WEB_TRACKS ", " FF_WEB_TRACKS)
+  configure_file("${CMAKE_SOURCE_DIR}/web/index.html" "${CMAKE_CURRENT_BINARY_DIR}/index.html" @ONLY)
+  file(GENERATE OUTPUT "${FF_WEB_DIR}/index.html" INPUT "${CMAKE_CURRENT_BINARY_DIR}/index.html")
+  return()
 endif()
 
 # Tests that run the game from a script (tests/check_*.cmake) start it through EMULATOR: Node.js

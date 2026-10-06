@@ -31,8 +31,14 @@ static int open_audio(void)
     WARNING("no sound: SDL audio failed (%s)",SDL_GetError());
     return 0;
   }
+#ifdef FF_BROWSER
+  // the browser build's music is Ogg Vorbis (1ss_song.cpp)
+  if((Mix_Init(MIX_INIT_OGG)&MIX_INIT_OGG)==0)
+    WARNING("no music: SDL_mixer has no Ogg Vorbis support (%s)",Mix_GetError());
+#else
   if((Mix_Init(MIX_INIT_FLAC)&MIX_INIT_FLAC)==0)
     WARNING("no music: SDL_mixer has no FLAC support (%s)",Mix_GetError());
+#endif
   if(Mix_OpenAudioDevice(MIX_DEFAULT_FREQUENCY,AUDIO_S16SYS,2,1024,NULL,SDL_AUDIO_ALLOW_FREQUENCY_CHANGE)!=0) {
     WARNING("no sound: the audio device does not open (%s)",Mix_GetError());
     Mix_Quit();

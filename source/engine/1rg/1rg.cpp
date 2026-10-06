@@ -1,4 +1,5 @@
 #include "1rg_hdrs.h"
+#include <compat/browser.h>
 #include <filesystem>
 #include <map>
 #include <string>
@@ -42,8 +43,8 @@ char    Registry::buffer[REG_BUFFER_LEN];
 // Registry methods
 //=============================================================================
 // Port: the registry is a settings file, <preferences>/settings.ini, read at init and written
-// back at quit. Each registry key below the application key is an INI section and each value an
-// entry, tagged with its registry type:
+// back at quit (in the browser, at every change). Each registry key below the application key is
+// an INI section and each value an entry, tagged with its registry type:
 //
 //   [spr]
 //   hires mode=dword:1
@@ -130,6 +131,8 @@ void put_value(const char *section, const char *entry, DWORD type, const void *d
   Reg_value &val = sec.values[lower(entry)];
   if (val.name.empty())
     val.name = entry;
+  else if (val.type == type && val.data.size() == size && memcmp(val.data.data(), data, size) == 0)
+    return;  // unchanged
   val.type = type;
   val.data.assign((const char *)data, size);
   if (!machine_mode)
@@ -229,7 +232,19 @@ void save_settings()
   if (!ok || ec)
     WARNING("cannot write settings file %s", (char*)path.c_str());
   else
+  {
     dirty = false;
+    browser_pref_written();
+  }
+}
+
+// A page in a browser is closed rather than quit, and the quits don't run then, so the browser
+// build writes the file at every change.
+void changed()
+{
+#ifdef FF_BROWSER
+  save_settings();
+#endif
 }
 
 } // namespace
@@ -357,6 +372,7 @@ BOOL Registry::set_int    (char *section, char *entry,	unsigned value)
   DBG_CHECK(entry!=NULL);
   DWORD d = value;
   put_value(section, entry, type_dword, &d, sizeof(d));
+  changed();
   return TRUE;
 }
 //-----------------------------------------------------------------------------
@@ -366,6 +382,7 @@ BOOL Registry::set_string (char *section, char *entry,	char *value)
   DBG_CHECK(entry!=NULL);
   DBG_CHECK(value!=NULL);
   put_value(section, entry, type_string, value, strlen(value)+1);
+  changed();
   return TRUE;
 }
 //-----------------------------------------------------------------------------
@@ -376,6 +393,7 @@ BOOL Registry::set_binary (char *section, char *entry,	char* data, unsigned size
   DBG_CHECK(data!=NULL);
   DBG_CHECK(size);
   put_value(section, entry, type_binary, data, size);
+  changed();
   return TRUE;
 }
 //-----------------------------------------------------------------------------
@@ -389,6 +407,7 @@ BOOL Registry::delete_entry   (char *section, char *entry)
     return FALSE;
   if (!machine_mode)
     dirty = true;
+  changed();
   return TRUE;
 }
 //-----------------------------------------------------------------------------
@@ -400,6 +419,7 @@ BOOL Registry::delete_section (char *section)
     return FALSE;
   if (!machine_mode)
     dirty = true;
+  changed();
   return TRUE;
 }
 //-----------------------------------------------------------------------------
@@ -409,6 +429,7 @@ BOOL Registry::delete_application_key(void)
   store().clear();
   if (!machine_mode)
     dirty = true;
+  changed();
   return TRUE;
 }
 //-----------------------------------------------------------------------------

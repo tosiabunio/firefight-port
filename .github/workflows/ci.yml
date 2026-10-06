@@ -14,7 +14,7 @@ concurrency:
 
 jobs:
   # Which platforms run when. macOS runner minutes cost a multiple of Linux minutes:
-  #   push to a branch         -> Windows + Linux (with the Emscripten build under Node)
+  #   push to a branch         -> Windows + Linux (with the Emscripten builds: Node, browser)
   #   pull request             -> macOS only (the push run already covers Windows + Linux
   #                               for the same commit, and its checks show on the PR)
   #   push to main, nightly,
@@ -56,6 +56,11 @@ jobs:
 
       - name: Configure, build and test (Debug + Release)
         run: cmake --workflow --preset ${{ matrix.preset }}
+
+      # The browser build (phase 9) has no tests of its own: the node build above runs them.
+      - name: Build for the browser (Debug + Release)
+        if: matrix.preset == 'node-emscripten'
+        run: cmake --workflow --preset web-emscripten
 
       - name: Upload vcpkg logs on failure
         if: failure()

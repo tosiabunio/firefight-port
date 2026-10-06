@@ -68,6 +68,17 @@
         "CMAKE_CONFIGURATION_TYPES": "Debug;Release",
         "FF_WEB_PLATFORM": "node"
       }
+    },
+    {
+      "name": "web-emscripten",
+      "displayName": "WebAssembly in a web browser, Emscripten (phase 9)",
+      "generator": "Ninja Multi-Config",
+      "binaryDir": "${sourceDir}/build/${presetName}",
+      "toolchainFile": "$env{EMSDK}/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake",
+      "cacheVariables": {
+        "CMAKE_CONFIGURATION_TYPES": "Debug;Release",
+        "FF_WEB_PLATFORM": "web"
+      }
     }
   ],
   "buildPresets": [
@@ -80,7 +91,9 @@
     { "name": "macos-clang-debug",    "configurePreset": "macos-clang",  "configuration": "Debug" },
     { "name": "macos-clang-release",  "configurePreset": "macos-clang",  "configuration": "Release" },
     { "name": "node-emscripten-debug",   "configurePreset": "node-emscripten", "configuration": "Debug" },
-    { "name": "node-emscripten-release", "configurePreset": "node-emscripten", "configuration": "Release" }
+    { "name": "node-emscripten-release", "configurePreset": "node-emscripten", "configuration": "Release" },
+    { "name": "web-emscripten-debug",    "configurePreset": "web-emscripten",  "configuration": "Debug" },
+    { "name": "web-emscripten-release",  "configurePreset": "web-emscripten",  "configuration": "Release" }
   ],
   "testPresets": [
     { "name": "test-base", "hidden": true, "output": { "outputOnFailure": true }, "execution": { "noTestsAction": "error" } },
@@ -144,6 +157,14 @@
         { "type": "build", "name": "node-emscripten-release" },
         { "type": "test", "name": "node-emscripten-debug" },
         { "type": "test", "name": "node-emscripten-release" }
+      ]
+    },
+    {
+      "name": "web-emscripten",
+      "steps": [
+        { "type": "configure", "name": "web-emscripten" },
+        { "type": "build", "name": "web-emscripten-debug" },
+        { "type": "build", "name": "web-emscripten-release" }
       ]
     }
   ]

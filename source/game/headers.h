@@ -16,6 +16,7 @@ inline void *operator new(size_t)
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <compat/crt.h>
+#include <compat/browser.h>
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>

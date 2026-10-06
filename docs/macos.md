@@ -28,6 +28,18 @@ git push                         # runs the full matrix again, macOS included
 
 If the fast-forward fails, `main` has moved. Rebase the branch on `main`, push it, and check again.
 
+## Checking the browser build
+
+CI builds the WebAssembly versions on Linux and runs the Node tests, but only a person can play the browser build. With the Emscripten SDK and vorbis-tools installed (step 6 of the quick start in [`porting.md`](porting.md)):
+
+```sh
+source ~/emsdk/emsdk_env.sh
+cmake --workflow --preset web-emscripten
+python3 -m http.server -d build/web-emscripten/web/Release
+```
+
+Open `http://localhost:8000/` in Chrome and in Safari (27 or newer), click Play, and play the title and a mission with the keyboard, the mouse and a game controller, with the sound on. `?demo=level1&fast` checks the simulation: the page must end with "The game has ended." and the console must say `in sync to the end`. The game pauses whenever its page loses the focus, as on the desktop.
+
 ## When a test fails on the Mac
 
 Golden files describe the original game. Never regenerate them to make a Mac run pass. The same files pass on Windows and Linux, so a failure here is a platform difference to find and fix.

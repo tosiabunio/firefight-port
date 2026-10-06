@@ -1,0 +1,216 @@
+<!doctype html>
+<!-- Fire Fight in the browser (phase 9). CMake fills in the values between at signs
+     (source/CMakeLists.txt). web/pre.js is the module side of this page. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fire Fight</title>
+<link rel="icon" href="data:,">
+<style>
+  html, body {
+    margin: 0;
+    height: 100%;
+    overflow: hidden;
+    background: #000;
+    color: #c8c8c8;
+    font: 16px/1.5 system-ui, sans-serif;
+  }
+  /* SDL makes the drawing buffer this size (times the pixel ratio); the game letterboxes. */
+  #canvas {
+    display: block;
+    width: 100vw;
+    height: 100vh;
+    outline: none;
+  }
+  #screen {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    padding: 16px;
+    background: #000;
+    text-align: center;
+  }
+  h1 {
+    margin: 0;
+    font-size: 40px;
+    letter-spacing: 0.15em;
+    color: #e8b030;
+  }
+  #status {
+    margin: 0;
+    min-height: 1.5em;
+  }
+  progress {
+    width: min(320px, 80vw);
+  }
+  #buttons {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+  }
+  button {
+    padding: 10px 24px;
+    border: 1px solid #e8b030;
+    border-radius: 4px;
+    background: #201808;
+    color: #f0f0f0;
+    font: inherit;
+    cursor: pointer;
+  }
+  button:hover, button:focus-visible {
+    background: #403010;
+  }
+  #note {
+    margin: 0;
+    font-size: 13px;
+    color: #808080;
+  }
+  [hidden] {
+    display: none !important;
+  }
+</style>
+</head>
+<body>
+<canvas id="canvas" tabindex="-1"></canvas>
+<div id="screen">
+  <h1>FIRE FIGHT</h1>
+  <p id="status">Loading</p>
+  <progress id="progress" value="0" max="1"></progress>
+  <div id="buttons" hidden>
+    <button id="play" type="button">Play</button>
+    <button id="play-fullscreen" type="button">Play full screen</button>
+  </div>
+  <p id="note">Chaos Works, 1996. Port @PROJECT_VERSION@.</p>
+</div>
+<script>
+'use strict';
+
+const canvas = document.getElementById('canvas');
+const screenDiv = document.getElementById('screen');
+const statusText = document.getElementById('status');
+const progressBar = document.getElementById('progress');
+const buttons = document.getElementById('buttons');
+
+let running = false;
+
+function show(text, withButtons) {
+  screenDiv.hidden = false;
+  statusText.textContent = text;
+  buttons.hidden = !withButtons;
+}
+
+// Options from the URL become command-line arguments (source/game/main.cpp lists them):
+// ?demo=level1&stretch gives --demo level1 --stretch.
+function argumentsFromUrl() {
+  const args = [];
+  for (const [key, value] of new URLSearchParams(location.search)) {
+    args.push('--' + key);
+    if (value !== '')
+      args.push(value);
+  }
+  return args;
+}
+
+// Sound, pointer lock and full screen each need a user gesture, so the game starts on a click.
+function start(fullscreen) {
+  if (fullscreen) {
+    const page = document.documentElement;
+    const request = page.requestFullscreen || page.webkitRequestFullscreen;
+    if (request)
+      Promise.resolve(request.call(page)).catch(() => {});
+  }
+  progressBar.hidden = true;
+  show('Starting', false);
+  running = true;
+  Module.callMain(argumentsFromUrl());
+}
+
+document.getElementById('play').addEventListener('click', () => start(false));
+document.getElementById('play-fullscreen').addEventListener('click', () => start(true));
+canvas.addEventListener('contextmenu', (event) => event.preventDefault());
+
+// Ctrl+W closes the tab, and a page can't prevent it; Left Ctrl fires and W thrusts. While the
+// game runs, the browser asks before the page goes.
+addEventListener('beforeunload', (event) => {
+  if (running) {
+    event.preventDefault();
+    event.returnValue = '';
+  }
+});
+
+var Module = {
+  canvas: canvas,
+  ffTracks: [@FF_WEB_TRACKS@],
+  // The engine's log goes to stderr: all of it is console.log here, not errors.
+  print: (text) => console.log(text),
+  printErr: (text) => console.log(text),
+  // The data package reports "Downloading data... (loaded/total)".
+  setStatus: (text) => {
+    const match = /\((\d+)\/(\d+)\)/.exec(text);
+    if (match) {
+      statusText.textContent = 'Downloading the game data';
+      progressBar.max = Number(match[2]);
+      progressBar.value = Number(match[1]);
+    }
+  },
+  onRuntimeInitialized: () => {
+    progressBar.value = progressBar.max;
+    show('Ready', true);
+    document.getElementById('play').focus();
+  },
+  // From the game (compat/browser.cpp): its startup stages, then its first frame.
+  ffStatus: (text) => {
+    statusText.textContent = text;
+  },
+  ffFirstFrame: () => {
+    screenDiv.hidden = true;
+    canvas.focus();
+  },
+  onExit: (code) => {
+    running = false;
+    if (document.fullscreenElement)
+      document.exitFullscreen().catch(() => {});
+    show(code === 0 ? 'The game has ended.'
+                    : 'The game stopped with an error (' + code + '). The browser console has its log.',
+         false);
+    offerRestart();
+  },
+  onAbort: (what) => {
+    running = false;
+    show('The game stopped: ' + what, false);
+    offerRestart();
+  },
+};
+
+function offerRestart() {
+  const again = document.createElement('button');
+  again.type = 'button';
+  again.textContent = 'Play again';
+  again.addEventListener('click', () => location.reload());
+  buttons.replaceChildren(again);
+  buttons.hidden = false;
+  again.focus();
+}
+
+// JSPI (WebAssembly.Suspending) lets the game wait for the browser: Chrome and Edge 137+,
+// Firefox 153+, Safari 27.
+if (typeof WebAssembly === 'object' && typeof WebAssembly.Suspending === 'function') {
+  const script = document.createElement('script');
+  script.src = 'firefight.js';
+  script.async = true;
+  script.onerror = () => show('The game does not load.', false);
+  document.body.appendChild(script);
+} else {
+  progressBar.hidden = true;
+  show('This browser cannot run Fire Fight yet. It needs WebAssembly JSPI: Chrome or Edge 137, ' +
+       'Firefox 153, Safari 27, or newer.', false);
+}
+</script>
+</body>
+</html>

@@ -410,9 +410,9 @@ Added 2026-10-06, after a code survey, and **done next, before the rest of phase
   - The tracks download in the background after the start, so the game never waits for music. A track that hasn't arrived yet starts when it does.
 - **Browser behaviour:**
   - **A click to start.** Sound, pointer lock (mouse steering's relative mode) and fullscreen each need a user gesture, so the page opens on a "click to play" screen.
-  - **Ctrl+W closes the tab**, and a page can't prevent it. Fire2 is Left Ctrl by default (`1regdata.cpp:173`), and W thrusts (phase 4's WASD). Choose a remedy in this phase: a "leave the page?" prompt (`beforeunload`) while a mission runs, Chromium's Keyboard Lock in fullscreen, or another Fire2 default in the web build.
+  - **Ctrl+W closes the tab**, and a page can't prevent it. Fire2 is Left Ctrl by default (`1regdata.cpp:173`), and W thrusts (phase 4's WASD). The remedy, chosen in step 2: while the game runs, the page asks before it goes (`beforeunload`), so Ctrl+W or a reload needs a confirmation. Chromium's Keyboard Lock in fullscreen or another Fire2 default in the web build could come later. (On macOS browsers close tabs with Command-W, so the Mac doesn't have this problem.)
   - **Esc** also leaves pointer lock and fullscreen. Check what the game still receives.
-  - **Function keys:** F1 (help), F5 and F11 (control sets) have browser meanings. SDL suppresses the browser's action while the canvas has focus; check each key, as on macOS for F11.
+  - **Function keys:** F1 (help), F5 and F11 (control sets) have browser meanings. SDL's key handler (`SDL_emscriptenevents.c`) cancels the browser's action for the function keys, the cursor keys, Tab, Backspace and every Ctrl combination it receives; check each key by hand, as on macOS for F11.
   - **QUIT GAME** has no window to close. It ends on a page that offers to start again.
   - **Game controllers** come through the Gamepad API (SDL's Emscripten joystick driver). Touch screens are a non-goal.
   - **Options from the URL** (`?demo=level1`, `?stretch`) become command-line arguments, for tests and attract-mode links. Until phase 8's menus, they also stand in for the display options, as the command line does on the desktop.
@@ -431,7 +431,7 @@ Added 2026-10-06, after a code survey, and **done next, before the rest of phase
   - Browsers slow the timers of hidden tabs down to about once a second, while network play must keep simulating without drawing (phase 2's rule). Measure how a hidden tab affects the other players.
 - **Exit, single player:** in current Chrome, Firefox and Safari, served from a static host, the title, the attract demos and a full mission play on keyboard, mouse and a game controller, with sound and music, and the settings and pilots survive a reload. The Node runs of the demo and golden tests pass in CI.
 - **Exit, network play** (with phase 7's relay server): a browser and a desktop player play through the relay for 30 minutes without a sync failure.
-- **Open questions:** JSPI only, or an Asyncify build as well; the Ctrl+W remedy; where the web version is hosted.
+- **Open questions:** JSPI only, or an Asyncify build as well; where the web version is hosted.
 - **Progress** (2026-10-06): step 1 is done. **The simulation is bit-exact in WebAssembly.** Built with Emscripten 6.0.11 and run under Node.js 24, all 8 original demos and the 4 golden demos replay in sync to the end, in Debug and Release. `golden_title`, `sprite_build`, `crt_vectors`, `headless_run` and `data_files` pass too. The game and engine code needed no change.
   - **Build:** the `node-emscripten` preset. `cmake/FFEmscripten.cmake` holds the Emscripten options, and `FFDependencies.cmake` maps the SDK's SDL2 and SDL2_mixer ports to `ff::sdl2` and `ff::mixer` (`ff::enet` is empty). `1ee_enet_none.cpp` stands in for the ENet transport. The smoke test and packaging stay desktop-only.
   - **Node settings:**
@@ -445,6 +445,27 @@ Added 2026-10-06, after a code survey, and **done next, before the rest of phase
   - **CI:** a `node-emscripten` job on Linux runs the workflow on branch pushes, with the SDK pinned to 6.0.11.
   - **Disabled on Emscripten for now:** `net_play` and `net_lan` (no ENet); `sound_play` (no FLAC in the SDK's SDL2_mixer); `input_play`, because the SDK's SDL2 port leaves out SDL's virtual joystick driver, which the test's game controller uses.
   - **Warnings:** only the original code's usual Clang warnings. Nothing specific to the 32-bit target.
+- **Progress** (2026-10-06): step 2 has started. **The game plays in Chrome**: the title, the attract demos and mission 1 on the keyboard, with the music. The in-game menus work, QUIT GAME ends on the page's end screen, and the settings and pilots survive a reload. `?demo=level1&fast` replays the demo in sync to the end in the browser.
+  - **Build:** the `web-emscripten` preset (`FF_WEB_PLATFORM=web`, which defines `FF_BROWSER`). It has no tests; CI builds it in the Emscripten job, after the Node tests. The output is a directory of static files, `build/web-emscripten/web/<config>/`:
+    - `index.html`, the page (`web/index.html`, with the version and the track list filled in by CMake);
+    - `firefight.js` and `firefight.wasm`, the game (1.7 MB in Release), with `web/pre.js` at the start of the script;
+    - `firefight.data`, `data/` as one preloaded package (46 MB), mounted at `/data`. SDL's base path is `/`, so `main.cpp` finds it as `data` next to the executable, with no change;
+    - `music/track02.ogg` … `track09.ogg`: `oggenc -q 3` at build time, 27 MB.
+  - **Link options:** `-sJSPI`, `-sINVOKE_RUN=0` (the page calls `callMain` on the click), `-sEXIT_RUNTIME` (now for both Emscripten builds), IDBFS, and `FS` exported for reading the log from the console.
+  - **Frames:** `browser_next_frame()` (`compat/browser.cpp`) runs after each `SDL_RenderPresent` and waits for the next `requestAnimationFrame`, as vsync does on the desktop. A hidden tab gets no animation frames, so a 100 ms timer stands in. Idle waits end in `SDL_Delay`, which SDL turns into `emscripten_sleep` because JSPI sets `ASYNCIFY=2` (`emscripten_has_asyncify`). In Chrome the game runs at its own 30 fps, with about nine 1 ms sleeps between frames. The startup stages (`progress_text`) also go to the page and let it repaint. There are no yields inside the sprite build: it takes about 2 s at startup.
+  - **Preferences:** SDL's preferences path is `/libsdl/Chaos Works/Fire Fight/`. `pre.js` mounts `/libsdl` as IDBFS and loads it before the game starts. The game calls `browser_pref_written()` after it writes settings, a pilot file or a recorded demo. The page then copies the directory to IndexedDB half a second later, or at once when the page is hidden.
+    - In the browser `Registry` writes `settings.ini` at every change, because a page is closed rather than quit and the quits don't run. `put_value` now ignores writes that change nothing, on every platform.
+    - The log is in `/tmp`, in memory, and goes to the console.
+  - **Music:** `pre.js` downloads the tracks one by one after the data, in the background. Until a track arrives its file is empty. `CD::play` also accepts `trackNN.ogg`, and it waits for a track whose file is empty. When a track has downloaded, the page calls `ff_music_arrived`, which starts it if it is still wanted. `Sounds` checks for Ogg support instead of FLAC in the browser.
+  - **The page:**
+    - It shows the data download's progress, then Play and Play full screen.
+    - While the game starts it shows the startup stages, until the first frame.
+    - At the end it says how the game ended and offers Play again.
+    - A browser without JSPI gets a message instead of the game.
+    - Options in the URL become arguments (`?demo=level1&fast`).
+    - The right mouse button's context menu is off on the canvas, and the `beforeunload` prompt stands while the game runs.
+  - **Focus:** losing the focus pauses the game (standby), as on the desktop. In an automated browser whose window isn't in front, a synthetic `focus` event on `window` resumes it.
+  - **Still to check for the exit:** mouse steering (pointer lock), a game controller, the sound by ear, F1, F5, F11 and Esc, Firefox and Safari, and serving from a static host.
 
 ## Risks
 
@@ -461,7 +482,7 @@ Added 2026-10-06, after a code survey, and **done next, before the rest of phase
 | Relay server hosting | Running cost; availability | A tiny stateless forwarder on a cheap VPS. LAN and direct connections still work without it |
 | Simulation differs in WebAssembly | Browser games desync, alone and against desktop players | Checked: under Node every original and golden demo replays in sync (phase 9). CI keeps checking |
 | No JSPI in older browsers (Safari before 27, older iOS) | The browser build doesn't start there | An Asyncify build as a fallback, once the end credits run outside their `catch` |
-| Browser-reserved shortcuts (Ctrl+W with the default Fire2 and WASD) | A player closes the tab mid-mission | A `beforeunload` prompt, Keyboard Lock in fullscreen, or other default keys in the web build |
+| Browser-reserved shortcuts (Ctrl+W with the default Fire2 and WASD) | A player closes the tab mid-mission | A `beforeunload` prompt while the game runs (done). Later perhaps Keyboard Lock in fullscreen, or other default keys in the web build |
 | Browser download size (data 22 MB compressed, music 232 MB as FLAC) | A slow first start | Music as Ogg, downloaded in the background; per-world data packages if needed |
 | Timers throttled in hidden browser tabs | A hidden tab stalls a network game | Measure in phase 9; warn the player |
 | Private-repo CI minutes (macOS multiplier) | Cost | macOS on `main`/nightly; daily testing on the local Mac; Linux for most checks |

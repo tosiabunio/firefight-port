@@ -11,8 +11,9 @@ inputs:
 runs:
   using: composite
   steps:
-    # The Emscripten build (phase 9) takes its SDL2 and SDL2_mixer from the SDK's own ports, so it
-    # needs no vcpkg. The SDK version is pinned: the tests check bit-exact results.
+    # The Emscripten builds (phase 9) take their SDL2 and SDL2_mixer from the SDK's own ports, so
+    # they need no vcpkg. The SDK version is pinned: the tests check bit-exact results. The browser
+    # build encodes the music with oggenc (vorbis-tools).
     - name: Set up Emscripten
       if: inputs.preset == 'node-emscripten'
       shell: bash
@@ -20,7 +21,7 @@ runs:
         EMSDK_VERSION: '6.0.11'
       run: |
         sudo apt-get update
-        sudo apt-get install -y --no-install-recommends ninja-build
+        sudo apt-get install -y --no-install-recommends ninja-build vorbis-tools
         git clone --depth 1 https://github.com/emscripten-core/emsdk.git "$RUNNER_TEMP/emsdk"
         "$RUNNER_TEMP/emsdk/emsdk" install "$EMSDK_VERSION"
         "$RUNNER_TEMP/emsdk/emsdk" activate "$EMSDK_VERSION"

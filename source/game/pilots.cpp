@@ -112,6 +112,7 @@ void Pilot::dump_to_registry(Data& d)
     WARNING("cannot write pilot file %s", (char*)name.c_str());
   if (file != NULL)
     fclose(file);
+  browser_pref_written();
 }
 
 int Pilot::try_registry(void)

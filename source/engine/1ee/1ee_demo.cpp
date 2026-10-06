@@ -1,4 +1,5 @@
 #include "1ee_hdrs.h"
+#include <compat/browser.h>
 
 // Demo files and network packets hold raw structs in the byte order of the original x86 build.
 #if defined(__BYTE_ORDER__) && (__BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__)
@@ -218,6 +219,7 @@ void  Demo_recorder::close  (void)
     MESSAGE("demo %s saved - %d players, %d bytes, %d blocks", 
             name, header.players_num, header.size, header.blocks);
     strncpy(last_demo_file, name, _MAX_PATH-1);
+    browser_pref_written();
   }
   if (main_buffer!=NULL)
   {
