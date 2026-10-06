@@ -469,7 +469,7 @@ Added 2026-10-06, after a code survey, and **done next, before the rest of phase
     - The right mouse button's context menu is off on the canvas, and the `beforeunload` prompt stands while the game runs.
   - **Focus:** losing the focus pauses the game (standby), as on the desktop. In an automated browser whose window isn't in front, a synthetic `focus` event on `window` resumes it.
   - **Checked by hand since** (macOS): mouse steering, the sound and the music, in Chrome and in Safari 27. The demos replay in sync from GitHub Pages too (`?demo=level1&fast`: in sync to the end).
-  - **Still to check for the exit:** a game controller, F1, F5, F11 and Esc, Firefox, and a full mission.
+  - **Still to check for the exit:** a game controller, F1, F5, F11 and Esc, Firefox, and a full mission. The checklist for each browser is in `docs/macos.md` ("Checking the browser build").
 
 ## Risks
 

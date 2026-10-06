@@ -38,7 +38,18 @@ cmake --workflow --preset web-emscripten
 python3 -m http.server -d build/web-emscripten/web/Release
 ```
 
-Open `http://localhost:8000/` in Chrome and in Safari (27 or newer), click Play, and play the title and a mission with the keyboard, the mouse and a game controller, with the sound on. `?demo=level1&fast` checks the simulation: the page must end with "The game has ended." and the console must say `in sync to the end`. The game pauses whenever its page loses the focus, as on the desktop.
+Open `http://localhost:8000/` (or the GitHub Pages site, https://tosiabunio.github.io/firefight-port/) in Chrome, Safari 27 and Firefox 153, or newer, and click Play. In each browser, check:
+
+- [ ] **Title and demos:** the title sequence and the attract demos play. `?demo=level1&fast` checks the simulation: the page must end with "The game has ended." and the console must say `in sync to the end`.
+- [ ] **Keyboard:** Return twice starts the first mission from the title. Fly, turn, fire and open the Esc menu.
+- [ ] **Mouse steering:** F11 switches to the mouse, and the page locks the pointer. The right button flies towards the pointer and the left button fires. Esc releases the pointer; note what the game still receives.
+- [ ] **Game controller:** connect it and press one of its buttons. Browsers reveal a gamepad to a page only after a button press, and the game picks it up even mid-game. F11 switches to the controller. The d-pad or the left stick steers, A fires and B is turbo.
+- [ ] **Sound and music:** the effects and the mission's track play, and Esc → Sound changes their volumes.
+- [ ] **Function keys:** F1 shows the help, F5 and F11 switch the control set, and the browser does nothing with them (no reload, no full screen).
+- [ ] **Saving:** a changed volume, and a pilot's progress, are still there after a reload.
+- [ ] **Quitting:** Esc → Mission → Quit Game ends on the page's "The game has ended." with Play again.
+
+The game pauses whenever its page loses the focus, as on the desktop. Record the results in `docs/porting-plan.md` (phase 9, step 2's progress).
 
 ## When a test fails on the Mac
 
