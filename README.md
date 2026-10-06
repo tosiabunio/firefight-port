@@ -46,7 +46,7 @@ If you hold rights to Fire Fight and object to this repository, write to me at *
 
 - **Single player** works: graphics, sound, the soundtrack, keyboard, mouse and game controllers.
 - **Network play** works on a local network. Internet play is not there yet.
-- **In a web browser**, single player works too; this version is new (see Download).
+- **In a web browser**, single player works too, so far tried in Chrome and Safari (see [Download](#in-a-web-browser)).
 - **Not yet:** in-game menus for key bindings and network games (the original had a separate launcher for these).
 
 The port's progress, and how it was done, is in [`docs/porting.md`](docs/porting.md).
@@ -59,7 +59,28 @@ Ready-made packages for Windows, Linux and macOS are on the [Releases](https://g
 - **Linux (64-bit, glibc 2.39 or newer: Ubuntu 24.04, Fedora 40 and later):** unpack and run `./firefight`.
 - **macOS 11 or newer, Apple Silicon:** open the disk image and drag *Fire Fight* to *Applications*. The app is not notarised, so the first time macOS refuses to open it; allow it in *System Settings → Privacy & Security* (*Open Anyway*).
 
-**In a web browser:** play at [tosiabunio.github.io/firefight-port](https://tosiabunio.github.io/firefight-port/) in Chrome or Edge 137, Firefox 153 or Safari 27, or newer. The first visit downloads about 50 MB. It is single player only, and new: it has been played with the keyboard, but not yet with the mouse or a game controller. The browser keeps the settings and pilots.
+### In a web browser
+
+Play at [tosiabunio.github.io/firefight-port](https://tosiabunio.github.io/firefight-port/), with nothing to install. It needs a browser with WebAssembly JSPI: Chrome or Edge 137, Firefox 153 or Safari 27, or newer. Older browsers get a message instead of the game. The first visit downloads about 50 MB; the soundtrack comes in the background, so the game can start before all of it has arrived.
+
+The web version is new. It runs the same code as the desktop version, built as WebAssembly.
+
+- **Works, tried in Chrome and Safari 27 on macOS:**
+  - the title sequence, the attract-mode demos and the first mission;
+  - the keyboard and mouse steering;
+  - the sound and the soundtrack;
+  - the in-game menus;
+  - saving: the browser keeps the settings and the pilots between visits;
+  - the recorded demos replay in perfect sync, as they do on the desktop.
+- **Not checked yet:** game controllers, and Firefox.
+- **Not there yet:** network play. It will come with internet play, through a relay server.
+
+In a browser:
+- The game pauses while its tab or window is not in front, as the desktop version pauses when its window loses the focus.
+- While the game runs, closing or reloading the page asks for confirmation. On Windows and Linux, Ctrl+W closes a tab, and Ctrl is the secondary fire key.
+- To quit, use the menu: Esc, then *Mission*, *Quit Game*. On macOS, Cmd+Q quits the browser itself.
+- The settings and pilots are stored by the browser for this site, so clearing the site's data removes them.
+- Options go in the address: `?stretch` shows the picture at 4:3, and `?demo=level1` plays one recorded demo.
 
 ## Building from source
 
