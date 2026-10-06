@@ -422,7 +422,10 @@ Added 2026-10-06, after a code survey, and **done next, before the rest of phase
     - The `net_*` tests don't carry over (no ENet). Emscripten's SDL has the `disk` audio driver, but its SDL2_mixer plays no FLAC, so `sound_play` needs the Ogg tracks first.
   - **CI:** a Linux job with the Emscripten SDK builds the web preset and runs the Node tests on branch pushes.
   - **In browsers,** by hand at first: a mission on keyboard, mouse and a game controller in current Chrome, Firefox and Safari. A headless Chrome replaying a demo from the URL could automate this later.
-- **Hosting:** static files only: the page, the `.wasm`, the data package and the music. With no threads there is no `SharedArrayBuffer`, so no cross-origin isolation headers are needed. The release workflow can publish the web package beside the other three, and any static host can serve it.
+- **Hosting:** static files only: the page, the `.wasm`, the data package and the music. With no threads there is no `SharedArrayBuffer`, so no cross-origin isolation headers are needed, and any static host can serve them.
+  - **Chosen in step 2: GitHub Pages**, at `https://tosiabunio.github.io/firefight-port/`. `.github/workflows/pages.yml` builds the Release web build and deploys it once CI has passed for a push to `main`. Pages takes files up to 100 MB and sites up to 1 GB, with a soft limit of 100 GB of traffic a month, about 1,300 first visits of 75 MB.
+  - Netlify was ruled out for now. Its CDN doesn't take files over 10 MB, and its free plan gives about 15 GB of traffic a month.
+  - Cloudflare's static assets are the next step if the traffic grows: unlimited traffic, but files of at most 25 MiB, so the data package would have to be split (per world, say).
 - **Network play** (needs phase 7's relay server):
   - A browser has no UDP sockets, can't accept connections and can't broadcast, so ENet, hosting on a listening port and LAN discovery don't carry over.
   - A WebSocket version of the transport, behind the same interface (`1ee_enet.h`), connects to the relay. The transport already sends everything on one reliable, ordered channel, which is what a WebSocket gives.
@@ -431,7 +434,7 @@ Added 2026-10-06, after a code survey, and **done next, before the rest of phase
   - Browsers slow the timers of hidden tabs down to about once a second, while network play must keep simulating without drawing (phase 2's rule). Measure how a hidden tab affects the other players.
 - **Exit, single player:** in current Chrome, Firefox and Safari, served from a static host, the title, the attract demos and a full mission play on keyboard, mouse and a game controller, with sound and music, and the settings and pilots survive a reload. The Node runs of the demo and golden tests pass in CI.
 - **Exit, network play** (with phase 7's relay server): a browser and a desktop player play through the relay for 30 minutes without a sync failure.
-- **Open questions:** JSPI only, or an Asyncify build as well; where the web version is hosted.
+- **Open question:** JSPI only, or an Asyncify build as well.
 - **Progress** (2026-10-06): step 1 is done. **The simulation is bit-exact in WebAssembly.** Built with Emscripten 6.0.11 and run under Node.js 24, all 8 original demos and the 4 golden demos replay in sync to the end, in Debug and Release. `golden_title`, `sprite_build`, `crt_vectors`, `headless_run` and `data_files` pass too. The game and engine code needed no change.
   - **Build:** the `node-emscripten` preset. `cmake/FFEmscripten.cmake` holds the Emscripten options, and `FFDependencies.cmake` maps the SDK's SDL2 and SDL2_mixer ports to `ff::sdl2` and `ff::mixer` (`ff::enet` is empty). `1ee_enet_none.cpp` stands in for the ENet transport. The smoke test and packaging stay desktop-only.
   - **Node settings:**
@@ -465,7 +468,7 @@ Added 2026-10-06, after a code survey, and **done next, before the rest of phase
     - Options in the URL become arguments (`?demo=level1&fast`).
     - The right mouse button's context menu is off on the canvas, and the `beforeunload` prompt stands while the game runs.
   - **Focus:** losing the focus pauses the game (standby), as on the desktop. In an automated browser whose window isn't in front, a synthetic `focus` event on `window` resumes it.
-  - **Still to check for the exit:** mouse steering (pointer lock), a game controller, the sound by ear, F1, F5, F11 and Esc, Firefox and Safari, and serving from a static host.
+  - **Still to check for the exit:** mouse steering (pointer lock), a game controller, the sound by ear, F1, F5, F11 and Esc, Firefox and Safari, and the game served from GitHub Pages.
 
 ## Risks
 

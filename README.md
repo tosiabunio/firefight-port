@@ -46,6 +46,7 @@ If you hold rights to Fire Fight and object to this repository, write to me at *
 
 - **Single player** works: graphics, sound, the soundtrack, keyboard, mouse and game controllers.
 - **Network play** works on a local network. Internet play is not there yet.
+- **In a web browser**, single player works too; this version is new (see Download).
 - **Not yet:** in-game menus for key bindings and network games (the original had a separate launcher for these).
 
 The port's progress, and how it was done, is in [`docs/porting.md`](docs/porting.md).
@@ -57,6 +58,8 @@ Ready-made packages for Windows, Linux and macOS are on the [Releases](https://g
 - **Windows 10 or 11 (64-bit):** unzip and run `firefight.exe`. Windows may warn about an unrecognised app: choose *More info*, then *Run anyway*.
 - **Linux (64-bit, glibc 2.39 or newer: Ubuntu 24.04, Fedora 40 and later):** unpack and run `./firefight`.
 - **macOS 11 or newer, Apple Silicon:** open the disk image and drag *Fire Fight* to *Applications*. The app is not notarised, so the first time macOS refuses to open it; allow it in *System Settings → Privacy & Security* (*Open Anyway*).
+
+**In a web browser:** play at [tosiabunio.github.io/firefight-port](https://tosiabunio.github.io/firefight-port/) in Chrome or Edge 137, Firefox 153 or Safari 27, or newer. The first visit downloads about 75 MB. It is single player only, and new: it has been played with the keyboard, but not yet with the mouse or a game controller. The browser keeps the settings and pilots.
 
 ## Building from source
 

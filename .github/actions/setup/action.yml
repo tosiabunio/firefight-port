@@ -1,7 +1,7 @@
 name: Set up the build
 description: >-
   The build tools and vcpkg, with vcpkg's binary cache, for one CMake preset; for the Emscripten
-  preset, Ninja and the Emscripten SDK instead.
+  presets (node-emscripten, web-emscripten), Ninja, the Emscripten SDK and oggenc instead.
 
 inputs:
   preset:
@@ -15,7 +15,7 @@ runs:
     # they need no vcpkg. The SDK version is pinned: the tests check bit-exact results. The browser
     # build encodes the music with oggenc (vorbis-tools).
     - name: Set up Emscripten
-      if: inputs.preset == 'node-emscripten'
+      if: endsWith(inputs.preset, '-emscripten')
       shell: bash
       env:
         EMSDK_VERSION: '6.0.11'
@@ -32,7 +32,7 @@ runs:
         emcc --version | head -1 && "$EMSDK_NODE" --version
 
     - name: Install Linux packages
-      if: runner.os == 'Linux' && inputs.preset != 'node-emscripten'
+      if: runner.os == 'Linux' && !endsWith(inputs.preset, '-emscripten')
       shell: bash
       run: |
         sudo apt-get update
@@ -69,7 +69,7 @@ runs:
 
     # vcpkg at the commit of "builtin-baseline" in vcpkg.json.
     - name: Set up vcpkg
-      if: inputs.preset != 'node-emscripten'
+      if: ${{ !endsWith(inputs.preset, '-emscripten') }}
       shell: bash
       run: |
         VCPKG_COMMIT=$(sed -n 's/.*"builtin-baseline": *"\([0-9a-f]*\)".*/\1/p' vcpkg.json)
@@ -84,7 +84,7 @@ runs:
         echo "VCPKG_BINARY_SOURCES=clear;files,$VCPKG_BINARY_CACHE,readwrite" >> "$GITHUB_ENV"
 
     - name: Restore vcpkg binary cache
-      if: inputs.preset != 'node-emscripten'
+      if: ${{ !endsWith(inputs.preset, '-emscripten') }}
       uses: actions/cache@v6
       with:
         path: ${{ env.VCPKG_BINARY_CACHE }}

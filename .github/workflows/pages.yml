@@ -1,0 +1,57 @@
+name: Pages
+
+# The browser build (phase 9) on GitHub Pages: https://tosiabunio.github.io/firefight-port/
+# It deploys main once CI has passed for a push to main, and on a manual run (workflow_dispatch)
+# from main. The site is build/web-emscripten/web/Release: the page, the game, the data package
+# and the music. It needs no special headers (no threads, so no cross-origin isolation).
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# One deployment at a time; a newer one waits for the running one instead of cancelling it.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push')
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+
+      - uses: ./.github/actions/setup
+        with:
+          preset: web-emscripten
+
+      - name: Build for the browser (Release)
+        run: |
+          cmake --preset web-emscripten
+          cmake --build --preset web-emscripten-release
+
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: build/web-emscripten/web/Release
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-24.04
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5

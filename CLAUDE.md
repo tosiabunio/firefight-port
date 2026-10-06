@@ -70,6 +70,7 @@ Everything was selected by rule from the original archive. `README.md` is about 
   3. When both are green, fast-forward `main` to the branch and push (`git merge --ff-only`). That push runs the full matrix again.
 
   No pull request is needed; open one only when the user asks for a review. Documentation-only changes may go straight to `main`.
+- **GitHub Pages:** `.github/workflows/pages.yml` publishes the Release browser build at `https://tosiabunio.github.io/firefight-port/` once CI has passed for a push to `main` (or on a manual run from `main`). Only `main` may deploy (the `github-pages` environment).
 - **Archive-only material:** the launcher, the LED level editor, makefiles, shareware data, lores sprites (`data/` has only the 22 lores masters, for their bounds) and the design docs exist only in the original archive, outside this repo.
 
 ## Layout

@@ -58,7 +58,7 @@ The [README](../README.md#building-from-source) has the requirements and the bas
 python3 -m http.server -d build/web-emscripten/web/Release   # then open http://localhost:8000/
 ```
 
-The browser needs JSPI: Chrome or Edge 137+, Firefox 153+, Safari 27 or newer. Options in the URL become command-line options: `?demo=level1&fast` plays one demo, as fast as the display allows, and ends. The log goes to the browser's console, and the whole of it is in `Module.FS.readFile('/tmp/Firefght.log', {encoding: 'utf8'})`. The settings, pilots and recorded demos are kept in the site's IndexedDB. The game pauses when its page loses the focus, as it does when its window does on the desktop.
+The browser needs JSPI: Chrome or Edge 137+, Firefox 153+, Safari 27 or newer. The public copy is on GitHub Pages, `https://tosiabunio.github.io/firefight-port/`; `.github/workflows/pages.yml` deploys it once CI has passed for a push to `main`, or by hand (Actions → Pages → Run workflow). Options in the URL become command-line options: `?demo=level1&fast` plays one demo, as fast as the display allows, and ends. The log goes to the browser's console, and the whole of it is in `Module.FS.readFile('/tmp/Firefght.log', {encoding: 'utf8'})`. The settings, pilots and recorded demos are kept in the site's IndexedDB. The game pauses when its page loses the focus, as it does when its window does on the desktop.
 
 ```sh
 cmake --workflow --preset linux-gcc            # configure, build Debug + Release, run all tests
