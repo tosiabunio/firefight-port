@@ -59,7 +59,7 @@ Ready-made packages for Windows, Linux and macOS are on the [Releases](https://g
 - **Linux (64-bit, glibc 2.39 or newer: Ubuntu 24.04, Fedora 40 and later):** unpack and run `./firefight`.
 - **macOS 11 or newer, Apple Silicon:** open the disk image and drag *Fire Fight* to *Applications*. The app is not notarised, so the first time macOS refuses to open it; allow it in *System Settings → Privacy & Security* (*Open Anyway*).
 
-**In a web browser:** play at [tosiabunio.github.io/firefight-port](https://tosiabunio.github.io/firefight-port/) in Chrome or Edge 137, Firefox 153 or Safari 27, or newer. The first visit downloads about 75 MB. It is single player only, and new: it has been played with the keyboard, but not yet with the mouse or a game controller. The browser keeps the settings and pilots.
+**In a web browser:** play at [tosiabunio.github.io/firefight-port](https://tosiabunio.github.io/firefight-port/) in Chrome or Edge 137, Firefox 153 or Safari 27, or newer. The first visit downloads about 50 MB. It is single player only, and new: it has been played with the keyboard, but not yet with the mouse or a game controller. The browser keeps the settings and pilots.
 
 ## Building from source
 

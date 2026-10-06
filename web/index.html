@@ -150,12 +150,14 @@ var Module = {
   // The engine's log goes to stderr: all of it is console.log here, not errors.
   print: (text) => console.log(text),
   printErr: (text) => console.log(text),
-  // The data package reports "Downloading data... (loaded/total)".
+  // The data package reports "Downloading data... (loaded/total)". The loaded bytes are
+  // uncompressed, but the total is the compressed length when the server compresses the package
+  // (GitHub Pages does), so the bar uses the package's real size.
   setStatus: (text) => {
     const match = /\((\d+)\/(\d+)\)/.exec(text);
     if (match) {
       statusText.textContent = 'Downloading the game data';
-      progressBar.max = Number(match[2]);
+      progressBar.max = @FF_WEB_DATA_SIZE@;
       progressBar.value = Number(match[1]);
     }
   },

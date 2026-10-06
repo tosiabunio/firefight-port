@@ -157,7 +157,17 @@ if(FF_BROWSER)
   endif()
   add_custom_target(web_music ALL DEPENDS ${FF_WEB_MUSIC})
 
-  # The page, with the version and the track list.
+  # The data package's size, the sum of the files in data/. The page measures the download with it:
+  # a server that compresses the package reports the compressed length, which the loader takes
+  # for the total while it counts the uncompressed bytes.
+  file(GLOB_RECURSE FF_DATA_FILES "${FF_DATA_DIR}/*")
+  set(FF_WEB_DATA_SIZE 0)
+  foreach(file IN LISTS FF_DATA_FILES)
+    file(SIZE "${file}" size)
+    math(EXPR FF_WEB_DATA_SIZE "${FF_WEB_DATA_SIZE} + ${size}")
+  endforeach()
+
+  # The page, with the version, the data package's size and the track list.
   list(JOIN FF_WEB_TRACKS ", " FF_WEB_TRACKS)
   configure_file("${CMAKE_SOURCE_DIR}/web/index.html" "${CMAKE_CURRENT_BINARY_DIR}/index.html" @ONLY)
   file(GENERATE OUTPUT "${FF_WEB_DIR}/index.html" INPUT "${CMAKE_CURRENT_BINARY_DIR}/index.html")
