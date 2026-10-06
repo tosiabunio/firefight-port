@@ -1,4 +1,5 @@
 #include "1lg_hdrs.h"
+#include <compat/browser.h>
 #include <atomic>
 #include <new>
 #include <SDL.h>
@@ -192,6 +193,7 @@ static void dispatch_sdl_event (SDL_Event &event)
 
 void Comm::process_messages (void)
 {
+  browser_poll();  // port: a browser delivers input and network messages only while the game waits
   SDL_Event event;
   if((!standby)||closed)
   {
@@ -250,6 +252,7 @@ void Comm::debug_break (void)
 int Comm::show_message_box (char *text, int ask)
 {
   fprintf(stderr,"[chaos works engine] %s\n",text);
+  browser_message(text);  // port: the browser's page shows it when the game ends
   if(headless)
     return(1);
   static const SDL_MessageBoxButtonData buttons[]={

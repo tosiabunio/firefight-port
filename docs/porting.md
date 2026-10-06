@@ -20,9 +20,9 @@ The repository holds the original Fire Fight material needed to port the game to
 | 4 | Input: keyboard, mouse, game controllers | Done. A full mission played by hand on each device is still to be confirmed |
 | 5 | Determinism and the demo regression suite | Done. All 8 original demos and 4 golden demos replay in sync on Windows, Linux and macOS |
 | 6 | Sound and the CD soundtrack (SDL2_mixer) | Done. Checked by ear on Windows |
-| 7 | Network play (ENet) | In progress. LAN play by address and by LAN discovery works; internet play, the relay server and the input delay are to do |
+| 7 | Network play (ENet) | In progress. LAN play by address and by LAN discovery works, and so does play through a relay server (`tools/relay`), which browsers can join; no relay is hosted yet. The input delay for internet latency, UPnP and the rest of the hardening are to do |
 | 8 | Replace the launcher (in-game options, key bindings, network menus); packaging | Started: packages for the three systems and a release workflow. The menus are to do |
-| 9 | The browser: a WebAssembly build (Emscripten) | In progress, before the rest of phases 7 and 8. Under Node.js all 8 original demos and the 4 golden demos replay in sync, and the title frames and the sprite build match. In Chrome and Safari 27 the title, the attract demos and a mission play on the keyboard and with mouse steering, with sound and music, and the settings and pilots survive a reload. It is on GitHub Pages. Game controllers and Firefox are still to check. Browsers without JSPI get an Asyncify build (step 3), back to Chrome 95, Firefox 100 and Safari 15.2. In Chrome, forced with `?asyncify`, it plays a mission and replays the demos in sync, also from GitHub Pages; it is still to try in an older browser |
+| 9 | The browser: a WebAssembly build (Emscripten) | In progress, before the rest of phases 7 and 8. Under Node.js all 8 original demos and the 4 golden demos replay in sync, and the title frames and the sprite build match. In Chrome and Safari 27 the title, the attract demos and a mission play on the keyboard and with mouse steering, with sound and music, and the settings and pilots survive a reload. It is on GitHub Pages. Game controllers and Firefox are still to check. Browsers without JSPI get an Asyncify build (step 3), back to Chrome 95, Firefox 100 and Safari 15.2. In Chrome, forced with `?asyncify`, it plays a mission and replays the demos in sync, also from GitHub Pages; it is still to try in an older browser. Network play (step 4) runs through a relay server over WebSocket: a browser and a desktop played in sync through a local relay, either one hosting |
 
 The tests (`ctest`) check the dependencies, a headless run, the title frames, the sprite build against the original's caches, the MSVC 4 CRT clones, the original and golden demos, sound, network play, input and the data files. [`CLAUDE.md`](../CLAUDE.md) lists them.
 
@@ -42,6 +42,7 @@ The tests (`ctest`) check the dependencies, a headless run, the title frames, th
 | `CMakeLists.txt`, `CMakePresets.json`, `vcpkg.json`, `cmake/` | Build system |
 | `tests/` | Test scripts, input scripts, golden files and golden demos |
 | `tools/smoke/` | Dependency smoke test (SDL2 window and paletted present, SDL2_mixer FLAC/WAV, ENet loopback) |
+| `tools/relay/` | The relay server, `ff_relay`, for network play over the internet and from browsers |
 | `tools/fonts/` | Generates the C++ fonts from the original font data |
 | `tools/layout/` | `stale_memory.py`: generates `source/game/stale_gen.cpp` from clang's 32-bit MSVC record layouts (the original's object layout, which one uninitialised read depends on) |
 | `tools/archive/` | Run where the original archive is: `ffarchive.py` (volumes, sprite caches, data provenance, sprite checks), `crt_vectors.py` (MSVC `qsort`/`rand` test vectors from the original exe) and `patch_hooks.py` (makes the original 1.1 exe run on Windows 11) |
@@ -67,6 +68,8 @@ cmake --preset linux-gcc
 cmake --build --preset linux-gcc-debug
 ctest --preset linux-gcc-debug
 ```
+
+**The relay server** (`build/<preset>/tools/relay/<config>/ff_relay`) carries network games for players who can't reach each other directly, browsers included. It takes ENet on UDP port 19970 and WebSocket on TCP port 19971 (`--port`, `--ws-port`). A browser on an HTTPS page may only open `wss://`, so in public it needs a TLS proxy in front of the WebSocket port: for example Caddy, `reverse_proxy 127.0.0.1:19971` under the relay's domain. Players then use `--relay <domain>` on the desktop and `?relay=<domain>` in the browser. For a local test, run `ff_relay` and use `--relay 127.0.0.1` on the desktop and `?relay=ws://127.0.0.1:19971` in a browser on a page served from `localhost`.
 
 Options for testing (all in `source/game/main.cpp`):
 

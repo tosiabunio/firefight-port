@@ -135,8 +135,9 @@ void Eem::sdl_event (const SDL_Event &event)
 }
 //---------------------------------------------------------------------------
 // Port: the session comes from the command line (main.cpp): net_host=<players> hosts a game for
-// 2-4 players, net_join=<address> joins one, net_port=<port> overrides Net::default_port. The
-// launcher wrote the session as registry values before ([eem] net mode, game id, provider and
+// 2-4 players, net_join=<address> joins one, net_port=<port> overrides Net::default_port.
+// net_relay=<relay> plays through a relay server: the host gets a session code there (net_code
+// asks for one), and net_join is that code. The launcher wrote the session as registry values before ([eem] net mode, game id, provider and
 // game GUIDs). The player name is still [eem] player name, else the user name, and the host's game
 // rules are still [eem] game info; without it every player uses RegData's defaults.
 void Eem::init_multi ()
@@ -149,6 +150,12 @@ void Eem::init_multi ()
   if (const char *join = Cmd_line::get_string("net_join",NULL))  // a buffer the next call reuses
     strncpy(address, join, sizeof(address)-1);
   unsigned short port = (unsigned short)Cmd_line::get_int("net_port",Net::default_port);
+  char        relay[256] = "";
+  char        code[32] = "";
+  if (const char *text = Cmd_line::get_string("net_relay",NULL))
+    strncpy(relay, text, sizeof(relay)-1);
+  if (const char *text = Cmd_line::get_string("net_code",NULL))
+    strncpy(code, text, sizeof(code)-1);
 
   memset(player_name, 0, sizeof(player_name));
   char uname[MAX_COMPUTERNAME_LENGTH];
@@ -160,6 +167,7 @@ void Eem::init_multi ()
   unsigned retries = Registry::get_int(sec_eem, key_eem_retries, def_connection_retries);
 
   Net::init (status.is(eem_Debug)?1:0);
+  Net::set_relay(relay, code[0]?code:NULL);
   if (host_players)
   {
     status.set(eem_Server);
@@ -227,6 +235,11 @@ void Eem::init (int size, int frequency, int network_supported, int check_sync,
     // a frame still waiting for the others returns to the caller, which keeps drawing, as with
     // the focused window (WM_ACTIVATEAPP below sets eem_InNetActive for a window).
     if (status.is(eem_Multi)&&Cmd_line::get_int("headless",0))
+      status.set(eem_InNetActive);
+    // Nor does a window that already had the focus: its activation came while the session was
+    // set up (init_multi), before Eem took messages. A browser's canvas has the focus from the
+    // click that started the game.
+    if (status.is(eem_Multi)&&SDL_GetKeyboardFocus())
       status.set(eem_InNetActive);
 
     players=NEW(Array<Eem::Player>(), "Eem::players");

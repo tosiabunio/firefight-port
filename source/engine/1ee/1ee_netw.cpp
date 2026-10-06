@@ -75,6 +75,11 @@ void Net::wait (unsigned timeout, int (*done)(void), int error, const char *what
   }
 }
 //-----------------------------------------------------------------------------
+void Net::set_relay (const char *relay, const char *code)
+{
+  enet_transport::set_relay(relay, code);
+}
+//-----------------------------------------------------------------------------
 static int all_joined (void)
 {
   return enet_transport::joined()==enet_transport::players_max();

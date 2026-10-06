@@ -50,12 +50,15 @@ add_library(cwengine STATIC
   engine/1ss/1ss_mix.cpp
   engine/1ss/1ss_smp.cpp
   engine/1ss/1ss_song.cpp)
-# The network transport: ENet; the Emscripten build (phase 9) has a stand-in without network
-# play until its WebSocket transport.
-if(EMSCRIPTEN)
+# The network transport: the session logic on a link layer (engine/1ee/1ee_link.h), ENet on the
+# desktop (directly or through a relay server) and WebSocket to a relay in the browser. The Node
+# build (phase 9) has a stand-in without network play.
+if(FF_BROWSER)
+  target_sources(cwengine PRIVATE engine/1ee/1ee_session.cpp engine/1ee/1ee_ws.cpp)
+elseif(EMSCRIPTEN)
   target_sources(cwengine PRIVATE engine/1ee/1ee_enet_none.cpp)
 else()
-  target_sources(cwengine PRIVATE engine/1ee/1ee_enet.cpp)
+  target_sources(cwengine PRIVATE engine/1ee/1ee_session.cpp engine/1ee/1ee_enet.cpp)
 endif()
 # Modules include each other's headers as <1xx.h>, so every module directory is public.
 foreach(module IN LISTS FF_ENGINE_MODULES)
@@ -324,6 +327,18 @@ add_test(NAME net_lan
           -DPORT=19964 -DJOIN=lan
           -P ${CMAKE_SOURCE_DIR}/tests/check_net.cmake)
 set_tests_properties(net_lan PROPERTIES TIMEOUT 300)
+# The same through the relay server (tools/relay, phases 7 and 9): the host opens a session there
+# and the client joins it by its code. Desktop only, like the relay.
+if(TARGET ff_relay)
+  add_test(NAME net_relay
+    COMMAND ${CMAKE_COMMAND}
+            -DFIREFIGHT=$<TARGET_FILE:firefight> -DDATA=${FF_TEST_DATA}
+            -DPREF=${FF_TEST_BIN}/net_relay
+            -DSCRIPTS=${CMAKE_SOURCE_DIR}/tests/input
+            -DPORT=19966 -DRELAY=$<TARGET_FILE:ff_relay>
+            -P ${CMAKE_SOURCE_DIR}/tests/check_net.cmake)
+  set_tests_properties(net_relay PROPERTIES TIMEOUT 300)
+endif()
 
 # Phase 4 input check: an input script starts the first mission from the title and flies it with
 # the keyboard, the mouse and a virtual game controller, switching with F11. The input states it

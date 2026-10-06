@@ -1,6 +1,7 @@
-// Port: the network transport of the Emscripten build (phase 9) until its WebSocket transport to
-// the relay server: a browser has no UDP sockets. Network play reports itself unavailable. Single
-// player never calls the transport (Net::init runs only for --host and --join).
+// Port: the network transport of the Emscripten build under Node.js (phase 9), which has neither
+// ENet nor a WebSocket: network play reports itself unavailable. Single player never calls the
+// transport (Net::init runs only for --host and --join). The browser build has its WebSocket link
+// layer (1ee_ws.cpp).
 
 #include "1ee_enet.h"
 
@@ -19,6 +20,8 @@ bool startup(void (*log_function)(const char *text))
 }
 
 void shutdown(void) {}
+void set_relay(const char *, const char *) {}
+const char *session_code(void) { return ""; }
 bool host(unsigned short, int, const char *, const unsigned char *) { return false; }
 bool join(const char *, unsigned short, const char *) { return false; }
 void poll(void) {}

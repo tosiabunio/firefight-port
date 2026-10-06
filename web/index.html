@@ -179,12 +179,16 @@ var Module = {
     screenDiv.hidden = true;
     canvas.focus();
   },
+  // ffMessage: the engine's last error message (compat/browser.cpp), if any; its first line says
+  // what failed.
   onExit: (code) => {
     running = false;
     if (document.fullscreenElement)
       document.exitFullscreen().catch(() => {});
+    const reason = (Module.ffMessage || '').split('\n')[0].replace(/\.$/, '');
     show(code === 0 ? 'The game has ended.'
-                    : 'The game stopped with an error (' + code + '). The browser console has its log.',
+                    : 'The game stopped with an error' + (reason ? ': ' + reason : ' (' + code + ')') +
+                      '. The browser console has its log.',
          false);
     offerRestart();
   },

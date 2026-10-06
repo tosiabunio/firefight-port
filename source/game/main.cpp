@@ -4,7 +4,8 @@
 //   firefight [--data <dir>] [--pref <dir>] [--music <dir>] [--headless] [--sound]
 //             [--quit-after <s>] [--fullscreen] [--stretch] [--shots <s>] [--fast]
 //             [--shot-every <n>] [--quit-frames <n>] [--demo <name>] [--input <file>]
-//             [--host <players> | --join <address>] [--port <port>] [switch ...]
+//             [--host <players> | --join <address>] [--port <port>] [--relay <relay>]
+//             [--code <code>] [switch ...]
 //
 //   --data <dir>      directory holding cwe.ini and the *.dir manifests. Default: "data" next
 //                     to the executable, else the repository's data/ (development builds),
@@ -32,6 +33,10 @@
 //   --join <address>  join the network game hosted at that address (net_join=<address>); lan
 //                     joins the first open game found on the LAN
 //   --port <port>     the network game's UDP port (net_port=<port>), default 19960
+//   --relay <relay>   play through a relay server (net_relay=<relay>): host[:port] (its ENet port,
+//                     19970 by default), or in the browser a ws:// or wss:// URL (a bare host
+//                     means wss://<host>/). --host then gets a session code, and --join takes it
+//   --code <code>     with --host and --relay, ask the relay for this session code (net_code)
 //
 // Relative paths mean the current directory. Everything else is passed through as an original
 // engine switch (debug=1, check, ...).
@@ -39,6 +44,7 @@
 // replay went out of sync and 4 when it stopped before the end of the recording.
 
 #include <compat/win32.h>
+#include <compat/browser.h>
 #include <1lg.h>
 #include <1ss.h>
 
@@ -178,6 +184,10 @@ int main(int argc, char *argv[])
       line += " net_join=" + std::string(argv[++i]);
     else if (arg == "--port" && i + 1 < argc)
       line += " net_port=" + std::string(argv[++i]);
+    else if (arg == "--relay" && i + 1 < argc)
+      line += " net_relay=" + std::string(argv[++i]);
+    else if (arg == "--code" && i + 1 < argc)
+      line += " net_code=" + std::string(argv[++i]);
     else if (arg == "--fullscreen")
       line += " fullscreen=1";
     else if (arg == "--stretch")
@@ -230,8 +240,8 @@ int main(int argc, char *argv[])
 #ifdef FF_BROWSER
   // The Asyncify build returns from main to the page at its first sleep, and Emscripten doesn't
   // see the real return later. exit() runs the static destructors and the quits, and tells the
-  // page (Module.onExit), in both browser builds.
-  exit(exit_code);
+  // page (Module.onExit), in both browser builds; nothing may wait for the browser inside it.
+  browser_exit(exit_code);
 #endif
   return exit_code;
 }

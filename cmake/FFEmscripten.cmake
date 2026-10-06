@@ -39,5 +39,6 @@ else()
     -sFORCE_FILESYSTEM=1  # the data package is loaded by its own script (file_packager)
     # FS: the log is /tmp/Firefght.log, for Module.FS.readFile in the browser's console.
     -sEXPORTED_RUNTIME_METHODS=callMain,FS
-    -lidbfs.js)     # the preferences directory, kept in IndexedDB (web/pre.js)
+    -lidbfs.js      # the preferences directory, kept in IndexedDB (web/pre.js)
+    -lwebsocket.js) # network play through a relay server (engine/1ee/1ee_ws.cpp)
 endif()

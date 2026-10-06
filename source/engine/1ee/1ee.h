@@ -112,6 +112,10 @@ private:
 public:
   static void ping  (void) {}  // port: ENet keeps the link alive and reliable
   static void purge (void) {}
+  // Port: through a relay server (relay "host[:port]", or a ws:// or wss:// URL in the browser)
+  // instead of directly: game_create opens a session there, and game_connect's address is the
+  // session's code. code asks the relay for that code, or is NULL. Set before either.
+  static void set_relay (const char *relay, const char *code);
 
   static void init (int debug);
   static void close (void);

@@ -355,6 +355,22 @@ Each phase ends with something runnable and an exit check. Phases 5–7 can over
   - **Disconnects:** a client that leaves is announced to the others (LEFT), whose `Eem` zeroes its input as before. If the host leaves, each client goes on alone, the original's rule. ENet notices a vanished peer within 10 s.
   - **Tests:** `net_play` (by address) and `net_lan` (`--join lan`) run a host and a client on one machine, headless and `--fast`, each with an input script that accepts the level in the lobby and flies in the deathmatch. Both must reach the mission, pass the per-frame sync check and end normally. A forced desync (`syncfail` with `cwdiags=extended`) is detected on both sides. A three-player run by hand (two relayed clients) also stayed in sync.
   - **Still to do:** internet play (UPnP/NAT-PMP, IPv6) and the relay server; the session-wide input delay; the rest of the hardening (rate caps, password, fuzzing the parser); a 4-player game across the three systems; the menus of phase 8.
+- **Progress** (2026-10-06): the relay server works, built together with phase 9's step 4. Nothing is deployed yet.
+  - **The transport** is split. `1ee_session.cpp` has the session logic, unchanged: HELLO to LEFT, the roster, and the host forwarding between clients. It runs on links (`1ee_link.h`).
+    - `1ee_enet.cpp` provides the links over ENet, either directly or through a relay. LAN discovery is there too.
+    - `1ee_ws.cpp` provides them over WebSocket to a relay, for the browser.
+    - `net_play` and `net_lan` pass unchanged.
+  - **The relay** (`tools/relay/relay.cpp`, `ff_relay`) is one thread around a `select` loop.
+    - It takes ENet on UDP 19970 and WebSocket on TCP 19971. The WebSocket side is written by hand on ENet's portable sockets: the handshake (SHA-1, base64) and unfragmented, masked binary frames. TLS for `wss://` is a proxy's job.
+    - A plain HTTP request gets `ff_relay`, for health checks.
+    - Its protocol (`1ee_relay.h`) wraps the session protocol. The host OPENs a session and gets a six-character code from `ABCDEFGHJKLMNPQRSTUVWXYZ23456789`. A client ENTERs it and gets a link. The relay forwards TO and FROM between the host and each link, and when the host leaves it disconnects the clients.
+    - It checks every message's length, type and turn. It limits each connection to 1,000 messages a second (`--rate`), and drops a connection that hasn't opened or entered a session within 10 s. It logs sessions and refusals.
+  - **Setup:**
+    - `--relay <host[:port]>` with `--host` opens a session. The code goes to the log, and in the browser onto the page.
+    - `--join <code>` enters it. A client whose session isn't open yet asks again every second, as a direct client does.
+    - `--code` asks for a particular code. Codes are checked before anything is sent.
+  - **Test:** `net_relay` starts a relay (`--rate 0 --once`) between `net_play`'s host and client. The host opens `TEST42`; a real-time run by hand also stayed in sync for 33 s.
+  - **Still to do:** host the relay (a server, a domain, TLS in front of the WebSocket port); a default relay address, so that `--relay` isn't needed; the session-wide input delay; the code on the desktop's screen (it is only in the log); the rest of the hardening.
 
 ### Phase 8: replace the launcher; packaging
 - **In-game options**, extending the original `Menu` system, cover:
@@ -486,6 +502,16 @@ Added 2026-10-06, after a code survey, and **done next, before the rest of phase
   - **Exit:** under Asyncify, `main` returns to the page at its first sleep, and Emscripten doesn't act on its real return later. So `main` ends with `exit()` in both browser builds. That runs the static destructors and the quits, and calls `Module.onExit`.
   - **Speed:** in fast mode both builds keep up with Chrome's 120 Hz display (36.4 s for `level1`), so the Asyncify build has headroom over the game's 30 fps.
   - **Warning:** every link prints `ASYNCIFY=1 is not compatible with -fwasm-exceptions`. It is Emscripten's general warning about the `catch` limit above.
+- **Progress** (2026-10-06): step 4 has started, together with phase 7's relay server (see its Progress). **A browser and a desktop played a deathmatch in sync through a local relay**, either one hosting: 49 s with the browser hosting and 39 s with it joining, both in Chrome. The Node build still has no network play.
+  - **The browser's links** (`1ee_ws.cpp`) are a WebSocket to the relay, through Emscripten's WebSocket API (`-lwebsocket.js`). The browser delivers its events while the game waits, so the callbacks only queue them, and `poll` handles them on the game's stack.
+    - `?host=2&relay=ws://127.0.0.1:19971` hosts; the page shows "Session code K7M3QX: waiting for the other players".
+    - `?join=K7M3QX&relay=...` joins. A bare host name means `wss://<host>/`.
+  - **Fixes the browser needed:**
+    - **Polling loops.** Some of the session setup waits by polling (`Eem::read` while the others' data is due). On the desktop that only spins, but a browser delivers nothing until the game waits. `Comm::process_messages` now calls `browser_poll`, which lets the browser run when the game hasn't waited for 10 ms. It yields with a `MessageChannel` message, which browsers don't delay the way they delay repeated timers.
+    - **No waiting inside `exit()`.** `File::close` pumps messages, and the static `File` destructors run inside `exit()`, where neither JSPI nor Asyncify can suspend. `browser_exit` marks the exit, and from then on nothing waits.
+    - **A window with the focus already.** `Eem` counts a network game as active (`eem_InNetActive`) only after `WM_ACTIVATEAPP`. A browser canvas has the focus from the click that started the game, and the activation came during the session setup, before `Eem` took messages. So the lobby never drew. `Eem::init` now also checks `SDL_GetKeyboardFocus()`.
+    - **The reason on the page.** The engine's message box text goes to the page (`browser_message`), which shows its first line when the game ends with an error.
+  - **Still to do:** a hosted relay with TLS, and a default address in the page; Firefox, Safari and the Asyncify build in network play; a hidden tab's effect on the others (timers slow to about once a second); a page form for hosting and joining in place of the address options; the exit test, 30 minutes through the relay.
 
 ## Risks
 

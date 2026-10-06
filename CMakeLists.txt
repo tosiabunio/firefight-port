@@ -29,9 +29,10 @@ include(CTest)
 set(FF_DATA_DIR  "${CMAKE_CURRENT_SOURCE_DIR}/data")
 set(FF_MUSIC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/music")
 
-# The smoke test needs a window, FLAC and ENet: desktop only.
+# The smoke test needs a window, FLAC and ENet, and the relay server ENet: desktop only.
 if(NOT EMSCRIPTEN)
   add_subdirectory(tools/smoke)
+  add_subdirectory(tools/relay)
 endif()
 
 if(FF_BUILD_GAME)

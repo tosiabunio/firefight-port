@@ -45,7 +45,7 @@ If you hold rights to Fire Fight and object to this repository, write to me at *
 ## Status
 
 - **Single player** works: graphics, sound, the soundtrack, keyboard, mouse and game controllers.
-- **Network play** works on a local network. Internet play is not there yet.
+- **Network play** works on a local network, and through a relay server, which browsers can join too. There is no public relay server yet.
 - **In a web browser**, single player works too, so far tried in Chrome and Safari (see [Download](#in-a-web-browser)).
 - **Not yet:** in-game menus for key bindings and network games (the original had a separate launcher for these).
 
@@ -79,7 +79,7 @@ The web version is new. It runs the same code as the desktop version, built as W
 
   It has not been tried in an older browser yet.
 - **Not checked yet:** game controllers, and Firefox.
-- **Not there yet:** network play. It will come with internet play, through a relay server.
+- **Network play** works through a relay server (see [Network play](#network-play)), with the browser hosting or joining; tried against a desktop player in Chrome. There is no public relay server yet.
 
 In a browser:
 - The game pauses while its tab or window is not in front, as the desktop version pauses when its window loses the focus.
@@ -151,6 +151,15 @@ firefight --join lan            # or find it on the local network
 ```
 
 The game uses UDP port 19960; `--port <port>` changes it. Once everyone has joined, the players choose a map together, and the game starts when all of them have accepted the same one.
+
+Players who can't reach each other directly, over the internet or from a web browser, can meet on a relay server (`ff_relay`, in `tools/relay/`). Everyone connects out to it, so no port needs opening. The host gets a six-character session code and tells it to the others:
+
+```sh
+firefight --host 2 --relay relay.example.com     # prints "session code K7M3QX"
+firefight --join K7M3QX --relay relay.example.com
+```
+
+In a browser the same goes in the address: `?host=2&relay=relay.example.com`, or `?join=K7M3QX&relay=relay.example.com`. Browsers and desktop players can share a game. This is new: there is no public relay server yet, so for now it needs one you run yourself, behind TLS for browsers (see [`docs/porting.md`](docs/porting.md)).
 
 ## Credits
 

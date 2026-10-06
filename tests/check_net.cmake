@@ -4,9 +4,11 @@
 # normally.
 #
 #   cmake -DFIREFIGHT=<exe> -DDATA=<dir> -DPREF=<dir> -DSCRIPTS=<dir> -DPORT=<port> [-DJOIN=lan]
-#         -P check_net.cmake
+#         [-DRELAY=<ff_relay>] -P check_net.cmake
 #
 # JOIN is what the client joins: 127.0.0.1 by default, or lan to find the game by LAN discovery.
+# With RELAY, both play through that relay server instead (tools/relay), on ports PORT (ENet) and
+# PORT+1 (WebSocket): the host opens the session TEST42 and the client joins it by that code.
 #
 # execute_process runs its commands at the same time (as a pipeline), which is how the two
 # peers run side by side; the client retries until the host is listening.
@@ -19,8 +21,19 @@ endif()
 file(REMOVE_RECURSE "${PREF}")
 file(MAKE_DIRECTORY "${PREF}/host" "${PREF}/client")
 set(common --data "${DATA}" --headless --fast --port ${PORT} --quit-frames 1200)
+if(RELAY)
+  # The relay goes first and ends when the session has (--once). --rate 0: --fast sends far
+  # more than the 30 messages a second of real-time play.
+  math(EXPR ws_port "${PORT} + 1")
+  set(relay_command COMMAND "${RELAY}" --port ${PORT} --ws-port ${ws_port} --rate 0 --once
+                            --quit-after 200)
+  list(APPEND common --relay 127.0.0.1:${PORT})
+  set(host_extra --code TEST42)
+  set(JOIN TEST42)
+endif()
 execute_process(
-  COMMAND "${FIREFIGHT}" ${common} --pref "${PREF}/host" --host 2
+  ${relay_command}
+  COMMAND "${FIREFIGHT}" ${common} --pref "${PREF}/host" --host 2 ${host_extra}
           --input "${SCRIPTS}/net_host.txt"
   COMMAND "${FIREFIGHT}" ${common} --pref "${PREF}/client" --join ${JOIN}
           --input "${SCRIPTS}/net_client.txt"
@@ -28,6 +41,12 @@ execute_process(
   OUTPUT_VARIABLE output
   ERROR_VARIABLE output
   TIMEOUT 240)
+if(RELAY)
+  list(POP_FRONT results relay_result)
+  if(NOT relay_result STREQUAL "0")
+    message(SEND_ERROR "the relay exited with ${relay_result}")
+  endif()
+endif()
 
 set(failed 0)
 foreach(peer host client)
@@ -50,6 +69,12 @@ foreach(peer host client)
     set(connected "network: joined as player 2")
     if(JOIN STREQUAL "lan")
       set(found "network: found")
+    endif()
+  endif()
+  if(RELAY)
+    set(found ${found} "through the relay 127.0.0.1:${PORT}")
+    if(peer STREQUAL "host")
+      list(APPEND found "network: session code TEST42")
     endif()
   endif()
   foreach(expected ${found} "${connected}" "all players connected" "reading directory: net1.dir"

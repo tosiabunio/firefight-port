@@ -1,4 +1,6 @@
-// Port: the network transport for Net (1ee_netw.cpp), on ENet. Kept apart from the engine headers
+// Port: the network transport for Net (1ee_netw.cpp). The session logic (1ee_session.cpp) runs on
+// a link layer (1ee_link.h): ENet on the desktop (1ee_enet.cpp), directly or through a relay
+// server, and WebSocket to a relay in the browser (1ee_ws.cpp). Kept apart from the engine headers
 // because <enet/enet.h> brings in the real Windows socket headers, which clash with the Win32
 // stand-ins in compat/win32.h.
 //
@@ -10,6 +12,11 @@
 // which sends every client the roster and the game info. A client connects and polls until
 // started(). After that, send() and receive() carry the engine's messages, and the roster loses
 // the players who leave (a client whose host leaves is left alone).
+//
+// Through a relay server (1ee_relay.h, tools/relay): everyone connects out to the relay, which
+// forwards between the host and each client. set_relay() before host() or join() selects it: the
+// host opens a session there and gets its code (session_code()), and join() takes that code in
+// place of the address. The session protocol inside is the same.
 
 #ifndef FF_1EE_ENET_H
 #define FF_1EE_ENET_H
@@ -33,6 +40,12 @@ namespace enet_transport
 
   bool startup(void (*log_function)(const char *text));
   void shutdown(void);
+
+  // relay: "host[:port]" (ENet's UDP port, relay_protocol::enet_port by default); the browser
+  // also takes a ws:// or wss:// URL. code: the session code a host asks for, or nullptr for one
+  // the relay picks. A null or empty relay goes back to direct connections.
+  void set_relay(const char *relay, const char *code);
+  const char *session_code(void);  // the hosted session's code, or "" until the relay gives it
 
   bool host(unsigned short port, int players, const char *name, const unsigned char *info);
   bool join(const char *address, unsigned short port, const char *name);
