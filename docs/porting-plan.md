@@ -387,7 +387,7 @@ Added 2026-10-06, after a code survey, and **done next, before the rest of phase
   - Every event pump goes through `Comm::process_messages`, every frame through `VD_sdl::present` and every idle wait through `Comm::wait_messages`.
   - wasm32 is a 32-bit target, like the original. It will be the port's first 32-bit build, so the layout `static_assert`s get their first test there.
 - **Toolchain:**
-  - Emscripten, with a `web-emscripten` preset (Emscripten's toolchain file, Ninja Multi-Config).
+  - Emscripten, with Emscripten's toolchain file and Ninja Multi-Config: the `node-emscripten` preset for the tests, and a `web-emscripten` preset for the browser.
   - SDL2 and SDL2_mixer come from Emscripten's own ports, not vcpkg; `FFDependencies.cmake` maps them to `ff::sdl2` and `ff::mixer`. Emscripten's SDL2_mixer (2.8.0) plays Ogg and MP3 but not FLAC (see Music).
   - No ENet. Until the WebSocket transport, the web build links a stand-in for `1ee_enet.cpp` whose `host`, `join` and `discover` fail, so `--host` and `--join` end with a message.
   - C++ exceptions are native WebAssembly exceptions (`-fwasm-exceptions`). The control flow depends on them, and Emscripten doesn't catch exceptions by default.
@@ -419,7 +419,7 @@ Added 2026-10-06, after a code survey, and **done next, before the rest of phase
 - **Tests:**
   - **First on Node.js, before any browser work.** A headless build runs under Node on the real file system (`-sNODERAWFS`, the repository's `data/`), and CTest runs it through Emscripten's cross-compiling emulator. It needs no stack switching: nothing is shown, and SDL's waits spin.
     - It must pass `headless_run`, `golden_title`, `sprite_build`, `crt_vectors`, `input_play`, every `demo_<name>` and every `golden_<name>`. That answers the main question, whether the simulation is bit-exact in WebAssembly, before anything else is built.
-    - The `net_*` tests don't carry over (no ENet). `sound_play` does only if Emscripten's SDL has the `disk` audio driver.
+    - The `net_*` tests don't carry over (no ENet). Emscripten's SDL has the `disk` audio driver, but its SDL2_mixer plays no FLAC, so `sound_play` needs the Ogg tracks first.
   - **CI:** a Linux job with the Emscripten SDK builds the web preset and runs the Node tests on branch pushes.
   - **In browsers,** by hand at first: a mission on keyboard, mouse and a game controller in current Chrome, Firefox and Safari. A headless Chrome replaying a demo from the URL could automate this later.
 - **Hosting:** static files only: the page, the `.wasm`, the data package and the music. With no threads there is no `SharedArrayBuffer`, so no cross-origin isolation headers are needed. The release workflow can publish the web package beside the other three, and any static host can serve it.
@@ -432,6 +432,19 @@ Added 2026-10-06, after a code survey, and **done next, before the rest of phase
 - **Exit, single player:** in current Chrome, Firefox and Safari, served from a static host, the title, the attract demos and a full mission play on keyboard, mouse and a game controller, with sound and music, and the settings and pilots survive a reload. The Node runs of the demo and golden tests pass in CI.
 - **Exit, network play** (with phase 7's relay server): a browser and a desktop player play through the relay for 30 minutes without a sync failure.
 - **Open questions:** JSPI only, or an Asyncify build as well; the Ctrl+W remedy; where the web version is hosted.
+- **Progress** (2026-10-06): step 1 is done. **The simulation is bit-exact in WebAssembly.** Built with Emscripten 6.0.11 and run under Node.js 24, all 8 original demos and the 4 golden demos replay in sync to the end, in Debug and Release. `golden_title`, `sprite_build`, `crt_vectors`, `headless_run` and `data_files` pass too. The game and engine code needed no change.
+  - **Build:** the `node-emscripten` preset. `cmake/FFEmscripten.cmake` holds the Emscripten options, and `FFDependencies.cmake` maps the SDK's SDL2 and SDL2_mixer ports to `ff::sdl2` and `ff::mixer` (`ff::enet` is empty). `1ee_enet_none.cpp` stands in for the ENet transport. The smoke test and packaging stay desktop-only.
+  - **Node settings:**
+    - `-fwasm-exceptions`, memory growth, and an 8 MB stack (Emscripten's default is 64 KB);
+    - `NODERAWFS`: the host's file system, so the tests use the repository's `data/` and their own paths;
+    - `NODE_HOST_ENV`: the host's environment, for `cwdiags=extended`;
+    - `EXIT_RUNTIME`: the static destructors and the quit manager run at the end, and `main`'s result is the exit code.
+    - There is no stack switching: headless runs show nothing, and SDL's waits fall back to busy-waiting.
+  - **Tests:** the tests that start the game from a CMake script pass it through `EMULATOR` (Node). Emscripten's file system is POSIX and can't take Windows drive paths, so on a Windows host these tests give the game paths relative to their working directory.
+  - **Speed:** in Release under Node a demo takes about 1.3–1.5 times as long as the native MSVC build (`level1`: 2.9 s against 2.1 s; `sprite_build`: 11.7 s against 7.7 s).
+  - **CI:** a `node-emscripten` job on Linux runs the workflow on branch pushes, with the SDK pinned to 6.0.11.
+  - **Disabled on Emscripten for now:** `net_play` and `net_lan` (no ENet); `sound_play` (no FLAC in the SDK's SDL2_mixer); `input_play`, because the SDK's SDL2 port leaves out SDL's virtual joystick driver, which the test's game controller uses.
+  - **Warnings:** only the original code's usual Clang warnings. Nothing specific to the 32-bit target.
 
 ## Risks
 
@@ -446,7 +459,7 @@ Added 2026-10-06, after a code survey, and **done next, before the rest of phase
 | Internet latency and jitter | Lockstep stalls | Session-wide input delay chosen from measured round trips. The frame cap already slows the game rather than desyncing it |
 | Untrusted packets from the internet | Crashes or exploits through the 1996 parser | Validate before parsing, rate limits, parser fuzzing in CI |
 | Relay server hosting | Running cost; availability | A tiny stateless forwarder on a cheap VPS. LAN and direct connections still work without it |
-| Simulation differs in WebAssembly | Browser games desync, alone and against desktop players | The Node runs of the demo and golden tests, before any browser work (phase 9) |
+| Simulation differs in WebAssembly | Browser games desync, alone and against desktop players | Checked: under Node every original and golden demo replays in sync (phase 9). CI keeps checking |
 | No JSPI in older browsers (Safari before 27, older iOS) | The browser build doesn't start there | An Asyncify build as a fallback, once the end credits run outside their `catch` |
 | Browser-reserved shortcuts (Ctrl+W with the default Fire2 and WASD) | A player closes the tab mid-mission | A `beforeunload` prompt, Keyboard Lock in fullscreen, or other default keys in the web build |
 | Browser download size (data 22 MB compressed, music 232 MB as FLAC) | A slow first start | Music as Ogg, downloaded in the background; per-world data packages if needed |

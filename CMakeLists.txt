@@ -10,14 +10,18 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-if(NOT CMAKE_SIZEOF_VOID_P EQUAL 8)
-  message(FATAL_ERROR "Fire Fight is built as 64-bit only (see docs/porting-plan.md).")
+# 64-bit on the desktop; the Emscripten build (phase 9) is wasm32.
+if(NOT EMSCRIPTEN AND NOT CMAKE_SIZEOF_VOID_P EQUAL 8)
+  message(FATAL_ERROR "Fire Fight is built as 64-bit only on the desktop (see docs/porting-plan.md).")
 endif()
 
 option(FF_BUILD_GAME "Build the game (compat, cwengine, regdata, firefight)" ON)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 include(FFCompileOptions)
+if(EMSCRIPTEN)
+  include(FFEmscripten)
+endif()
 include(FFDependencies)
 include(CTest)
 
@@ -25,9 +29,14 @@ include(CTest)
 set(FF_DATA_DIR  "${CMAKE_CURRENT_SOURCE_DIR}/data")
 set(FF_MUSIC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/music")
 
-add_subdirectory(tools/smoke)
+# The smoke test needs a window, FLAC and ENet: desktop only.
+if(NOT EMSCRIPTEN)
+  add_subdirectory(tools/smoke)
+endif()
 
 if(FF_BUILD_GAME)
   add_subdirectory(source)
-  include(FFPackaging)
+  if(NOT EMSCRIPTEN)
+    include(FFPackaging)
+  endif()
 endif()

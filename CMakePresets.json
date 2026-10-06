@@ -57,6 +57,17 @@
         "CMAKE_OSX_DEPLOYMENT_TARGET": "11.0",
         "VCPKG_TARGET_TRIPLET": "arm64-osx-11"
       }
+    },
+    {
+      "name": "node-emscripten",
+      "displayName": "WebAssembly under Node.js, Emscripten (phase 9 tests)",
+      "generator": "Ninja Multi-Config",
+      "binaryDir": "${sourceDir}/build/${presetName}",
+      "toolchainFile": "$env{EMSDK}/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake",
+      "cacheVariables": {
+        "CMAKE_CONFIGURATION_TYPES": "Debug;Release",
+        "FF_WEB_PLATFORM": "node"
+      }
     }
   ],
   "buildPresets": [
@@ -67,7 +78,9 @@
     { "name": "linux-clang-debug",    "configurePreset": "linux-clang",  "configuration": "Debug" },
     { "name": "linux-clang-release",  "configurePreset": "linux-clang",  "configuration": "Release" },
     { "name": "macos-clang-debug",    "configurePreset": "macos-clang",  "configuration": "Debug" },
-    { "name": "macos-clang-release",  "configurePreset": "macos-clang",  "configuration": "Release" }
+    { "name": "macos-clang-release",  "configurePreset": "macos-clang",  "configuration": "Release" },
+    { "name": "node-emscripten-debug",   "configurePreset": "node-emscripten", "configuration": "Debug" },
+    { "name": "node-emscripten-release", "configurePreset": "node-emscripten", "configuration": "Release" }
   ],
   "testPresets": [
     { "name": "test-base", "hidden": true, "output": { "outputOnFailure": true }, "execution": { "noTestsAction": "error" } },
@@ -78,7 +91,9 @@
     { "name": "linux-clang-debug",    "inherits": "test-base", "configurePreset": "linux-clang",  "configuration": "Debug" },
     { "name": "linux-clang-release",  "inherits": "test-base", "configurePreset": "linux-clang",  "configuration": "Release" },
     { "name": "macos-clang-debug",    "inherits": "test-base", "configurePreset": "macos-clang",  "configuration": "Debug" },
-    { "name": "macos-clang-release",  "inherits": "test-base", "configurePreset": "macos-clang",  "configuration": "Release" }
+    { "name": "macos-clang-release",  "inherits": "test-base", "configurePreset": "macos-clang",  "configuration": "Release" },
+    { "name": "node-emscripten-debug",   "inherits": "test-base", "configurePreset": "node-emscripten", "configuration": "Debug" },
+    { "name": "node-emscripten-release", "inherits": "test-base", "configurePreset": "node-emscripten", "configuration": "Release" }
   ],
   "workflowPresets": [
     {
@@ -119,6 +134,16 @@
         { "type": "build", "name": "macos-clang-release" },
         { "type": "test", "name": "macos-clang-debug" },
         { "type": "test", "name": "macos-clang-release" }
+      ]
+    },
+    {
+      "name": "node-emscripten",
+      "steps": [
+        { "type": "configure", "name": "node-emscripten" },
+        { "type": "build", "name": "node-emscripten-debug" },
+        { "type": "build", "name": "node-emscripten-release" },
+        { "type": "test", "name": "node-emscripten-debug" },
+        { "type": "test", "name": "node-emscripten-release" }
       ]
     }
   ]

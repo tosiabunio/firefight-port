@@ -21,7 +21,6 @@ add_library(cwengine STATIC
   engine/1ee/1ee_kbrd.cpp
   engine/1ee/1ee_main.cpp
   engine/1ee/1ee_mous.cpp
-  engine/1ee/1ee_enet.cpp
   engine/1ee/1ee_netw.cpp
   engine/1ee/1ee_timr.cpp
   engine/1ee/1ee_virt.cpp
@@ -50,6 +49,13 @@ add_library(cwengine STATIC
   engine/1ss/1ss_mix.cpp
   engine/1ss/1ss_smp.cpp
   engine/1ss/1ss_song.cpp)
+# The network transport: ENet; the Emscripten build (phase 9) has a stand-in without network
+# play until its WebSocket transport.
+if(EMSCRIPTEN)
+  target_sources(cwengine PRIVATE engine/1ee/1ee_enet_none.cpp)
+else()
+  target_sources(cwengine PRIVATE engine/1ee/1ee_enet.cpp)
+endif()
 # Modules include each other's headers as <1xx.h>, so every module directory is public.
 foreach(module IN LISTS FF_ENGINE_MODULES)
   target_include_directories(cwengine PUBLIC engine/${module})
@@ -112,12 +118,30 @@ if(WIN32)
   set_target_properties(firefight PROPERTIES WIN32_EXECUTABLE TRUE)
 endif()
 
+# Tests that run the game from a script (tests/check_*.cmake) start it through EMULATOR: Node.js
+# for the Emscripten build, whose firefight is a .js file; nothing on the desktop. Tests that run
+# a target directly get the emulator from CMake.
+set(FF_EMULATOR "-DEMULATOR=${CMAKE_CROSSCOMPILING_EMULATOR}")
+
+# The paths the tests give the game. Emscripten's file system under Node is POSIX and can't take
+# Windows drive paths (D:/...), so on a Windows host the Emscripten tests get paths relative to
+# their working directory, this binary directory.
+if(EMSCRIPTEN AND CMAKE_HOST_WIN32)
+  file(RELATIVE_PATH FF_TEST_DATA "${CMAKE_CURRENT_BINARY_DIR}" "${FF_DATA_DIR}")
+  file(RELATIVE_PATH FF_TEST_DEMOS "${CMAKE_CURRENT_BINARY_DIR}" "${CMAKE_SOURCE_DIR}/tests/demos")
+  set(FF_TEST_BIN ".")
+else()
+  set(FF_TEST_DATA "${FF_DATA_DIR}")
+  set(FF_TEST_DEMOS "${CMAKE_SOURCE_DIR}/tests/demos")
+  set(FF_TEST_BIN "${CMAKE_CURRENT_BINARY_DIR}")
+endif()
+
 # Phase 2 exit check: boot headless against data/, run the title loop on the 30 Hz clock until
 # it starts an attract demo (after 20 s), then quit as if the window were closed. Rebuilds
 # missing sprite caches in data/ (git-ignored). The log is echoed to stderr, where the test
 # requires the loaded sprite totals, the demo's interactive section and a clean finish.
 add_test(NAME headless_run
-  COMMAND firefight --data "${FF_DATA_DIR}" --pref "${CMAKE_CURRENT_BINARY_DIR}/pref"
+  COMMAND firefight --data "${FF_TEST_DATA}" --pref "${FF_TEST_BIN}/pref"
           --headless --quit-after 30)
 set_tests_properties(headless_run PROPERTIES
   PASS_REGULAR_EXPRESSION "99 sprites, 2510 phases.*INTERACTIVE section entered.*quit time reached.*heap ok.*Program status:  completed successfully"
@@ -129,9 +153,9 @@ set_tests_properties(headless_run PROPERTIES
 # platform. It covers the palette tables, the sprite build from the FLC masters, the blitter,
 # the fonts, the palette conversion and the title's float motion.
 add_test(NAME golden_title
-  COMMAND ${CMAKE_COMMAND}
-          -DFIREFIGHT=$<TARGET_FILE:firefight> -DDATA=${FF_DATA_DIR}
-          -DPREF=${CMAKE_CURRENT_BINARY_DIR}/golden_title
+  COMMAND ${CMAKE_COMMAND} ${FF_EMULATOR}
+          -DFIREFIGHT=$<TARGET_FILE:firefight> -DDATA=${FF_TEST_DATA}
+          -DPREF=${FF_TEST_BIN}/golden_title
           -DEXPECTED=${CMAKE_SOURCE_DIR}/tests/golden/title_frames.sha256
           "-DARGS=--shot-every 20 --quit-frames 200"
           -P ${CMAKE_SOURCE_DIR}/tests/check_frames.cmake)
@@ -142,9 +166,9 @@ set_tests_properties(golden_title PROPERTIES TIMEOUT 300)
 # original's prebuilt caches. The phase bounds decide which level objects look_at sees and builds,
 # so they are simulation state.
 add_test(NAME sprite_build
-  COMMAND ${CMAKE_COMMAND}
-          -DFIREFIGHT=$<TARGET_FILE:firefight> -DDATA=${FF_DATA_DIR}
-          -DPREF=${CMAKE_CURRENT_BINARY_DIR}/sprite_build
+  COMMAND ${CMAKE_COMMAND} ${FF_EMULATOR}
+          -DFIREFIGHT=$<TARGET_FILE:firefight> -DDATA=${FF_TEST_DATA}
+          -DPREF=${FF_TEST_BIN}/sprite_build
           -DGOLDEN=${CMAKE_SOURCE_DIR}/tests/golden
           -P ${CMAKE_SOURCE_DIR}/tests/check_sprites.cmake)
 set_tests_properties(sprite_build PROPERTIES TIMEOUT 300)
@@ -163,7 +187,7 @@ add_test(NAME crt_vectors
 # early (game.cpp, Game::go).
 foreach(demo IN ITEMS level1 level2 level3 level4 level1C level2C level3C level4C)
   add_test(NAME demo_${demo}
-    COMMAND firefight --data "${FF_DATA_DIR}" --pref "${CMAKE_CURRENT_BINARY_DIR}/demo_${demo}"
+    COMMAND firefight --data "${FF_TEST_DATA}" --pref "${FF_TEST_BIN}/demo_${demo}"
             --headless --fast --demo ${demo})
   set_tests_properties(demo_${demo} PROPERTIES
     PASS_REGULAR_EXPRESSION "in sync to the end"
@@ -176,8 +200,8 @@ endforeach()
 # replay in sync to the end on every platform, the cross-platform determinism gate.
 foreach(demo IN ITEMS gray1 net3 green3 gray2)
   add_test(NAME golden_${demo}
-    COMMAND firefight --data "${FF_DATA_DIR}" --pref "${CMAKE_CURRENT_BINARY_DIR}/golden_${demo}"
-            --headless --fast --demo "!${CMAKE_SOURCE_DIR}/tests/demos/${demo}.rec")
+    COMMAND firefight --data "${FF_TEST_DATA}" --pref "${FF_TEST_BIN}/golden_${demo}"
+            --headless --fast --demo "!${FF_TEST_DEMOS}/${demo}.rec")
   set_tests_properties(golden_${demo} PROPERTIES
     PASS_REGULAR_EXPRESSION "in sync to the end"
     FAIL_REGULAR_EXPRESSION "without object_deleted"
@@ -189,8 +213,8 @@ endforeach()
 # and the replay must stay in sync (tests/check_sound.cmake).
 add_test(NAME sound_play
   COMMAND ${CMAKE_COMMAND}
-          -DFIREFIGHT=$<TARGET_FILE:firefight> -DDATA=${FF_DATA_DIR}
-          -DPREF=${CMAKE_CURRENT_BINARY_DIR}/sound_play
+          -DFIREFIGHT=$<TARGET_FILE:firefight> -DDATA=${FF_TEST_DATA}
+          -DPREF=${FF_TEST_BIN}/sound_play
           -P ${CMAKE_SOURCE_DIR}/tests/check_sound.cmake)
 set_tests_properties(sound_play PROPERTIES TIMEOUT 300)
 
@@ -199,8 +223,8 @@ set_tests_properties(sound_play PROPERTIES TIMEOUT 300)
 # never fail the per-frame sync check, and end normally (tests/check_net.cmake).
 add_test(NAME net_play
   COMMAND ${CMAKE_COMMAND}
-          -DFIREFIGHT=$<TARGET_FILE:firefight> -DDATA=${FF_DATA_DIR}
-          -DPREF=${CMAKE_CURRENT_BINARY_DIR}/net_play
+          -DFIREFIGHT=$<TARGET_FILE:firefight> -DDATA=${FF_TEST_DATA}
+          -DPREF=${FF_TEST_BIN}/net_play
           -DSCRIPTS=${CMAKE_SOURCE_DIR}/tests/input
           -DPORT=19962
           -P ${CMAKE_SOURCE_DIR}/tests/check_net.cmake)
@@ -208,8 +232,8 @@ set_tests_properties(net_play PROPERTIES TIMEOUT 300)
 # The same, with the client finding the game by LAN discovery (--join lan).
 add_test(NAME net_lan
   COMMAND ${CMAKE_COMMAND}
-          -DFIREFIGHT=$<TARGET_FILE:firefight> -DDATA=${FF_DATA_DIR}
-          -DPREF=${CMAKE_CURRENT_BINARY_DIR}/net_lan
+          -DFIREFIGHT=$<TARGET_FILE:firefight> -DDATA=${FF_TEST_DATA}
+          -DPREF=${FF_TEST_BIN}/net_lan
           -DSCRIPTS=${CMAKE_SOURCE_DIR}/tests/input
           -DPORT=19964 -DJOIN=lan
           -P ${CMAKE_SOURCE_DIR}/tests/check_net.cmake)
@@ -221,13 +245,19 @@ set_tests_properties(net_lan PROPERTIES TIMEOUT 300)
 # match the golden file on every platform: demos and network play exchange exactly these.
 add_test(NAME input_play
   COMMAND ${CMAKE_COMMAND}
-          -DFIREFIGHT=$<TARGET_FILE:firefight> -DDATA=${FF_DATA_DIR}
-          -DPREF=${CMAKE_CURRENT_BINARY_DIR}/input_play
+          -DFIREFIGHT=$<TARGET_FILE:firefight> -DDATA=${FF_TEST_DATA}
+          -DPREF=${FF_TEST_BIN}/input_play
           -DSCRIPT=${CMAKE_SOURCE_DIR}/tests/input/mission1.txt
           -DEXPECTED=${CMAKE_SOURCE_DIR}/tests/golden/input_states.txt
           -DFRAMES=1000
           -P ${CMAKE_SOURCE_DIR}/tests/check_input.cmake)
 set_tests_properties(input_play PROPERTIES TIMEOUT 300)
+
+# Not in the Emscripten build yet (phase 9): it has no ENet (net_*), its SDL2_mixer plays no FLAC
+# (sound_play needs the mission's track) and its SDL2 has no virtual game controller (input_play).
+if(EMSCRIPTEN)
+  set_tests_properties(sound_play net_play net_lan input_play PROPERTIES DISABLED TRUE)
+endif()
 
 # Data check: every file in data/ and music/ must have the SHA-256 listed in the golden file,
 # which was checked against the original archive, and no file may be missing or extra.

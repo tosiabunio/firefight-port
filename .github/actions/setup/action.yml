@@ -1,5 +1,7 @@
 name: Set up the build
-description: The build tools and vcpkg, with vcpkg's binary cache, for one CMake preset.
+description: >-
+  The build tools and vcpkg, with vcpkg's binary cache, for one CMake preset; for the Emscripten
+  preset, Ninja and the Emscripten SDK instead.
 
 inputs:
   preset:
@@ -9,8 +11,27 @@ inputs:
 runs:
   using: composite
   steps:
+    # The Emscripten build (phase 9) takes its SDL2 and SDL2_mixer from the SDK's own ports, so it
+    # needs no vcpkg. The SDK version is pinned: the tests check bit-exact results.
+    - name: Set up Emscripten
+      if: inputs.preset == 'node-emscripten'
+      shell: bash
+      env:
+        EMSDK_VERSION: '6.0.11'
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y --no-install-recommends ninja-build
+        git clone --depth 1 https://github.com/emscripten-core/emsdk.git "$RUNNER_TEMP/emsdk"
+        "$RUNNER_TEMP/emsdk/emsdk" install "$EMSDK_VERSION"
+        "$RUNNER_TEMP/emsdk/emsdk" activate "$EMSDK_VERSION"
+        source "$RUNNER_TEMP/emsdk/emsdk_env.sh"
+        echo "EMSDK=$EMSDK" >> "$GITHUB_ENV"
+        echo "$EMSDK/upstream/emscripten" >> "$GITHUB_PATH"
+        dirname "$EMSDK_NODE" >> "$GITHUB_PATH"
+        emcc --version | head -1 && "$EMSDK_NODE" --version
+
     - name: Install Linux packages
-      if: runner.os == 'Linux'
+      if: runner.os == 'Linux' && inputs.preset != 'node-emscripten'
       shell: bash
       run: |
         sudo apt-get update
@@ -47,6 +68,7 @@ runs:
 
     # vcpkg at the commit of "builtin-baseline" in vcpkg.json.
     - name: Set up vcpkg
+      if: inputs.preset != 'node-emscripten'
       shell: bash
       run: |
         VCPKG_COMMIT=$(sed -n 's/.*"builtin-baseline": *"\([0-9a-f]*\)".*/\1/p' vcpkg.json)
@@ -61,6 +83,7 @@ runs:
         echo "VCPKG_BINARY_SOURCES=clear;files,$VCPKG_BINARY_CACHE,readwrite" >> "$GITHUB_ENV"
 
     - name: Restore vcpkg binary cache
+      if: inputs.preset != 'node-emscripten'
       uses: actions/cache@v6
       with:
         path: ${{ env.VCPKG_BINARY_CACHE }}

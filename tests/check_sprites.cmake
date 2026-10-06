@@ -1,7 +1,10 @@
 # Runs the game in check mode, which loads the level of every mission, and compares the sprites
 # and palette tables it builds with golden files.
 #
-#   cmake -DFIREFIGHT=<exe> -DDATA=<dir> -DPREF=<dir> -DGOLDEN=<dir> -P check_sprites.cmake
+#   cmake [-DEMULATOR=<node>] -DFIREFIGHT=<exe> -DDATA=<dir> -DPREF=<dir> -DGOLDEN=<dir>
+#         -P check_sprites.cmake
+#
+# EMULATOR runs the Emscripten build's firefight.js.
 #
 # The switch sprite_dump=1 (see Spr::dump_printf) makes the game write PREF/sprite_bounds.txt
 # (phase bounds) and PREF/sprite_data.txt (size and CRC-32 of the pixel data and palette tables).
@@ -13,7 +16,7 @@
 file(REMOVE_RECURSE "${PREF}")
 execute_process(
   COMMAND "${CMAKE_COMMAND}" -E env cwdiags=extended
-          "${FIREFIGHT}" --data "${DATA}" --pref "${PREF}" --headless --fast check sprite_dump=1
+          ${EMULATOR} "${FIREFIGHT}" --data "${DATA}" --pref "${PREF}" --headless --fast check sprite_dump=1
   RESULT_VARIABLE result
   OUTPUT_VARIABLE output
   ERROR_VARIABLE output)

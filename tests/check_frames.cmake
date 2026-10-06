@@ -1,14 +1,16 @@
 # Runs the game headless and compares the frames it saves with golden hashes.
 #
-#   cmake -DFIREFIGHT=<exe> -DDATA=<dir> -DPREF=<dir> -DEXPECTED=<file> -DARGS="<options>" -P check_frames.cmake
+#   cmake [-DEMULATOR=<node>] -DFIREFIGHT=<exe> -DDATA=<dir> -DPREF=<dir> -DEXPECTED=<file>
+#         -DARGS="<options>" -P check_frames.cmake
 #
 # EXPECTED holds one "<sha256>  <frame file>" line per frame (the format of `sha256sum`). The
-# frames are written by --shot-every into PREF, which is emptied first.
+# frames are written by --shot-every into PREF, which is emptied first. EMULATOR runs the
+# Emscripten build's firefight.js.
 
 file(REMOVE_RECURSE "${PREF}")
 separate_arguments(args NATIVE_COMMAND "${ARGS}")
 execute_process(
-  COMMAND "${FIREFIGHT}" --data "${DATA}" --pref "${PREF}" --headless --fast ${args}
+  COMMAND ${EMULATOR} "${FIREFIGHT}" --data "${DATA}" --pref "${PREF}" --headless --fast ${args}
   RESULT_VARIABLE result
   OUTPUT_VARIABLE output
   ERROR_VARIABLE output)

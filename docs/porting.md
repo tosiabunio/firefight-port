@@ -22,7 +22,7 @@ The repository holds the original Fire Fight material needed to port the game to
 | 6 | Sound and the CD soundtrack (SDL2_mixer) | Done. Checked by ear on Windows |
 | 7 | Network play (ENet) | In progress. LAN play by address and by LAN discovery works; internet play, the relay server and the input delay are to do |
 | 8 | Replace the launcher (in-game options, key bindings, network menus); packaging | Started: packages for the three systems and a release workflow. The menus are to do |
-| 9 | The browser: a WebAssembly build (Emscripten) | Next, before the rest of phases 7 and 8 |
+| 9 | The browser: a WebAssembly build (Emscripten) | In progress, before the rest of phases 7 and 8. Under Node.js all 8 original demos and the 4 golden demos replay in sync, and the title frames and the sprite build match; the browser is to do |
 
 The tests (`ctest`) check the dependencies, a headless run, the title frames, the sprite build against the original's caches, the MSVC 4 CRT clones, the original and golden demos, sound, network play, input and the data files. [`CLAUDE.md`](../CLAUDE.md) lists them.
 
@@ -48,6 +48,8 @@ The tests (`ctest`) check the dependencies, a headless run, the title frames, th
 ## Building, for development
 
 The [README](../README.md#building-from-source) has the requirements and the basic commands. The presets are `windows-msvc`, `linux-gcc`, `linux-clang` and `macos-clang`; each has `-debug` and `-release` build and test presets.
+
+`node-emscripten` builds the game as WebAssembly and runs its tests under Node.js (phase 9). It needs the Emscripten SDK (CI uses 6.0.11): `EMSDK` set by its `emsdk_env` script, and CMake and Ninja on the `PATH`. It needs no vcpkg.
 
 ```sh
 cmake --workflow --preset linux-gcc            # configure, build Debug + Release, run all tests

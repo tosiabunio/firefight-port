@@ -4,6 +4,22 @@
 #   ff::enet   ENet
 # Works with vcpkg (the default, see vcpkg.json) and with distro packages.
 
+# Emscripten (phase 9): its own ports. Its SDL2_mixer plays Ogg, not FLAC. No ENet: the build
+# links a stand-in transport (1ee_enet_none.cpp), so ff::enet is empty.
+if(EMSCRIPTEN)
+  add_library(ff_sdl2 INTERFACE)
+  target_compile_options(ff_sdl2 INTERFACE --use-port=sdl2)
+  target_link_options(ff_sdl2 INTERFACE --use-port=sdl2)
+  add_library(ff::sdl2 ALIAS ff_sdl2)
+  add_library(ff_mixer INTERFACE)
+  target_compile_options(ff_mixer INTERFACE --use-port=sdl2_mixer:formats=ogg)
+  target_link_options(ff_mixer INTERFACE --use-port=sdl2_mixer:formats=ogg)
+  add_library(ff::mixer ALIAS ff_mixer)
+  add_library(ff_enet INTERFACE)
+  add_library(ff::enet ALIAS ff_enet)
+  return()
+endif()
+
 find_package(SDL2 CONFIG REQUIRED)
 find_package(SDL2_mixer CONFIG REQUIRED)
 

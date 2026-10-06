@@ -14,7 +14,7 @@ concurrency:
 
 jobs:
   # Which platforms run when. macOS runner minutes cost a multiple of Linux minutes:
-  #   push to a branch         -> Windows + Linux
+  #   push to a branch         -> Windows + Linux (with the Emscripten build under Node)
   #   pull request             -> macOS only (the push run already covers Windows + Linux
   #                               for the same commit, and its checks show on the PR)
   #   push to main, nightly,
@@ -28,7 +28,7 @@ jobs:
       - id: set
         shell: bash
         run: |
-          winlinux='[{"preset":"windows-msvc","os":"windows-latest"},{"preset":"linux-gcc","os":"ubuntu-24.04"},{"preset":"linux-clang","os":"ubuntu-24.04"}]'
+          winlinux='[{"preset":"windows-msvc","os":"windows-latest"},{"preset":"linux-gcc","os":"ubuntu-24.04"},{"preset":"linux-clang","os":"ubuntu-24.04"},{"preset":"node-emscripten","os":"ubuntu-24.04"}]'
           macos='[{"preset":"macos-clang","os":"macos-latest"}]'
           if [[ "$GITHUB_EVENT_NAME" == "pull_request" ]]; then
             m="$macos"
