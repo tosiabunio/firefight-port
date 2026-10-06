@@ -61,7 +61,7 @@ Ready-made packages for Windows, Linux and macOS are on the [Releases](https://g
 
 ### In a web browser
 
-Play at [tosiabunio.github.io/firefight-port](https://tosiabunio.github.io/firefight-port/), with nothing to install. It runs best in Chrome or Edge 137, Firefox 153 or Safari 27, or newer. Older browsers, back to Chrome 95, Firefox 100 and Safari 15.2, get a larger and slower version of the game, so far tried only in Chrome. The first visit downloads about 50 MB; the soundtrack comes in the background, so the game can start before all of it has arrived.
+Play at [tosiabunio.github.io/firefight-port](https://tosiabunio.github.io/firefight-port/), with nothing to install. It runs best in Chrome or Edge 137, Firefox 153 or Safari 27, or newer. Older browsers, back to Chrome 95, Firefox 100 and Safari 15.2, get a fallback version of the game (see below). The first visit downloads about 50 MB; the soundtrack comes in the background, so the game can start before all of it has arrived.
 
 The web version is new. It runs the same code as the desktop version, built as WebAssembly.
 
@@ -72,6 +72,12 @@ The web version is new. It runs the same code as the desktop version, built as W
   - the in-game menus;
   - saving: the browser keeps the settings and the pilots between visits;
   - the recorded demos replay in perfect sync, as they do on the desktop.
+- **The fallback for older browsers** is built with Asyncify instead of JSPI; its game file is 2.5 MB instead of 1.8 MB. Tried in Chrome, where `?asyncify` forces it:
+  - the title, the first mission, ending a mission with its end screens, and quitting work;
+  - the recorded demos replay in perfect sync;
+  - it keeps up with a 120 Hz display, with room to spare for the game's 30 frames a second.
+
+  It has not been tried in an older browser yet.
 - **Not checked yet:** game controllers, and Firefox.
 - **Not there yet:** network play. It will come with internet play, through a relay server.
 
@@ -80,7 +86,7 @@ In a browser:
 - While the game runs, closing or reloading the page asks for confirmation. On Windows and Linux, Ctrl+W closes a tab, and Ctrl is the secondary fire key.
 - To quit, use the menu: Esc, then *Mission*, *Quit Game*. On macOS, Cmd+Q quits the browser itself.
 - The settings and pilots are stored by the browser for this site, so clearing the site's data removes them.
-- Options go in the address: `?stretch` shows the picture at 4:3, and `?demo=level1` plays one recorded demo.
+- Options go in the address: `?stretch` shows the picture at 4:3, `?demo=level1` plays one recorded demo, and `?asyncify` picks the fallback version.
 
 ## Building from source
 
