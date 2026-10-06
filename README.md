@@ -161,6 +161,12 @@ firefight --join K7M3QX --relay relay.example.com
 
 In a browser the same goes in the address: `?host=2&relay=relay.example.com`, or `?join=K7M3QX&relay=relay.example.com`. Browsers and desktop players can share a game. This is new: there is no public relay server yet, so for now it needs one you run yourself, behind TLS for browsers (see [`docs/porting.md`](docs/porting.md)).
 
+What has been tried so far, all on one computer with a local relay:
+- a browser (Chrome) and a desktop game played a deathmatch in sync, with the browser hosting and with it joining;
+- two desktop games played one in real time, and the automated tests play one through a relay on Windows, Linux and macOS.
+
+Over the internet, with real distances between the players, it has not been tried yet. The game also still waits for every player's input each frame, as it did on a 1996 LAN, so long round trips will slow it down until a delay setting for internet play is added.
+
 ## Credits
 
 The original game, as listed in its end credits:
