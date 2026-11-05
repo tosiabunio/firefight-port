@@ -170,7 +170,7 @@ build/linux-gcc/tools/smoke/Debug/ff_smoke --music music/track02.flac --wav 'dat
   - A `-` before a path means "not packed into the shipped volume", i.e. it marks a source file.
   - Load order: `update,global,params` is mounted at startup. Each mission then mounts `update,<world>,<world><n>`, plus `<world><n>s` (mission speech) when spoken dialogs are on. `header` and `demo` are mounted for the title/statistics screens and demo playback.
 - **Worlds:** `brown`, `gray`, `green`, `white` (single-player) and `net` (multiplayer, plus two campaign missions). Each world directory contains:
-  - `<world>.def` — level file from the LED editor: type and sprite tables, plus per-level plane maps.
+  - `<world>.def` — level file from the LED editor: type and sprite tables, plus per-level plane maps. [`level-format.md`](level-format.md) documents it and the two files below, for writing a level or an editor.
   - `<world><n>m.tdf` — mission script: weather, checkpoints, bonus objectives, enable/disable actions.
   - `<world><n>t.tdf` — object type parameters.
 - **Global data:** `data/!global/` holds the global tunables (`main.tdf` → class `Mp`, `object.tdf` → class `Op`), menus, print layouts, `text.txt` (all UI strings, via `GAMETXT("LABEL")`, and the end credits) and `missions.tdf` (mission order and music).

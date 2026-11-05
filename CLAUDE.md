@@ -158,6 +158,7 @@ Modules are mostly static-class singletons with `init`/`quit`. Each header auto-
 
 ## Data and music (details in `docs/porting.md`)
 
+- **Levels:** `docs/level-format.md` is the full reference for the `.def` level files, type and mission scripts, and how sprites are placed: enough to write a level or an editor.
 - **Manifests:** each `data/<volume>.dir` maps logical names to files. Code opens data only by logical name. The exceptions are `cwe.ini` and the manifests themselves.
 - **Mount order:** at startup the game mounts `update,global,params`. Each mission then mounts `update,<world>,<world><n>`, plus `<world><n>s` (speech) when dialogs are on.
 - **Worlds:** `brown`, `gray`, `green`, `white` and `net`.
